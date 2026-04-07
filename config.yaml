@@ -12,14 +12,16 @@ display_language: "zh-CN"
 # API settings
 api:
   key: 'your-api-key'
-  base_url: 'https://yunwu.ai'
-  model: ''
-  llm_support_json: false
+  base_url: 'https://api.302.ai/v1'
+  model: 'deepseek-chat'
+  llm_support_json: true
 # *Number of LLM multi-threaded accesses, set to 1 if using local LLM
 max_workers: 4
 
 # Language settings, written into the prompt, can be described in natural language
-target_language: '简体中文'
+target_language: 'Русский язык'
+
+language_code: 'ru'
 
 # Whether to use Demucs for vocal separation before transcription
 demucs: true
@@ -38,7 +40,7 @@ whisper:
   elevenlabs_api_key: 'your_elevenlabs_api_key'
 
 # Whether to burn subtitles into the video
-burn_subtitles: true
+burn_subtitles: false
 
 ## ======================== Advanced Settings ======================== ##
 # *🔬 h264_nvenc GPU acceleration for ffmpeg, make sure your GPU supports it
@@ -49,7 +51,7 @@ youtube:
   cookies_path: ''
 
 # *Default resolution for downloading YouTube videos [360, 1080, best]
-ytb_resolution: '1080'
+ytb_resolution: 'best'
 
 subtitle:
   # *Maximum length of each subtitle line in characters
@@ -70,8 +72,10 @@ reflect_translate: true
 pause_before_translate: false
 
 ## ======================== Dubbing Settings ======================== ##
-# TTS selection [sf_fish_tts, openai_tts, gpt_sovits, azure_tts, fish_tts, edge_tts, custom_tts]
-tts_method: 'azure_tts'
+# TTS selection [sf_fish_tts, openai_tts, gpt_sovits, azure_tts, fish_tts, edge_tts, custom_tts, inworld_tts]
+tts_method: 'inworld_tts'
+
+tts_clone: false
 
 # SiliconFlow FishTTS
 sf_fish_tts:
@@ -85,6 +89,12 @@ sf_fish_tts:
   # preset, custom, dynamic
   mode: "preset"
 
+
+inworld_tts:
+  api_key: YOUR_INWORLD_API_KEY
+  model_id: inworld-tts-1.5-max
+  speakers:
+
 # OpenAI TTS-1 API configuration, 302.ai API only
 openai_tts:
   api_key: 'YOUR_302_API_KEY'
@@ -95,7 +105,6 @@ azure_tts:
   api_key: 'YOUR_302_API_KEY'
   voice: 'zh-CN-YunfengNeural'
 
-# FishTTS configuration, 302.ai API only
 fish_tts:
   api_key: 'YOUR_302_API_KEY'
   character: 'AD学姐'
@@ -107,11 +116,11 @@ fish_tts:
 sf_cosyvoice2:
   api_key: 'YOUR_SF_KEY'
 
-# Edge TTS configuration
+
 edge_tts:
   voice: 'zh-CN-XiaoxiaoNeural'
 
-# SoVITS configuration
+
 gpt_sovits:
   character: 'Huanyuv2'
   refer_mode: 3
