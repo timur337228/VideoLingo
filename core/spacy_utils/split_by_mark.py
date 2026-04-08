@@ -4,6 +4,8 @@ import warnings
 from core.spacy_utils.load_nlp_model import init_nlp, SPLIT_BY_MARK_FILE
 from core.utils.config_utils import load_key, get_joiner
 from rich import print as rprint
+from core.utils.models import _2_CLEANED_CHUNKS
+
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -12,7 +14,7 @@ def split_by_mark(nlp):
     language = load_key("whisper.detected_language") if whisper_language == 'auto' else whisper_language # consider force english case
     joiner = get_joiner(language)
     rprint(f"[blue]🔍 Using {language} language joiner: '{joiner}'[/blue]")
-    chunks = pd.read_excel("output/log/cleaned_chunks.xlsx")
+    chunks = pd.read_csv(_2_CLEANED_CHUNKS)
     chunks.text = chunks.text.apply(lambda x: x.strip('"').strip(""))
     
     # join with joiner

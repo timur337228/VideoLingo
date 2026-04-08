@@ -73,7 +73,7 @@ def translate_all():
 
     results.sort(key=lambda x: x[0])  # Sort results based on original order
     
-    # 💾 Save results to lists and Excel file
+    # 💾 Save results to lists and CSV file
     src_text, trans_text = [], []
     for i, chunk in enumerate(chunks):
         chunk_lines = chunk.split('\n')
@@ -95,7 +95,7 @@ def translate_all():
         trans_text.extend(best_match[0][2].split('\n'))
     
     # Trim long translation text
-    df_text = pd.read_excel(_2_CLEANED_CHUNKS)
+    df_text = pd.read_csv(_2_CLEANED_CHUNKS)
     df_text['text'] = df_text['text'].str.strip('"').str.strip()
     df_translate = pd.DataFrame({'Source': src_text, 'Translation': trans_text})
     subtitle_output_configs = [('trans_subs_for_audio.srt', ['Translation'])]
@@ -105,7 +105,7 @@ def translate_all():
     df_time['Translation'] = df_time.apply(lambda x: check_len_then_trim(x['Translation'], x['duration']) if x['duration'] > load_key("min_trim_duration") else x['Translation'], axis=1)
     console.print(df_time)
     
-    df_time.to_excel(_4_2_TRANSLATION, index=False)
+    df_time.to_csv(_4_2_TRANSLATION, index=False)
     console.print("[bold green]✅ Translation completed and results saved.[/bold green]")
 
 if __name__ == '__main__':

@@ -26,7 +26,7 @@ def process_batch():
     if not check_settings():
         raise Exception("Settings check failed")
 
-    df = pd.read_excel('batch/tasks_setting.xlsx')
+    df = pd.read_csv('batch/tasks_setting.csv')
     for index, row in df.iterrows():
         if pd.isna(row['Status']) or 'Error' in str(row['Status']):
             total_tasks = len(df)
@@ -68,7 +68,6 @@ def process_batch():
             target_language = row['Target Language']
             
             original_source_lang, original_target_lang = record_and_update_config(source_language, target_language)
-            
             try:
                 dubbing = 0 if pd.isna(row['Dubbing']) else int(row['Dubbing'])
                 is_retry = not pd.isna(row['Status']) and 'Error' in str(row['Status'])
@@ -82,7 +81,7 @@ def process_batch():
                 update_key('target_language', original_target_lang)
                 
                 df.at[index, 'Status'] = status_msg
-                df.to_excel('batch/tasks_setting.xlsx', index=False)
+                df.to_csv('batch/tasks_setting.csv', index=False)
                 
                 gc.collect()
                 

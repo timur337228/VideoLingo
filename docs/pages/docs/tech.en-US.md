@@ -37,9 +37,9 @@ The following outlines the core technical modules and workflows:
     *   `core/_3_1_split_nlp.py`: Orchestrates the spaCy-based splitting process, calling the various splitting functions (`split_by_mark`, `split_by_comma_main`, `split_sentences_main`, `split_long_by_root_main`).
 *   **Meaning-Based Splitting and Translation:**
     *   `core/_3_2_split_meaning.py`: Intelligently splits long sentences based on semantics using a GPT model, ensuring shorter and more manageable units for translation and subtitling. Leverages prompts defined in `core/prompts.py`.
-    *   `core/_4_1_summarize.py`: Uses an LLM (GPT) to generate summaries of video scripts and extract relevant terms (optionally augmented with custom terms from `custom_terms.xlsx`). Saves results to a JSON file. Leverages prompts defined in `core/prompts.py`.
+    *   `core/_4_1_summarize.py`: Uses an LLM (GPT) to generate summaries of video scripts and extract relevant terms (optionally augmented with custom terms from `custom_terms.csv`). Saves results to a JSON file. Leverages prompts defined in `core/prompts.py`.
     *   `core/translate_lines.py`: Implements the core line-by-line translation logic using a GPT model. Employs a two-step approach (fidelity and expressiveness) for high-quality translation, incorporating context prompting and retry mechanisms. Leverages prompts defined in `core/prompts.py`.
-    *   `core/_4_2_translate.py`: Manages the overall translation process. Splits text into chunks, gathers context, calls `core/translate_lines.py` for parallel chunk translation, checks translation quality (similarity), aligns timestamps, trims text to fit audio durations, and saves results to Excel.
+    *   `core/_4_2_translate.py`: Manages the overall translation process. Splits text into chunks, gathers context, calls `core/translate_lines.py` for parallel chunk translation, checks translation quality (similarity), aligns timestamps, trims text to fit audio durations, and saves results to CSV.
 
 **5. Subtitle Processing and Synthesis Module (`core`):**
 
@@ -49,7 +49,7 @@ The following outlines the core technical modules and workflows:
 
 **6. Audio Dubbing Module (`core`, `core/tts_backend`):**
 
-*   `core/_8_1_audio_task.py`: Parses the SRT file, merges short subtitles, cleans the text, trims text based on estimated duration using an LLM, and generates an Excel file (`_8_1_AUDIO_TASK.xlsx`) defining the tasks for the TTS engine. Leverages prompts defined in `core/prompts.py`.
+*   `core/_8_1_audio_task.py`: Parses the SRT file, merges short subtitles, cleans the text, trims text based on estimated duration using an LLM, and generates a CSV file (`_8_1_AUDIO_TASK.csv`) defining the tasks for the TTS engine. Leverages prompts defined in `core/prompts.py`.
 *   `core/_8_2_dub_chunks.py`: Analyzes the audio task file, calculates time gaps and speaking rates, determines optimal cut points for dubbing chunks based on speed and pauses, merges lines where necessary, matches subtitles, and updates the task file.
 *   `core/_9_refer_audio.py`: Extracts specific audio segments from the source vocal track based on timestamps defined in the audio task file, creating reference audio files used by certain TTS engines (e.g., GPT-SoVITS, F5-TTS, FishTTS).
 *   **TTS Backends (`core/tts_backend`):**
@@ -83,9 +83,9 @@ The following outlines the core technical modules and workflows:
 
 **8. Batch Processing Module (`batch`):**
 
-*   `batch/utils/settings_check.py`: Validates the settings defined in `batch/tasks_setting.xlsx` against the video files in `batch/input`, checking for file existence, valid URLs, and correct configuration values (e.g., dubbing flags). Uses `rich` for output.
+*   `batch/utils/settings_check.py`: Validates the settings defined in `batch/tasks_setting.csv` against the video files in `batch/input`, checking for file existence, valid URLs, and correct configuration values (e.g., dubbing flags). Uses `rich` for output.
 *   `batch/utils/video_processor.py`: Defines the `process_video` function, which orchestrates the processing pipeline for *a single* video in a batch job. Handles input (URL or local file), calls the core processing steps (transcription, translation, subtitling, optional dubbing), manages retries, handles output folders, and invokes `cleanup`.
-*   `batch/utils/batch_processor.py`: The main coordinator for batch processing. Reads tasks from `batch/tasks_setting.xlsx` (using `pandas`), iterates through the tasks, validates settings (`settings_check.py`), manages language configuration changes, calls `video_processor.py` for each video, handles errors and retries (including recovering files from the ERROR folder), and updates the status in the Excel file. Uses `rich` for console output.
+*   `batch/utils/batch_processor.py`: The main coordinator for batch processing. Reads tasks from `batch/tasks_setting.csv` (using `pandas`), iterates through the tasks, validates settings (`settings_check.py`), manages language configuration changes, calls `video_processor.py` for each video, handles errors and retries (including recovering files from the ERROR folder), and updates the status in the CSV file. Uses `rich` for console output.
 
 **9. Streamlit Interface Module (`core/st_utils`, `st.py`):**
 

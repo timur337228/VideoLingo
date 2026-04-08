@@ -37,9 +37,9 @@ Videolingo 是一个高度集成的视频翻译系统，能够自动执行一系
     *   `core/_3_1_split_nlp.py`: 编排基于 spaCy 的拆分过程，调用各种拆分函数（`split_by_mark`、`split_by_comma_main`、`split_sentences_main`、`split_long_by_root_main`）。
 *   **基于含义的拆分和翻译：**
     *   `core/_3_2_split_meaning.py`: 使用 GPT 模型根据语义智能地拆分长句子，确保翻译和字幕的单元更短、更易于管理。利用 `core/prompts.py` 中定义的提示。
-    *   `core/_4_1_summarize.py`: 使用 LLM (GPT) 生成视频脚本的摘要并提取相关术语（可以选择使用 `custom_terms.xlsx` 中的自定义术语进行增强）。将结果保存到 JSON 文件。利用 `core/prompts.py` 中定义的提示。
+    *   `core/_4_1_summarize.py`: 使用 LLM (GPT) 生成视频脚本的摘要并提取相关术语（可以选择使用 `custom_terms.csv` 中的自定义术语进行增强）。将结果保存到 JSON 文件。利用 `core/prompts.py` 中定义的提示。
     *   `core/translate_lines.py`: 使用 GPT 模型实现核心的逐行翻译逻辑。采用两步法（忠实性和表达性）进行高质量翻译，结合上下文提示和重试机制。利用 `core/prompts.py` 中定义的提示。
-    *   `core/_4_2_translate.py`: 管理整体翻译过程。将文本拆分为块，收集上下文，调用 `core/translate_lines.py` 进行并行块翻译，检查翻译质量（相似性），对齐时间戳，修剪文本以适应音频时长，并将结果保存到 Excel。
+    *   `core/_4_2_translate.py`: 管理整体翻译过程。将文本拆分为块，收集上下文，调用 `core/translate_lines.py` 进行并行块翻译，检查翻译质量（相似性），对齐时间戳，修剪文本以适应音频时长，并将结果保存到 CSV。
 
 **5. 字幕处理和合成模块 (`core`):**
 
@@ -49,7 +49,7 @@ Videolingo 是一个高度集成的视频翻译系统，能够自动执行一系
 
 **6. 音频配音模块 (`core`, `core/tts_backend`):**
 
-*   `core/_8_1_audio_task.py`: 解析 SRT 文件，合并短字幕，清理文本，使用 LLM 根据估计的时长修剪文本，并生成一个 Excel 文件 (`_8_1_AUDIO_TASK.xlsx`)，用于定义 TTS 引擎的任务。利用 `core/prompts.py` 中定义的提示。
+*   `core/_8_1_audio_task.py`: 解析 SRT 文件，合并短字幕，清理文本，使用 LLM 根据估计的时长修剪文本，并生成一个 CSV 文件 (`_8_1_AUDIO_TASK.csv`)，用于定义 TTS 引擎的任务。利用 `core/prompts.py` 中定义的提示。
 *   `core/_8_2_dub_chunks.py`: 分析音频任务文件，计算时间间隙和语速，根据速度和停顿确定配音块的最佳切断点，必要时合并行，匹配字幕，并更新任务文件。
 *   `core/_9_refer_audio.py`: 基于音频任务文件中定义的时间戳，从源人声音轨中提取特定的音频片段，创建某些 TTS 引擎（如 GPT-SoVITS、F5-TTS、FishTTS）使用的参考音频文件。
 *   **TTS 后端 (`core/tts_backend`):**
@@ -83,9 +83,9 @@ Videolingo 是一个高度集成的视频翻译系统，能够自动执行一系
 
 **8. 批量处理模块 (`batch`):**
 
-*   `batch/utils/settings_check.py`: 根据 `batch/input` 中的视频文件验证 `batch/tasks_setting.xlsx` 中定义的设置，检查文件是否存在、有效的 URL 和正确的配置值（例如，配音标志）。使用 `rich` 进行输出。
+*   `batch/utils/settings_check.py`: 根据 `batch/input` 中的视频文件验证 `batch/tasks_setting.csv` 中定义的设置，检查文件是否存在、有效的 URL 和正确的配置值（例如，配音标志）。使用 `rich` 进行输出。
 *   `batch/utils/video_processor.py`: 定义 `process_video` 函数，该函数编排批处理作业中*单个*视频的处理管道。 处理输入（URL 或本地文件），调用核心处理步骤（转录、翻译、字幕、可选配音），并进行重试，管理输出文件夹，并调用 `cleanup`。
-*   `batch/utils/batch_processor.py`: 批量处理的主协调器。从 `batch/tasks_setting.xlsx` 读取任务（使用 `pandas`），迭代任务，验证设置 (`settings_check.py`)，管理语言配置更改，为每个视频调用 `video_processor.py`，处理错误并重试（包括从 ERROR 文件夹恢复文件），并更新 Excel 文件中的状态。 使用 `rich` 进行控制台输出。
+*   `batch/utils/batch_processor.py`: 批量处理的主协调器。从 `batch/tasks_setting.csv` 读取任务（使用 `pandas`），迭代任务，验证设置 (`settings_check.py`)，管理语言配置更改，为每个视频调用 `video_processor.py`，处理错误并重试（包括从 ERROR 文件夹恢复文件），并更新 CSV 文件中的状态。 使用 `rich` 进行控制台输出。
 
 **9. Streamlit 界面模块 (`core/st_utils`, `st.py`):**
 

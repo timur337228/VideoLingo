@@ -13,9 +13,9 @@ DUB_VOCAL_FILE = 'output/dub.mp3'
 DUB_SUB_FILE = 'output/dub.srt'
 OUTPUT_FILE_TEMPLATE = f"{_AUDIO_SEGS_DIR}/{{}}.wav"
 
-def load_and_flatten_data(excel_file):
-    """Load and flatten Excel data"""
-    df = pd.read_excel(excel_file)
+def load_and_flatten_data(file):
+    """Load and flatten CSV task data."""
+    df = pd.read_csv(file)
     lines = [eval(line) if isinstance(line, str) else line for line in df['lines'].tolist()]
     lines = [item for sublist in lines for item in sublist]
     
@@ -100,7 +100,7 @@ def merge_full_audio():
     """Main function: Process the complete audio merging process"""
     console.print("\n[bold cyan]🎬 Starting audio merging process...[/bold cyan]")
     
-    with console.status("[bold cyan]📊 Loading data from Excel...[/bold cyan]"):
+    with console.status("[bold cyan]📊 Loading data from CSV...[/bold cyan]"):
         df, lines, new_sub_times = load_and_flatten_data(_8_1_AUDIO_TASK)
     console.print("[bold green]✅ Data loaded successfully[/bold green]")
     

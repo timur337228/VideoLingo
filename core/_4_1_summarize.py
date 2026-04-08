@@ -4,7 +4,7 @@ import pandas as pd
 from core.utils import *
 from core.utils.models import _3_2_SPLIT_BY_MEANING, _4_1_TERMINOLOGY
 
-CUSTOM_TERMS_PATH = 'custom_terms.xlsx'
+CUSTOM_TERMS_PATH = 'custom_terms.csv'
 
 def combine_chunks():
     """Combine the text chunks identified by whisper into a single long text"""
@@ -32,7 +32,7 @@ def search_things_to_note_in_prompt(sentence):
 
 def get_summary():
     src_content = combine_chunks()
-    custom_terms = pd.read_excel(CUSTOM_TERMS_PATH)
+    custom_terms = pd.read_csv(CUSTOM_TERMS_PATH)
     custom_terms_json = {
         "terms": 
             [
