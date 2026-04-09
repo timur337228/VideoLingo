@@ -110,7 +110,7 @@ def process_transcription(result: Dict) -> pd.DataFrame:
     all_words = []
     for segment in result['segments']:
         # Get speaker_id, if not exists, set to None
-        speaker_id = segment.get('speaker_id', None)
+        speaker_id = segment.get('speaker', None)
         
         for word in segment['words']:
             # Check word length

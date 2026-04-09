@@ -37,7 +37,8 @@ def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: floa
     audio_buffer.seek(0)
     
     files = [('audio_input', ('audio_slice.wav', audio_buffer, 'application/octet-stream'))]
-    payload = {"processing_type": "align", "language": WHISPER_LANGUAGE, "output": "raw"}
+    processing_type = "diarize" if load_key("whisper.enable_diarization") else "aligh"
+    payload = {"processing_type": processing_type, "language": WHISPER_LANGUAGE, "output": "raw"}
     
     start_time = time.time()
     rprint(f"[cyan]🎤 Transcribing audio with language:  <{WHISPER_LANGUAGE}> ...[/cyan]")
@@ -58,6 +59,7 @@ def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: floa
     
     with open(LOG_FILE, "w", encoding="utf-8") as f:
         json.dump(response_json, f, indent=4, ensure_ascii=False)
+        print(response_json)
     
     elapsed_time = time.time() - start_time
     rprint(f"[green]✓ Transcription completed in {elapsed_time:.2f} seconds[/green]")

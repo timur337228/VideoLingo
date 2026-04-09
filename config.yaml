@@ -36,6 +36,7 @@ whisper:
   runtime: 'cloud'
   # 302.ai API key
   whisperX_302_api_key: 'your_302_api_key'
+  enable_diarization: true
   # ElevenLabs API key (experimental)
   elevenlabs_api_key: 'your_elevenlabs_api_key'
 
