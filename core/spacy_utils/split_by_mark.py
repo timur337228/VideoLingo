@@ -16,23 +16,50 @@ def split_by_mark(nlp):
     rprint(f"[blue]🔍 Using {language} language joiner: '{joiner}'[/blue]")
     chunks = pd.read_csv(_2_CLEANED_CHUNKS)
     chunks.text = chunks.text.apply(lambda x: x.strip('"').strip(""))
+    enable_diarization = load_key("whisper.enable_diarization")
     
-    # join with joiner
-    input_text = joiner.join(chunks.text.to_list())
+    def normalize_speaker(value):
+        return None if pd.isna(value) else value
 
-    doc = nlp(input_text)
-    assert doc.has_annotation("SENT_START")
+    def flash(text: list):
+        if not text:
+            return []
+        doc = nlp(joiner.join(text))
+        assert doc.has_annotation("SENT_START")
+        return list(doc.sents)
+
+    if enable_diarization:
+        sents = []
+        text, speaker = [], None
+        for i in range(len(chunks)):
+            current_speaker = normalize_speaker(chunks["speaker_id"][i])
+            if speaker is None:
+                speaker = current_speaker
+            elif speaker != current_speaker:
+                sents.extend(flash(text))
+                text = []
+                speaker = current_speaker
+            text.append(chunks["text"][i])
+        sents.extend(flash(text))
+    else:
+        input_text = joiner.join(chunks.text.to_list())
+
+        doc = nlp(input_text)
+        assert doc.has_annotation("SENT_START")
+
+        sents = doc.sents
 
     # skip - and ...
     sentences_by_mark = []
     current_sentence = []
     
     # iterate all sentences
-    for sent in doc.sents:
+    for sent in sents:
         text = sent.text.strip()
         
         # check if the current sentence ends with - or ...
-        if current_sentence and (
+        # TODO make normal check to merge sentence the same speaker_id
+        if current_sentence and not enable_diarization and (
             text.startswith('-') or 
             text.startswith('...') or
             current_sentence[-1].endswith('-') or

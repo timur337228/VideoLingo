@@ -56,7 +56,6 @@ def ask_gpt(prompt, resp_type=None, valid_def=None, log_title="default"):
         base_url = "https://ark.cn-beijing.volces.com/api/v3" # huoshan base url
     elif 'v1' not in base_url:
         base_url = base_url.strip('/') + '/v1'
-    print(load_key("api.key"), base_url)
     client = OpenAI(api_key=load_key("api.key"), base_url=base_url)
     response_format = {"type": "json_object"} if resp_type == "json" and load_key("api.llm_support_json") else None
 
