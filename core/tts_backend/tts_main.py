@@ -6,6 +6,7 @@ from core.asr_backend.audio_preprocess import get_audio_duration
 from core.tts_backend.gpt_sovits_tts import gpt_sovits_tts_for_videolingo
 from core.tts_backend.sf_fishtts import siliconflow_fish_tts_for_videolingo
 from core.tts_backend.openai_tts import openai_tts
+from core.tts_backend.inworld_tts import inworld_tts
 from core.tts_backend.fish_tts import fish_tts
 from core.tts_backend.azure_tts import azure_tts
 from core.tts_backend.edge_tts import edge_tts
@@ -64,6 +65,8 @@ def tts_main(text, save_as, number, task_df):
                 cosyvoice_tts_for_videolingo(text, save_as, number, task_df)
             elif TTS_METHOD == 'f5tts':
                 f5_tts_for_videolingo(text, save_as, number, task_df)
+            elif TTS_METHOD == "inworld_tts":
+                inworld_tts(text, save_as)
                 
             # Check generated audio duration
             duration = get_audio_duration(save_as)

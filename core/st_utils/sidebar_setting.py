@@ -237,6 +237,7 @@ def page_setting():
             "custom_tts",
             "sf_cosyvoice2",
             "f5tts",
+            "inworld_tts",
         ]
         select_tts = st.selectbox(
             t("TTS Method"),
