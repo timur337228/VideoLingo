@@ -7,6 +7,7 @@ from core.prompts import get_subtitle_trim_prompt
 from core.tts_backend.estimate_duration import init_estimator, estimate_duration
 from core.utils import *
 from core.utils.models import *
+from core._6_gen_sub import seconds_to_hmsm
 
 console = Console()
 speed_factor = load_key("speed_factor")
@@ -43,6 +44,7 @@ def check_len_then_trim(text, duration):
     else:
         return text
 
+
 def time_diff_seconds(t1, t2, base_date):
     """Calculate the difference in seconds between two time objects"""
     dt1 = datetime.datetime.combine(base_date, t1)
@@ -70,6 +72,9 @@ def process_srt():
         src_text = ' '.join(lines[2:])
         src_subtitles[number] = src_text
     
+    index = 0
+    chunks = pd.read_csv(_2_CLEANED_CHUNKS)
+    speaker_id = chunks['speaker_id'][0]
     for block in content.strip().split('\n\n'):
         lines = [line.strip() for line in block.split('\n') if line.strip()]
         if len(lines) < 3:
@@ -80,6 +85,17 @@ def process_srt():
             start_time, end_time = lines[1].split(' --> ')
             start_time = datetime.datetime.strptime(start_time, '%H:%M:%S,%f').time()
             end_time = datetime.datetime.strptime(end_time, '%H:%M:%S,%f').time()
+            for i in range(index, len(chunks)):
+                if datetime.datetime.strptime(seconds_to_hmsm(chunks["start"][i]), '%H:%M:%S,%f').time() == end_time \
+                    and datetime.datetime.strptime(seconds_to_hmsm(chunks["end"][i]), '%H:%M:%S,%f').time() != end_time:
+                    index = i
+                    break
+                speaker_id = chunks["speaker_id"][i]
+                if datetime.datetime.strptime(seconds_to_hmsm(chunks["end"][i]), '%H:%M:%S,%f').time() == end_time:
+                    index = i
+                    break
+            
+
             duration = time_diff_seconds(start_time, end_time, datetime.date.today())
             text = ' '.join(lines[2:])
             # Remove content within parentheses (including English and Chinese parentheses)
@@ -95,7 +111,7 @@ def process_srt():
             rprint(Panel(f"Unable to parse subtitle block '{block}', error: {str(e)}, skipping this subtitle block.", title="Error", border_style="red"))
             continue
         
-        subtitles.append({'number': number, 'start_time': start_time, 'end_time': end_time, 'duration': duration, 'text': text, 'origin': origin})
+        subtitles.append({'number': number, 'start_time': start_time, 'end_time': end_time, 'duration': duration, 'text': text, 'origin': origin, "speaker_id": speaker_id})
     
     df = pd.DataFrame(subtitles)
     
@@ -104,7 +120,8 @@ def process_srt():
     while i < len(df):
         today = datetime.date.today()
         if df.loc[i, 'duration'] < MIN_SUB_DUR:
-            if i < len(df) - 1 and time_diff_seconds(df.loc[i, 'start_time'],df.loc[i+1, 'start_time'],today) < MIN_SUB_DUR:
+            if i < len(df) - 1 and time_diff_seconds(df.loc[i, 'start_time'],df.loc[i+1, 'start_time'],today) < MIN_SUB_DUR \
+                and df["speaker_id"][i] == df["speaker_id"][i+1]:
                 rprint(f"[bold yellow]Merging subtitles {i+1} and {i+2}[/bold yellow]")
                 df.loc[i, 'text'] += ' ' + df.loc[i+1, 'text']
                 df.loc[i, 'origin'] += ' ' + df.loc[i+1, 'origin']

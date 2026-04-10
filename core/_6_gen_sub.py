@@ -20,15 +20,15 @@ AUDIO_SUBTITLE_OUTPUT_CONFIGS = [
     ('trans_subs_for_audio.srt', ['Translation'])
 ]
 
-def convert_to_srt_format(start_time, end_time):
-    """Convert time (in seconds) to the format: hours:minutes:seconds,milliseconds"""
-    def seconds_to_hmsm(seconds):
+def seconds_to_hmsm(seconds):
         hours = int(seconds // 3600)
         minutes = int((seconds % 3600) // 60)
         seconds = seconds % 60
         milliseconds = int(seconds * 1000) % 1000
         return f"{hours:02d}:{minutes:02d}:{int(seconds):02d},{milliseconds:03d}"
 
+def convert_to_srt_format(start_time, end_time):
+    """Convert time (in seconds) to the format: hours:minutes:seconds,milliseconds"""
     start_srt = seconds_to_hmsm(start_time)
     end_srt = seconds_to_hmsm(end_time)
     return f"{start_srt} --> {end_srt}"
