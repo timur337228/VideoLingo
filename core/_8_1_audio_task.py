@@ -123,13 +123,16 @@ def process_srt():
         today = datetime.date.today()
         if df.loc[i, 'duration'] < MIN_SUB_DUR:
             if i < len(df) - 1 and time_diff_seconds(df.loc[i, 'start_time'],df.loc[i+1, 'start_time'],today) < MIN_SUB_DUR \
-                and df["speaker_id"][i] == df["speaker_id"][i+1]:
-                rprint(f"[bold yellow]Merging subtitles {i+1} and {i+2}[/bold yellow]")
-                df.loc[i, 'text'] += ' ' + df.loc[i+1, 'text']
-                df.loc[i, 'origin'] += ' ' + df.loc[i+1, 'origin']
-                df.loc[i, 'end_time'] = df.loc[i+1, 'end_time']
-                df.loc[i, 'duration'] = time_diff_seconds(df.loc[i, 'start_time'],df.loc[i, 'end_time'],today)
-                df = df.drop(i+1).reset_index(drop=True)
+                :
+                if df["speaker_id"][i] == df["speaker_id"][i+1]:
+                    rprint(f"[bold yellow]Merging subtitles {i+1} and {i+2}[/bold yellow]")
+                    df.loc[i, 'text'] += ' ' + df.loc[i+1, 'text']
+                    df.loc[i, 'origin'] += ' ' + df.loc[i+1, 'origin']
+                    df.loc[i, 'end_time'] = df.loc[i+1, 'end_time']
+                    df.loc[i, 'duration'] = time_diff_seconds(df.loc[i, 'start_time'],df.loc[i, 'end_time'],today)
+                    df = df.drop(i+1).reset_index(drop=True)
+                else:
+                    i += 1
             else:
                 if i < len(df) - 1:  # Not the last audio
                     rprint(f"[bold blue]Extending subtitle {i+1} duration to {MIN_SUB_DUR} seconds[/bold blue]")

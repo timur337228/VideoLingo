@@ -3,7 +3,7 @@ import time
 import shutil
 import subprocess
 from typing import Tuple
-
+from ast import literal_eval
 import pandas as pd
 from pydub import AudioSegment
 from rich.console import Console
@@ -65,14 +65,13 @@ def adjust_audio_speed(input_file: str, output_file: str, speed_factor: float) -
 def process_row(row: pd.Series, tasks_df: pd.DataFrame) -> Tuple[int, float]:
     """Helper function for processing single row data"""
     number = row['number']
-    speaker_id = None
-    if "speaker_id" in row:
-        speaker_id = row["speaker_id"]
     lines = eval(row['lines']) if isinstance(row['lines'], str) else row['lines']
     real_dur = 0
+    speaker_id = row["speaker_id"] if "speaker_id" in row else None
+    durs = literal_eval(row["durs"])
     for line_index, line in enumerate(lines):
         temp_file = TEMP_FILE_TEMPLATE.format(f"{number}_{line_index}")
-        tts_main(line, temp_file, number, tasks_df, speaker_id)
+        tts_main(line, temp_file, number, tasks_df, durs[line_index], speaker_id)
         real_dur += get_audio_duration(temp_file)
     return number, real_dur
 
