@@ -23,7 +23,7 @@ def clean_text_for_tts(text):
         text = text.replace(char, '')
     return text.strip()
 
-def tts_main(text, save_as, number, task_df):
+def tts_main(text, save_as, number, task_df, speaker_id = None):
     text = clean_text_for_tts(text)
     # Check if text is empty or single character, single character voiceovers are prone to bugs
     cleaned_text = re.sub(r'[^\w\s]', '', text).strip()
@@ -66,7 +66,7 @@ def tts_main(text, save_as, number, task_df):
             elif TTS_METHOD == 'f5tts':
                 f5_tts_for_videolingo(text, save_as, number, task_df)
             elif TTS_METHOD == "inworld_tts":
-                inworld_tts(text, save_as)
+                inworld_tts(text, save_as, speaker_id)
                 
             # Check generated audio duration
             duration = get_audio_duration(save_as)

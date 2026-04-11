@@ -53,7 +53,7 @@ def time_diff_seconds(t1, t2, base_date):
 
 def process_srt():
     """Process srt file, generate audio tasks"""
-    
+    enable_diarization = load_key("whisper.enable_diarization")
     with open(TRANS_SUBS_FOR_AUDIO_FILE, 'r', encoding='utf-8') as file:
         content = file.read()
     
@@ -72,9 +72,10 @@ def process_srt():
         src_text = ' '.join(lines[2:])
         src_subtitles[number] = src_text
     
-    index = 0
-    chunks = pd.read_csv(_2_CLEANED_CHUNKS)
-    speaker_id = chunks['speaker_id'][0]
+    if enable_diarization:
+        index = 0
+        chunks = pd.read_csv(_2_CLEANED_CHUNKS)
+        speaker_id = chunks['speaker_id'][0]
     for block in content.strip().split('\n\n'):
         lines = [line.strip() for line in block.split('\n') if line.strip()]
         if len(lines) < 3:
@@ -85,15 +86,16 @@ def process_srt():
             start_time, end_time = lines[1].split(' --> ')
             start_time = datetime.datetime.strptime(start_time, '%H:%M:%S,%f').time()
             end_time = datetime.datetime.strptime(end_time, '%H:%M:%S,%f').time()
-            for i in range(index, len(chunks)):
-                if datetime.datetime.strptime(seconds_to_hmsm(chunks["start"][i]), '%H:%M:%S,%f').time() == end_time \
-                    and datetime.datetime.strptime(seconds_to_hmsm(chunks["end"][i]), '%H:%M:%S,%f').time() != end_time:
-                    index = i
-                    break
-                speaker_id = chunks["speaker_id"][i]
-                if datetime.datetime.strptime(seconds_to_hmsm(chunks["end"][i]), '%H:%M:%S,%f').time() == end_time:
-                    index = i
-                    break
+            if enable_diarization:
+                for i in range(index, len(chunks)):
+                    if datetime.datetime.strptime(seconds_to_hmsm(chunks["start"][i]), '%H:%M:%S,%f').time() == end_time \
+                        and datetime.datetime.strptime(seconds_to_hmsm(chunks["end"][i]), '%H:%M:%S,%f').time() != end_time:
+                        index = i
+                        break
+                    speaker_id = chunks["speaker_id"][i]
+                    if datetime.datetime.strptime(seconds_to_hmsm(chunks["end"][i]), '%H:%M:%S,%f').time() == end_time:
+                        index = i
+                        break
             
 
             duration = time_diff_seconds(start_time, end_time, datetime.date.today())

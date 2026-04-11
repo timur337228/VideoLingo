@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import subprocess
 from pydub import AudioSegment
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn

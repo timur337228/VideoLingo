@@ -9,6 +9,7 @@ import soundfile as sf
 console = Console()
 from core.asr_backend.demucs_vl import demucs_audio
 from core.utils.models import *
+from core.tts_backend.tts_config import speakers_send
 
 def time_to_samples(time_str, sr):
     """Unified time conversion function"""
@@ -48,7 +49,7 @@ def extract_refer_audio_main():
             out_file = os.path.join(_AUDIO_REFERS_DIR, f"{row['number']}.wav")
             extract_audio(data, sr, row['start_time'], row['end_time'], out_file)
             progress.update(task, advance=1)
-            
+    speakers_send()
     rprint(Panel(f"Audio segments saved to {_AUDIO_REFERS_DIR}", title="Success", border_style="green"))
 
 if __name__ == "__main__":

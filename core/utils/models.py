@@ -9,6 +9,7 @@ _4_1_TERMINOLOGY = "output/log/terminology.json"
 _4_2_TRANSLATION = "output/log/translation_results.csv"
 _5_SPLIT_SUB = "output/log/translation_results_for_subtitles.csv"
 _5_REMERGED = "output/log/translation_results_remerged.csv"
+_MERGED_AUDIO_DIR = "output/log/merged"
 
 _8_1_AUDIO_TASK = "output/audio/tts_tasks.csv"
 
@@ -37,6 +38,7 @@ __all__ = [
     "_4_2_TRANSLATION",
     "_5_SPLIT_SUB",
     "_5_REMERGED",
+    "_MERGED_AUDIO_DIR",
     "_8_1_AUDIO_TASK",
     "_OUTPUT_DIR",
     "_AUDIO_DIR",
