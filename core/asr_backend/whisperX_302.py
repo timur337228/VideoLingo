@@ -44,7 +44,6 @@ def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: floa
     rprint(f"[cyan]🎤 Transcribing audio with language:  <{WHISPER_LANGUAGE}> ...[/cyan]")
     headers = {'Authorization': f'Bearer {load_key("whisper.whisperX_302_api_key")}'}
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
-    
     response_json = response.json()
     
     if start is not None:
