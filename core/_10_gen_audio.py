@@ -279,7 +279,32 @@ def merge_chunks(tasks_df: pd.DataFrame) -> pd.DataFrame:
     rprint("[bold green]✅ Audio chunks processing completed![/bold green]")
     return tasks_df
 
+# Func for split df for group speakers and tine 
+def group_split(df):
+    rows = [row for _, row in df.iterrows()]
+    groups = [
+        [rows[0]],]
+    index = 0
+    is_long = False
+    if "start_time" in rows[0]:
+        is_long = True
+        dot = "," if "," in groups[0][0]["end_time"] else "."
 
+    for row in rows[1:]:
+        if is_long:
+            
+            time = time_diff_seconds(
+            datetime.datetime.strptime(groups[index][-1]["end_time"], f"%H:%M:%S{dot}%f").time(),
+            datetime.datetime.strptime(row["start_time"], f"%H:%M:%S{dot}%f").time(),
+            datetime.date.today(),) > 4
+        else:
+            time = float(row["end"]) - float(row["start"]) > 2
+        if groups[index][-1]["speaker_id"] != row["speaker_id"] or time:
+            index += 1
+            groups.append([])
+        groups[index].append(row)
+    return groups
+    
 
 
 def gen_audio() -> None:
@@ -292,46 +317,34 @@ def gen_audio() -> None:
     
     tasks_df = pd.read_csv(_8_1_AUDIO_TASK)
     rprint("[green]📊 Loaded task file successfully[/green]")
-    rows = [row for _, row in tasks_df.iterrows()]
-    groups = [
-        [rows[0]],]
-    x, y = 0.7, 0.75
-    n, b = 0.8, 0.75
-    index = 0
-    estimator = init_estimator()
-    for row in rows[1:]:
-        if \
-            groups[index][-1]["speaker_id"] != row["speaker_id"] or time_diff_seconds(
-            datetime.datetime.strptime(groups[index][-1]["end_time"], "%H:%M:%S.%f").time(),
-            datetime.datetime.strptime(row["start_time"], "%H:%M:%S.%f").time(),
-            datetime.date.today(),
-        ) > 4:
-            index += 1
-            groups.append([])
-        groups[index].append(row)
-    ai = 0
-    for group in groups:
-        S = sum([i["duration"] for i in group])
-        S_group = sum([estimate_duration(i["text"], estimator)**n for i in group])
-        for row in group:
-            durs = literal_eval(row["durs"])
-            lines = literal_eval(row["lines"])
-            dur_sentence = row["duration"]
-            real_dur_sentence = estimate_duration(row["text"], estimator)
-            P_i = dur_sentence / S 
-            Q_i = real_dur_sentence**n / S_group
-            H_i = b * P_i + (1 - b) * Q_i
-            T_i = S * H_i
-            tasks_df.at[ai, "duration"] = T_i
-            dur = []
-            for i in range(len(durs)):
-                p_ij = durs[i] / dur_sentence
-                real_dur_phrase = estimate_duration(lines[i], estimator)
-                q_ij = real_dur_phrase**y / sum([estimate_duration(line, estimator)**y for line in lines])
-                h_ij = x * p_ij + (1 - x) * q_ij
-                dur.append(T_i * h_ij)
-            tasks_df.at[ai, "durs"] = dur
-            ai += 1
+    if load_key("whisper.enable_diarization"):
+        x, y = 0.7, 0.75
+        n, b = 0.8, 0.75
+        estimator = init_estimator()
+        ai = 0
+        groups = group_split(tasks_df)
+        for group in groups:
+            S = sum([i["duration"] for i in group])
+            S_group = sum([estimate_duration(i["text"], estimator)**n for i in group])
+            for row in group:
+                durs = literal_eval(row["durs"])
+                lines = literal_eval(row["lines"])
+                dur_sentence = row["duration"]
+                real_dur_sentence = estimate_duration(row["text"], estimator)
+                P_i = dur_sentence / S 
+                Q_i = real_dur_sentence**n / S_group
+                H_i = b * P_i + (1 - b) * Q_i
+                T_i = S * H_i
+                tasks_df.at[ai, "duration"] = T_i
+                dur = []
+                for i in range(len(durs)):
+                    p_ij = durs[i] / dur_sentence
+                    real_dur_phrase = estimate_duration(lines[i], estimator)
+                    q_ij = real_dur_phrase**y / sum([estimate_duration(line, estimator)**y for line in lines])
+                    h_ij = x * p_ij + (1 - x) * q_ij
+                    dur.append(T_i * h_ij)
+                tasks_df.at[ai, "durs"] = dur
+                ai += 1
             
             
         

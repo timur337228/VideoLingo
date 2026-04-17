@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import concurrent.futures
+from core._10_gen_audio import group_split
 from core.translate_lines import translate_lines
 from core._4_1_summarize import search_things_to_note_in_prompt
 from core._8_1_audio_task import check_len_then_trim
@@ -13,37 +14,54 @@ from core.utils.models import *
 console = Console()
 
 # Function to split text into chunks
-def split_chunks_by_chars(chunk_size, max_i): 
+def split_chunks_by_chars(chunk_size, max_i):
     """Split text into chunks based on character count, return a list of multi-line text chunks"""
+    
+    def split_chunks(sentnc):
+        chunks = []
+        chunk = ''
+        sentence_count = 0
+        for sentence in sentnc:
+            if len(chunk) + len(sentence + '\n') > chunk_size or sentence_count == max_i:
+                chunks.append(chunk.strip())
+                chunk = sentence + '\n'
+                sentence_count = 1
+            else:
+                chunk += sentence + '\n'
+                sentence_count += 1
+        chunks.append(chunk.strip())
+        return chunks
+    
     with open(_3_2_SPLIT_BY_MEANING, "r", encoding="utf-8") as file:
         sentences = file.read().strip().split('\n')
-
-    chunks = []
-    chunk = ''
-    sentence_count = 0
-    for sentence in sentences:
-        if len(chunk) + len(sentence + '\n') > chunk_size or sentence_count == max_i:
-            chunks.append(chunk.strip())
-            chunk = sentence + '\n'
-            sentence_count = 1
-        else:
-            chunk += sentence + '\n'
-            sentence_count += 1
-    chunks.append(chunk.strip())
-    return chunks
-
+    if load_key("whisper.enable_diarization") and load_key("is_gender_translate"):
+        genders = load_key("genders_speakers")
+        df_text = pd.read_csv(_2_CLEANED_CHUNKS)
+        df = pd.DataFrame({'Source': sentences})
+        df = align_timestamp(df_text, df, for_display=False)
+        df[["start_time", "end_time"]] = df["timestamp"].str.split(" --> ", expand=True)
+        all_chunks = []
+        for group in group_split(df):
+            chunks = split_chunks([row["Source"] for row in group])
+            all_chunks.extend([{"text": chunk, "gender": genders[group[0]["speaker_id"]]} for chunk in chunks])
+        return all_chunks
+         
+    all_chunks = [{"text": chunk} for chunk in split_chunks(sentences)]
+    return all_chunks
 # Get context from surrounding chunks
 def get_previous_content(chunks, chunk_index):
-    return None if chunk_index == 0 else chunks[chunk_index - 1].split('\n')[-3:] # Get last 3 lines
+    return None if chunk_index == 0 else chunks[chunk_index - 1]["text"].split('\n')[-3:] # Get last 3 lines
 def get_after_content(chunks, chunk_index):
-    return None if chunk_index == len(chunks) - 1 else chunks[chunk_index + 1].split('\n')[:2] # Get first 2 lines
+    return None if chunk_index == len(chunks) - 1 else chunks[chunk_index + 1]["text"].split('\n')[:2] # Get first 2 lines
 
 # 🔍 Translate a single chunk
 def translate_chunk(chunk, chunks, theme_prompt, i):
-    things_to_note_prompt = search_things_to_note_in_prompt(chunk)
+    gender = chunk.get("gender")
+    text = chunk["text"]
+    things_to_note_prompt = search_things_to_note_in_prompt(text)
     previous_content_prompt = get_previous_content(chunks, i)
     after_content_prompt = get_after_content(chunks, i)
-    translation, english_result = translate_lines(chunk, previous_content_prompt, after_content_prompt, things_to_note_prompt, theme_prompt, i)
+    translation, english_result = translate_lines(text, previous_content_prompt, after_content_prompt, things_to_note_prompt, theme_prompt, i, gender)
     return i, english_result, translation
 
 # Add similarity calculation function
@@ -76,7 +94,7 @@ def translate_all():
     # 💾 Save results to lists and CSV file
     src_text, trans_text = [], []
     for i, chunk in enumerate(chunks):
-        chunk_lines = chunk.split('\n')
+        chunk_lines = chunk["text"].split('\n')
         src_text.extend(chunk_lines)
         
         # Calculate similarity between current chunk and translation results

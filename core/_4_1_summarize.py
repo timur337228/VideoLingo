@@ -20,13 +20,10 @@ def search_things_to_note_in_prompt(sentence):
         things_to_note = json.load(file)
     things_to_note_list = [term['src'] for term in things_to_note['terms'] if term['src'].lower() in sentence.lower()]
     if things_to_note_list:
-        prompt = '\n'.join(
-            f'{i+1}. "{term["src"]}": "{term["tgt"]}",'
+        return '\n'.join([f'{i+1}. "{term["src"]}": "{term["tgt"]}",'
             f' meaning: {term["note"]}'
             for i, term in enumerate(things_to_note['terms'])
-            if term['src'] in things_to_note_list
-        )
-        return prompt
+            if term['src'] in things_to_note_list])
     else:
         return None
 
