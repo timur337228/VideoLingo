@@ -62,7 +62,7 @@ def analyze_subtitle_timing_and_speed(df):
     rprint("[🔍 Analyzing] Calculating subtitle timing and speed...")
     global ESTIMATOR
     if ESTIMATOR is None:
-        ESTIMATOR = init_estimator()
+        ESTIMATOR = init_estimator(load_key("language_code"))
     TOLERANCE = load_key("tolerance")
     whole_dur = get_audio_duration(_RAW_AUDIO_FILE)
     df["gap"] = 0.0  # Initialize gap column
@@ -89,7 +89,7 @@ def analyze_subtitle_timing_and_speed(df):
 
     df["tolerance"] = df["gap"].apply(lambda x: TOLERANCE if x > TOLERANCE else x)
     df["tol_dur"] = df["duration"] + df["tolerance"]
-    df["est_dur"] = df.apply(lambda x: estimate_duration(x["text"], ESTIMATOR), axis=1)
+    df["est_dur"] = df.apply(lambda x: estimate_duration(x["text"], ESTIMATOR, load_key("language_code")), axis=1)
 
     ## Calculate speed indicators
     accept = load_key("speed_factor.accept")  # Maximum acceptable speed factor
