@@ -149,6 +149,9 @@ def get_prompt_faithfulness(lines, shared_prompt):
     # Split lines by \n
     line_splits = lines.split('\n')
     
+    if load_key("is_gender_translate"):
+        pass
+
     json_dict = {}
     for i, line in enumerate(line_splits, 1):
         json_dict[f"{i}"] = {"origin": line, "direct": f"direct {TARGET_LANGUAGE} translation {i}."}
@@ -218,8 +221,19 @@ Your task is to reflect on and improve these direct translations to create more 
 3. Perform free translation based on your analysis
 4. Do not add comments or explanations in the translation, as the subtitles are for the audience to read
 5. Do not leave empty lines in the free translation, as the subtitles are for the audience to read
+6. Each output line must translate only its own input line
+7. Do not merge neighboring lines into one sentence
+8. Do not repeat or copy content from adjacent lines
+9. If an input line is a fragment, keep it as a matching fragment instead of expanding it with neighboring meaning
 
 {shared_prompt}
+
+<Line Boundary Rules>
+- Preserve one-to-one alignment between input and output lines
+- Never use the same full translation for two different neighboring source lines unless the source lines themselves are effectively identical
+- If the meaning spans multiple source lines, keep each output line limited to the meaning expressed in that specific source line
+- Do not move key information from one line into another line
+</Line Boundary Rules>
 
 <Translation Analysis Steps>
 Please use a two-step thinking process to handle the text line by line:

@@ -23,7 +23,7 @@ language_with_gender:
   - es
   - fr
 
-is_gender_translate: false
+is_gender_translate: true
 all_speakers: []
 genders_speakers: {}
 
@@ -102,7 +102,7 @@ sf_fish_tts:
 
 inworld_tts:
   api_key: YOUR_INWORLD_API_KEY
-  model_id: inworld-tts-1.5-max
+  model_id: inworld-tts-1.5-mini
   speakers:
 
 # OpenAI TTS-1 API configuration, 302.ai API only
