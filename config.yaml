@@ -18,15 +18,6 @@ api:
 # *Number of LLM multi-threaded accesses, set to 1 if using local LLM
 max_workers: 4
 
-language_with_gender:
-  - ru
-  - es
-  - fr
-
-is_gender_translate: true
-all_speakers: []
-genders_speakers: {}
-
 # Language settings, written into the prompt, can be described in natural language
 target_language: 'Русский язык'
 

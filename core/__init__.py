@@ -3,7 +3,6 @@ try:
     from . import (
         _1_ytdlp,
         _2_asr,
-        _2_1_speakers_profiles,
         _3_1_split_nlp,
         _3_2_split_meaning,
         _4_1_summarize,
@@ -32,7 +31,6 @@ __all__ = [
     'delete_dubbing_files',
     '_1_ytdlp',
     '_2_asr',
-    "_2_1_speakers_profiles",
     '_3_1_split_nlp',
     '_3_2_split_meaning',
     '_4_1_summarize',

@@ -125,10 +125,7 @@ Note: Start you answer with ```json and end with ```, do not add any other text.
 
 ## ================================================================
 # @ step5_translate.py & translate_lines.py
-def generate_shared_prompt(previous_content_prompt, after_content_prompt, summary_prompt, things_to_note_prompt, gender=None):
-    gender_line = ""
-    if gender:
-        gender_line = f"\n### Speaker Information\nApply grammatical gender agreement according to: {gender}\n"
+def generate_shared_prompt(previous_content_prompt, after_content_prompt, summary_prompt, things_to_note_prompt):
     return f'''### Context Information
 <previous_content>
 {previous_content_prompt}
@@ -140,7 +137,7 @@ def generate_shared_prompt(previous_content_prompt, after_content_prompt, summar
 
 ### Content Summary
 {summary_prompt}
-{gender_line}
+
 ### Points to Note
 {things_to_note_prompt}'''
 

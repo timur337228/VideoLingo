@@ -1,10 +1,12 @@
 import os
 from rich.panel import Panel
+from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from core.utils import *
 from core.utils.models import *
 import pandas as pd
 import soundfile as sf
+console = Console()
 from core.asr_backend.demucs_vl import demucs_audio
 from core.utils.models import *
 from core.tts_backend.tts_config import speakers_send
@@ -24,7 +26,7 @@ def extract_audio(audio_data, sr, start_time, end_time, out_file):
 
 def extract_refer_audio_main():
     demucs_audio() #!!! in case demucs not run
-    if os.path.exists(os.path.join(_AUDIO_REFERS_DIR, '1.wav')):
+    if os.path.exists(os.path.join(_AUDIO_SEGS_DIR, '1.wav')):
         rprint(Panel("Audio segments already exist, skipping extraction", title="Info", border_style="blue"))
         return
 

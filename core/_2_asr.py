@@ -44,13 +44,6 @@ def transcribe():
     
     # 6. Process df
     df = process_transcription(combined_result)
-    if load_key("whisper.enable_diarization"):
-        speakers = []
-        for speaker in df["speaker_id"]:
-            if speaker not in speakers:
-                speakers.append(speaker)
-        update_key("all_speakers", speakers)
-
     save_results(df)
         
 if __name__ == "__main__":
