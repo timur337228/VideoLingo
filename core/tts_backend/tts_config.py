@@ -49,18 +49,21 @@ def classify_audio(audio_path):
     label = model.config.id2label[pred_id]
     return label
 
-def speakers_send():
-    create_example_tts_file()
+def speakers_send(is_gender_classification: bool = False):
+    if not is_gender_classification:
+        create_example_tts_file()
     result = {}
     for file in os.listdir(_MERGED_AUDIO_DIR):
         file = Path(file)
         speaker_id = file.name.replace("_merged.wav", "")
         if speaker_id not in result:
             full_path = os.path.join(_MERGED_AUDIO_DIR, file)
-            voice = get_voices(classify_audio(full_path))
-            result[speaker_id] = voice
+            gender = classify_audio(full_path)
+            tag = get_voices(gender) if not is_gender_classification else gender
+            result[speaker_id] = tag
     tts_method = load_key("tts_method")
-    update_key(f"{tts_method}.speakers", result)
+    label = "genders_speakers" if is_gender_classification else f"{tts_method}.speakers"
+    update_key(label, result)
 
 def create_example_tts_file():
     os.makedirs(_MERGED_AUDIO_DIR, exist_ok=True)
@@ -71,7 +74,7 @@ def create_example_tts_file():
         speaker = df["speaker_id"][i]
         number = df["number"][i]
         if speaker in speakers:
-            if len(speakers[speaker]) <= 10:
+            if len(speakers[speaker]) < 10:
                 speakers[speaker].append(get_file_name())
         else:
             speakers[speaker] = [get_file_name()]

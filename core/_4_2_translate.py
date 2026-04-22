@@ -13,10 +13,11 @@ from core.utils.models import *
 console = Console()
 
 # Function to split text into chunks
-def split_chunks_by_chars(chunk_size, max_i): 
+def split_chunks_by_chars(chunk_size, max_i, sentences=None): 
     """Split text into chunks based on character count, return a list of multi-line text chunks"""
-    with open(_3_2_SPLIT_BY_MEANING, "r", encoding="utf-8") as file:
-        sentences = file.read().strip().split('\n')
+    if not sentences:
+        with open(_3_2_SPLIT_BY_MEANING, "r", encoding="utf-8") as file:
+            sentences = file.read().strip().split('\n')
 
     chunks = []
     chunk = ''
@@ -107,6 +108,7 @@ def translate_all():
     
     df_time.to_csv(_4_2_TRANSLATION, index=False)
     console.print("[bold green]✅ Translation completed and results saved.[/bold green]")
+
 
 if __name__ == '__main__':
     translate_all()

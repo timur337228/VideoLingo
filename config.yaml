@@ -23,6 +23,11 @@ target_language: 'Русский язык'
 
 language_code: 'ru'
 
+genders_speakers: 
+is_gender_translate:
+language_with_gender: [ru, es, fr]
+all_speakers: []
+
 # Whether to use Demucs for vocal separation before transcription
 demucs: true
 

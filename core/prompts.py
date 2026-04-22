@@ -145,10 +145,6 @@ def get_prompt_faithfulness(lines, shared_prompt):
     TARGET_LANGUAGE = load_key("target_language")
     # Split lines by \n
     line_splits = lines.split('\n')
-    
-    if load_key("is_gender_translate"):
-        pass
-
     json_dict = {}
     for i, line in enumerate(line_splits, 1):
         json_dict[f"{i}"] = {"origin": line, "direct": f"direct {TARGET_LANGUAGE} translation {i}."}
@@ -376,3 +372,31 @@ Clean the given text by:
 
 Note: Start you answer with ```json and end with ```, do not add any other text.
 '''.strip()
+
+
+def build_gender_prompt(text, gender):
+    target_language = load_key("target_language")
+
+    return f"""
+You will receive subtitle lines already translated into {target_language}.
+
+Your task is to minimally revise each line so that grammatical agreement matches the speaker gender: {gender}.
+
+Rules:
+1. Preserve the original meaning.
+2. Preserve the number of lines exactly.
+3. Do not merge or split lines.
+4. Do not rewrite the style unless grammatical agreement requires it.
+5. If a line does not require gender marking in {target_language}, leave it unchanged.
+6. If gender is ambiguous or not relevant for a line, leave it unchanged.
+7. Return one output line for each input line.
+
+Return JSON only in this format:
+{{
+  "1": {{"text": "line 1"}},
+  "2": {{"text": "line 2"}}
+}}
+
+Input:
+{text}
+""".strip()

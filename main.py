@@ -20,10 +20,12 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 def get_translate_steps():
     return [
         ("🎙️ WhisperX transcription", _2_asr.transcribe),
+        ("Get gender speakers", _2_1_speakers_profiles.get_gender_speakers),
         ("✂️ NLP sentence split", _3_1_split_nlp.split_by_spacy),
         ("🧠 Meaning split", _3_2_split_meaning.split_sentences_by_meaning),
         ("📝 Summary and terminology", _4_1_summarize.get_summary),
         ("🌍 Translation", _4_2_translate.translate_all),
+        ("Adding gender in translation", _4_3_gender_inflection.gender_inflection),
         ("📏 Subtitle split", _5_split_sub.split_for_sub_main),
         ("⏱️ Subtitle timestamp alignment", _6_gen_sub.align_timestamp_main),
         ("🎬 Burn subtitles into video", _7_sub_into_vid.merge_subtitles_to_video),

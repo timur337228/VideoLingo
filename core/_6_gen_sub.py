@@ -58,7 +58,8 @@ def show_difference(str1, str2):
 
 def get_sentence_timestamps(df_words, df_sentences):
     time_stamp_list = []
-    
+    speaker_list = []
+    is_diarization = load_key("whisper.enable_diarization")
     # Build complete string and position mapping
     full_words_str = ''
     position_to_word_idx = {}
@@ -80,7 +81,9 @@ def get_sentence_timestamps(df_words, df_sentences):
             if full_words_str[current_pos:current_pos+sentence_len] == clean_sentence:
                 start_word_idx = position_to_word_idx[current_pos]
                 end_word_idx = position_to_word_idx[current_pos + sentence_len - 1]
-                
+                if is_diarization:
+                    speaker_list.append(df_words["speaker_id"][end_word_idx])
+
                 time_stamp_list.append((
                     float(df_words['start'][start_word_idx]),
                     float(df_words['end'][end_word_idx])
@@ -97,7 +100,8 @@ def get_sentence_timestamps(df_words, df_sentences):
                           full_words_str[current_pos:current_pos+len(clean_sentence)])
             print("\nOriginal sentence:", df_sentences['Source'][idx])
             raise ValueError("❎ No match found for sentence.")
-    
+    if is_diarization:
+        return time_stamp_list, speaker_list
     return time_stamp_list
 
 def align_timestamp(df_text, df_translate, subtitle_output_configs: list, output_dir: str, for_display: bool = True):
@@ -108,9 +112,15 @@ def align_timestamp(df_text, df_translate, subtitle_output_configs: list, output
     words = df_text['text'].str.split(expand=True).stack().reset_index(level=1, drop=True).reset_index()
     words.columns = ['id', 'word']
     words['id'] = words['id'].astype(int)
-
     # Process timestamps ⏰
-    time_stamp_list = get_sentence_timestamps(df_text, df_translate)
+
+    if load_key("whisper.enable_diarization"):
+        time_stamp_list, speaker_list = get_sentence_timestamps(df_text, df_translate)
+        df_trans_time["speaker_id"] = speaker_list
+    else:
+        time_stamp_list= get_sentence_timestamps(df_text, df_translate)
+    
+    
     df_trans_time['timestamp'] = time_stamp_list
     df_trans_time['duration'] = df_trans_time['timestamp'].apply(lambda x: x[1] - x[0])
 
