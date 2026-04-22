@@ -47,6 +47,14 @@ elif 'v1' not in base_url:
     base_url = base_url.strip('/') + '/v1'
 client = OpenAI(api_key=load_key("api.key"), base_url=base_url)
 
+
+def _optional_api_param(key):
+    try:
+        value = load_key(key)
+    except KeyError:
+        return None
+    return value if value is not None else None
+
 @except_handler("GPT request failed", retry=5)
 def ask_gpt(prompt, resp_type=None, valid_def=None, log_title="default"):
     if not load_key("api.key"):
@@ -63,6 +71,17 @@ def ask_gpt(prompt, resp_type=None, valid_def=None, log_title="default"):
     messages = [{"role": "user", "content": prompt}]
 
     params = dict(model=model, messages=messages, response_format=response_format, timeout=300)
+    optional_params = {
+        "temperature": _optional_api_param("api.temperature"),
+        "top_p": _optional_api_param("api.top_p"),
+        "frequency_penalty": _optional_api_param("api.frequency_penalty"),
+        "presence_penalty": _optional_api_param("api.presence_penalty"),
+        "seed": _optional_api_param("api.seed"),
+        "max_tokens": _optional_api_param("api.max_tokens"),
+    }
+    for key, value in optional_params.items():
+        if value is not None:
+            params[key] = value
     resp_raw = client.chat.completions.create(**params)
 
     # process and return full result
