@@ -40,7 +40,7 @@ def tts_main(text, save_as, number, task_df, duration, speaker_id):
     print(f"Generating <{text}...>")
     TTS_METHOD = load_key("tts_method")
     
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             if attempt >= max_retries - 1:

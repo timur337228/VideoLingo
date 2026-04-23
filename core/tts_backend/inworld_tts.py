@@ -31,12 +31,9 @@ def inworld_tts(text: str, save_path: str | Path, duration: float, speaker_id: s
         "Authorization": f"Basic {load_key('inworld_tts.api_key')}",
         "Content-Type": "application/json",
     }
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
-        result = response.json()
-        audio_content = base64.b64decode(result["audioContent"])
-    except Exception as e: 
-        print(e)
+    response = requests.post(url, json=payload, headers=headers, timeout=30)
+    response.raise_for_status()
+    result = response.json()
+    audio_content = base64.b64decode(result["audioContent"])
     with open(save_path, "wb") as f:
         f.write(audio_content)

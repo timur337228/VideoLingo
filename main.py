@@ -83,7 +83,8 @@ def main():
         )
     )
     run_steps("Subtitle Pipeline", get_translate_steps())
-    run_steps("Dubbing Pipeline", get_dubbing_steps())
+    if not load_key("get_only_sub_video"):
+        run_steps("Dubbing Pipeline", get_dubbing_steps())
     console.print(
         Panel(
             "[bold green]All stages completed successfully[/]",

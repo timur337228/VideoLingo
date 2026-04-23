@@ -40,24 +40,12 @@ def check_gpu_available():
     except:
         return False
 
+
 def merge_subtitles_to_video():
+    if not load_key("get_only_sub_video"):
+        return
     video_file = find_video_files()
     os.makedirs(os.path.dirname(OUTPUT_VIDEO), exist_ok=True)
-
-    # Check resolution
-    if not load_key("burn_subtitles"):
-        rprint("[bold yellow]Warning: A 0-second black video will be generated as a placeholder as subtitles are not burned in.[/bold yellow]")
-
-        # Create a black frame
-        frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(OUTPUT_VIDEO, fourcc, 1, (1920, 1080))
-        out.write(frame)
-        out.release()
-
-        rprint("[bold green]Placeholder video has been generated.[/bold green]")
-        return
-
     if not os.path.exists(SRC_SRT) or not os.path.exists(TRANS_SRT):
         rprint("Subtitle files not found in the 'output' directory.")
         exit(1)
@@ -90,7 +78,6 @@ def merge_subtitles_to_video():
     rprint("🎬 Start merging subtitles to video...")
     start_time = time.time()
     process = subprocess.Popen(ffmpeg_cmd)
-
     try:
         process.wait()
         if process.returncode == 0:

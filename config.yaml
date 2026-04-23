@@ -36,6 +36,8 @@ is_gender_translate:
 language_with_gender: [ru, es, fr]
 all_speakers: []
 
+get_only_sub_video: false
+
 # Whether to use Demucs for vocal separation before transcription
 demucs: true
 
@@ -54,11 +56,11 @@ whisper:
   elevenlabs_api_key: 'your_elevenlabs_api_key'
 
 # Whether to burn subtitles into the video
-burn_subtitles: true
+burn_subtitles_dub: true
 
 ## ======================== Advanced Settings ======================== ##
 # *🔬 h264_nvenc GPU acceleration for ffmpeg, make sure your GPU supports it
-ffmpeg_gpu: false
+ffmpeg_gpu: true
 
 # *Youtube settings
 youtube:
@@ -152,8 +154,6 @@ speed_factor:
 min_subtitle_duration: 2.5 # Minimum subtitle duration, will be forcibly extended
 min_trim_duration: 3.5 # Subtitles shorter than this value won't be split
 tolerance: 1.5 # Allowed extension time to the next subtitle
-
-
 
 
 

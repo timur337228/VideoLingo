@@ -216,17 +216,28 @@ def page_setting():
             update_key("demucs", demucs)
             st.rerun()
 
-        burn_subtitles = st.toggle(
-            t("Burn-in Subtitles"),
-            value=load_key("burn_subtitles"),
+        get_only_sub_video = st.toggle(
+            t("Generate Subtitle-Only Video"),
+            value=load_key("get_only_sub_video"),
             help=t(
-                "Whether to burn subtitles into the video, will increase processing time"
+                "Run only the subtitle pipeline and generate output_sub.mp4 without dubbing"
             ),
         )
-        if burn_subtitles != load_key("burn_subtitles"):
-            update_key("burn_subtitles", burn_subtitles)
+        if get_only_sub_video != load_key("get_only_sub_video"):
+            update_key("get_only_sub_video", get_only_sub_video)
             st.rerun()
     with st.expander(t("Dubbing Settings"), expanded=True):
+        burn_subtitles_dub = st.toggle(
+            t("Burn-in Dubbed Video Subtitles"),
+            value=load_key("burn_subtitles_dub"),
+            help=t(
+                "Whether to burn subtitles into the final dubbed video, will increase processing time"
+            ),
+        )
+        if burn_subtitles_dub != load_key("burn_subtitles_dub"):
+            update_key("burn_subtitles_dub", burn_subtitles_dub)
+            st.rerun()
+
         tts_methods = [
             "azure_tts",
             "openai_tts",
