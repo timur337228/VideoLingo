@@ -20,6 +20,7 @@ class Settings:
         self.data["whisper"]["whisperX_302_api_key"] = api_key_302
         self.data["api"]["key"] = api_key_302
         self.data["inworld_tts"]["api_key"] = inworld_tts_key
+        self.data["hf_token"] = os.getenv("hf_token")
 
         
 

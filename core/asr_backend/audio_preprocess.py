@@ -1,4 +1,4 @@
-import os, subprocess
+import os, re, subprocess
 import pandas as pd
 from typing import Dict, List, Tuple
 from pydub import AudioSegment
@@ -8,6 +8,70 @@ from pydub import AudioSegment
 from pydub.silence import detect_silence
 from pydub.utils import mediainfo
 from rich import print as rprint
+
+def _restore_missing_words(segment: Dict) -> List[Dict]:
+    words = [dict(word) for word in segment.get('words', []) if word.get('word')]
+    text = (segment.get('text') or '').strip()
+    if not text:
+        return words
+
+    text_words = text.split() or [char for char in text if not char.isspace()]
+    if not text_words:
+        return words
+
+    normalize = lambda value: re.sub(r"[^\w]+", "", value or "", flags=re.UNICODE).casefold()
+    text_norms = [normalize(word) or word.casefold() for word in text_words]
+    word_norms = [normalize(word['word']) or word['word'].casefold() for word in words]
+
+    if text_norms == word_norms:
+        return words
+
+    segment_start = float(segment.get('start', 0))
+    segment_end = float(segment.get('end', segment_start))
+
+    if not words:
+        gap_start = segment_start
+        gap_end = segment_end
+        missing_words = text_words
+        prefix = 0
+        suffix = 0
+    else:
+        prefix = 0
+        while prefix < min(len(text_norms), len(word_norms)) and text_norms[prefix] == word_norms[prefix]:
+            prefix += 1
+
+        suffix = 0
+        max_suffix = min(len(text_norms) - prefix, len(word_norms) - prefix)
+        while suffix < max_suffix and text_norms[-1 - suffix] == word_norms[-1 - suffix]:
+            suffix += 1
+
+        if prefix + suffix != len(word_norms):
+            return words
+
+        missing_words = text_words[prefix:len(text_words) - suffix]
+        if not missing_words:
+            return words
+
+        gap_start = words[prefix - 1].get('end', segment_start) if prefix > 0 else segment_start
+        gap_end = words[len(words) - suffix].get('start', segment_end) if suffix > 0 else segment_end
+
+    if gap_end <= gap_start:
+        gap_end = segment_end if segment_end > gap_start else gap_start + 0.001 * len(missing_words)
+
+    step = (gap_end - gap_start) / len(missing_words)
+    restored = [
+        {
+            'word': word,
+            'start': round(gap_start + index * step, 3),
+            'end': round(gap_start + (index + 1) * step, 3),
+        }
+        for index, word in enumerate(missing_words)
+    ]
+
+    if not words:
+        return restored
+
+    return words[:prefix] + restored + (words[len(words) - suffix:] if suffix > 0 else [])
 
 def _ffmpeg_has_encoder(encoder_name: str) -> bool:
     """Check if the current ffmpeg installation supports a given audio encoder."""
@@ -111,8 +175,11 @@ def process_transcription(result: Dict) -> pd.DataFrame:
     for segment in result['segments']:
         # Get speaker_id, if not exists, set to None
         speaker_id = segment.get('speaker', segment.get("speaker_id", None))
+        segment_words = _restore_missing_words(segment)
+        if len(segment_words) > len(segment.get('words', [])):
+            rprint(f"[yellow]⚠️ Restored missing words from segment text: {segment.get('text', '')[:80]}[/yellow]")
         
-        for word in segment['words']:
+        for word in segment_words:
             # Check word length
             if len(word["word"]) > 30:
                 rprint(f"[yellow]⚠️ Warning: Detected word longer than 30 characters, skipping: {word['word']}[/yellow]")
@@ -133,7 +200,7 @@ def process_transcription(result: Dict) -> pd.DataFrame:
                     all_words.append(word_dict)
                 else:
                     # If it's the first word, look next for a timestamp then assign it to the current word
-                    next_word = next((w for w in segment['words'] if 'start' in w and 'end' in w), None)
+                    next_word = next((w for w in segment_words if 'start' in w and 'end' in w), None)
                     if next_word:
                         word_dict = {
                             'text': word["word"],

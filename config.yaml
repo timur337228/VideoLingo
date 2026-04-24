@@ -25,7 +25,7 @@ api:
   max_tokens:
 # *Number of LLM multi-threaded accesses, set to 1 if using local LLM
 max_workers: 4
-
+hf_token: 
 # Language settings, written into the prompt, can be described in natural language
 target_language: 'Русский язык'
 
@@ -43,12 +43,14 @@ demucs: true
 
 whisper:
   # ["large-v3", "large-v3-turbo"]. Note: for zh model will force to use Belle/large-v3
-  model: 'large-v3'
+  model: 'large-v3-turbo'
   # Whisper specified recognition language ISO 639-1
   language: 'en'
   detected_language: 'en'
   # Whisper running mode ["local", "cloud", "elevenlabs"]. Specifies where to run, cloud uses 302.ai API
   runtime: 'cloud'
+  vad_onset: 0.35
+  vad_offset: 0.2
   # 302.ai API key
   whisperX_302_api_key: 'your_302_api_key'
   enable_diarization: true
@@ -90,6 +92,8 @@ pause_before_translate: false
 ## ======================== Dubbing Settings ======================== ##
 # TTS selection [sf_fish_tts, openai_tts, gpt_sovits, azure_tts, fish_tts, edge_tts, custom_tts, inworld_tts]
 tts_method: 'inworld_tts'
+
+compute_type: float32
 
 tts_clone: false
 

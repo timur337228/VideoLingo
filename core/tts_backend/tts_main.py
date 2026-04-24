@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from pydub import AudioSegment
 
 from core.asr_backend.audio_preprocess import get_audio_duration
@@ -85,4 +86,5 @@ def tts_main(text, save_as, number, task_df, duration, speaker_id):
         except Exception as e:
             if attempt == max_retries - 1:
                 raise Exception(f"Failed to generate audio after {max_retries} attempts: {str(e)}")
+            time.sleap(1)
             print(f"Attempt {attempt + 1} failed, retrying...")
