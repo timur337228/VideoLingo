@@ -8,7 +8,6 @@ from core._6_gen_sub import align_timestamp
 from core.utils import *
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from difflib import SequenceMatcher
 from core.utils.models import *
 console = Console()
 
@@ -47,9 +46,6 @@ def translate_chunk(chunk, chunks, theme_prompt, i):
     translation, english_result = translate_lines(chunk, previous_content_prompt, after_content_prompt, things_to_note_prompt, theme_prompt, i)
     return i, english_result, translation
 
-# Add similarity calculation function
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
 
 # 🚀 Main function to translate all chunks
 @check_file_exists(_4_2_TRANSLATION)
@@ -67,34 +63,21 @@ def translate_all():
             for i, chunk in enumerate(chunks):
                 future = executor.submit(translate_chunk, chunk, chunks, theme_prompt, i)
                 futures.append(future)
-            results = []
+            results = [None] * len(chunks)
             for future in concurrent.futures.as_completed(futures):
-                results.append(future.result())
+                i, english_result, translation = future.result()
+                results[i] = translation
                 progress.update(task, advance=1)
 
-    results.sort(key=lambda x: x[0])  # Sort results based on original order
     
     # 💾 Save results to lists and CSV file
     src_text, trans_text = [], []
+
     for i, chunk in enumerate(chunks):
         chunk_lines = chunk.split('\n')
         src_text.extend(chunk_lines)
+        trans_text.extend(results[i].split('\n'))
         
-        # Calculate similarity between current chunk and translation results
-        chunk_text = ''.join(chunk_lines).lower()
-        matching_results = [(r, similar(''.join(r[1].split('\n')).lower(), chunk_text)) 
-                          for r in results]
-        best_match = max(matching_results, key=lambda x: x[1])
-        
-        # Check similarity and handle exceptions
-        if best_match[1] < 0.9:
-            console.print(f"[yellow]Warning: No matching translation found for chunk {i}[/yellow]")
-            raise ValueError(f"Translation matching failed (chunk {i})")
-        elif best_match[1] < 1.0:
-            console.print(f"[yellow]Warning: Similar match found (chunk {i}, similarity: {best_match[1]:.3f})[/yellow]")
-            
-        trans_text.extend(best_match[0][2].split('\n'))
-    
     # Trim long translation text
     df_text = pd.read_csv(_2_CLEANED_CHUNKS)
     df_text['text'] = df_text['text'].str.strip('"').str.strip()
