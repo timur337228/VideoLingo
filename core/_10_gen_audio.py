@@ -112,8 +112,8 @@ def process_row(row: pd.Series, tasks_df: pd.DataFrame) -> Tuple[int, float]:
 def generate_tts_audio(tasks_df: pd.DataFrame) -> pd.DataFrame:
     """Generate TTS audio sequentially and calculate actual duration"""
     tasks_df["real_dur"] = 0
+    tts_context = tasks_df[["number", "origin", "duration"]].copy()
     rprint("[bold green]🎯 Starting TTS audio generation...[/bold green]")
-
     with Progress() as progress:
         task = progress.add_task(
             "[cyan]🔄 Generating TTS audio...", total=len(tasks_df)
@@ -123,7 +123,7 @@ def generate_tts_audio(tasks_df: pd.DataFrame) -> pd.DataFrame:
         warmup_size = min(WARMUP_SIZE, len(tasks_df))
         for _, row in tasks_df.head(warmup_size).iterrows():
             try:
-                number, real_dur = process_row(row, tasks_df)
+                number, real_dur = process_row(row, tts_context)
                 tasks_df.loc[tasks_df["number"] == number, "real_dur"] = real_dur
                 progress.advance(task)
             except Exception as e:
@@ -139,7 +139,7 @@ def generate_tts_audio(tasks_df: pd.DataFrame) -> pd.DataFrame:
             remaining_tasks = tasks_df.iloc[warmup_size:].copy()
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
                 futures = [
-                    executor.submit(process_row, row, tasks_df.copy())
+                    executor.submit(process_row, row, tts_context)
                     for _, row in remaining_tasks.iterrows()
                 ]
 
