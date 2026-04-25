@@ -10,7 +10,6 @@ import soundfile as sf
 from core.asr_backend.demucs_vl import demucs_audio
 from core.utils.models import *
 from core.tts_backend.tts_config import speakers_send
-from core.utils.speaker_utils import normalize_speaker_id
 
 
 def extract_audio(audio_data, sr, start_time, end_time, out_file = None, is_save: bool = True):
@@ -42,8 +41,7 @@ def get_gender_speakers():
     if not load_key("whisper.enable_diarization") or not load_key("is_gender_translate"):
         return 
 
-    if not os.path.exists(_VOCAL_AUDIO_FILE):
-        demucs_audio()
+    demucs_audio()
 
     os.makedirs(_MERGED_AUDIO_DIR, exist_ok=True)
     
@@ -52,22 +50,20 @@ def get_gender_speakers():
         update_key("genders_speakers", {})
         rprint(Panel("No diarization speaker data found, skipping gender detection.", title="Info", border_style="yellow"))
         return
-    df["speaker_id"] = df["speaker_id"].apply(normalize_speaker_id)
     data, sr = sf.read(_VOCAL_AUDIO_FILE)
 
     # speakers logic
     speakers = load_key("all_speakers") or []
-    speakers = [speaker for speaker in (normalize_speaker_id(s) for s in speakers) if speaker]
     if not speakers:
-        speakers = [speaker for speaker in df["speaker_id"].dropna().unique().tolist()]
+        speakers = df["speaker_id"].dropna().unique().tolist()
         update_key("all_speakers", speakers)
     speakers = {speaker: [] for speaker in speakers}
     groups = group_split(df)
 
     for group in groups:
         for row in group:
-            speaker = normalize_speaker_id(row["speaker_id"])
-            if not speaker:
+            speaker = row["speaker_id"]
+            if pd.isna(speaker):
                 continue
             if speaker not in speakers:
                 speakers[speaker] = []

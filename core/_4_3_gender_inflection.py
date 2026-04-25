@@ -1,5 +1,3 @@
-from difflib import SequenceMatcher
-
 import pandas as pd
 from rich.panel import Panel
 
@@ -7,37 +5,15 @@ from core._6_gen_sub import align_timestamp
 from core.prompts import build_gender_prompt
 from core.utils import *
 from core.utils.models import *
-from core.utils.speaker_utils import normalize_gender_label, normalize_speaker_id
 
 
 MAX_GENDER_ATTEMPTS = 2
-MIN_STABLE_SIMILARITY = 0.45
 
 
 def _clean_text(value):
     if pd.isna(value):
         return ""
     return str(value).strip()
-
-
-def _text_similarity(a: str, b: str) -> float:
-    return SequenceMatcher(None, a, b).ratio()
-
-
-def _line_changed_too_much(original, revised):
-    original = _clean_text(original)
-    revised = _clean_text(revised).replace("\n", " ")
-
-    if not revised:
-        return True
-    if not original:
-        return False
-
-    if len(original) >= 15 and _text_similarity(original, revised) < MIN_STABLE_SIMILARITY:
-        return True
-
-    max_len = max(len(original) + 24, int(len(original) * 1.8))
-    return len(revised) > max_len
 
 
 def split_records_into_chunks(records, chunk_size=900, max_i=8):
@@ -62,20 +38,6 @@ def split_records_into_chunks(records, chunk_size=900, max_i=8):
     return chunks
 
 
-def _normalize_gender_map(raw_genders):
-    normalized = {}
-    if not isinstance(raw_genders, dict):
-        return normalized
-
-    for speaker_id, gender in raw_genders.items():
-        speaker_key = normalize_speaker_id(speaker_id)
-        gender_label = normalize_gender_label(gender)
-        if speaker_key and gender_label:
-            normalized[speaker_key] = gender_label
-
-    return normalized
-
-
 def _validate_gender_result(response_data, records):
     if not isinstance(response_data, dict):
         return {"status": "error", "message": "Gender response is not a JSON object"}
@@ -94,12 +56,6 @@ def _validate_gender_result(response_data, records):
         if not isinstance(text, str) or not text.strip():
             return {"status": "error", "message": f"Item {index} must contain a non-empty text field"}
 
-        if _line_changed_too_much(record["translation"], text):
-            return {
-                "status": "error",
-                "message": f"Line {index} rewrites the translation too aggressively",
-            }
-
     return {"status": "success", "message": "success"}
 
 
@@ -111,10 +67,6 @@ def _best_effort_gender_result(response_data, records):
         item = response_data.get(str(index), {})
         text = item.get("text") if isinstance(item, dict) else None
         cleaned_text = _clean_text(text).replace("\n", " ")
-
-        if _line_changed_too_much(record["translation"], cleaned_text):
-            cleaned_text = record["translation"]
-
         normalized[str(index)] = {"text": cleaned_text or record["translation"]}
 
     return normalized
@@ -209,9 +161,8 @@ def gender_inflection():
         rprint(Panel("No speaker metadata available, skipping gender inflection.", title="Info", border_style="yellow"))
         return
 
-    df["speaker_id"] = df["speaker_id"].apply(normalize_speaker_id)
-    genders = _normalize_gender_map(load_key("genders_speakers"))
-    if not genders:
+    genders = load_key("genders_speakers") or {}
+    if not isinstance(genders, dict) or not genders:
         rprint(Panel("No speaker genders available, skipping gender inflection.", title="Info", border_style="yellow"))
         return
 
@@ -219,11 +170,10 @@ def gender_inflection():
     processed_speakers = 0
 
     for speaker_id, group_df in df.groupby("speaker_id", sort=False):
-        speaker_key = normalize_speaker_id(speaker_id)
-        if not speaker_key:
+        if pd.isna(speaker_id):
             continue
 
-        gender = genders.get(speaker_key)
+        gender = genders.get(speaker_id)
         if not gender:
             continue
 
