@@ -2,6 +2,7 @@ import functools
 import time
 import os
 from rich import print as rprint
+from core.utils.config_utils import is_cache_enabled
 
 # ------------------------------
 # retry decorator
@@ -35,7 +36,7 @@ def check_file_exists(file_path):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            if os.path.exists(file_path):
+            if is_cache_enabled() and os.path.exists(file_path):
                 rprint(f"[yellow]⚠️ File <{file_path}> already exists, skip <{func.__name__}> step.[/yellow]")
                 return
             return func(*args, **kwargs)

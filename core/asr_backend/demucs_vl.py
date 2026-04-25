@@ -10,6 +10,7 @@ from demucs.api import Separator
 from demucs.apply import BagOfModels
 import gc
 from core.utils.models import *
+from core.utils import is_cache_enabled
 
 class PreloadedSeparator(Separator):
     def __init__(self, model: BagOfModels, shifts: int = 1, overlap: float = 0.25,
@@ -20,7 +21,7 @@ class PreloadedSeparator(Separator):
                             segment=segment, jobs=jobs, progress=True, callback=None, callback_arg=None)
 
 def demucs_audio():
-    if os.path.exists(_VOCAL_AUDIO_FILE) and os.path.exists(_BACKGROUND_AUDIO_FILE):
+    if is_cache_enabled() and os.path.exists(_VOCAL_AUDIO_FILE) and os.path.exists(_BACKGROUND_AUDIO_FILE):
         rprint(f"[yellow]⚠️ {_VOCAL_AUDIO_FILE} and {_BACKGROUND_AUDIO_FILE} already exist, skip Demucs processing.[/yellow]")
         return
     

@@ -26,7 +26,7 @@ def extract_audio(audio_data, sr, start_time, end_time, out_file):
 
 def extract_refer_audio_main():
     demucs_audio() #!!! in case demucs not run
-    if os.path.exists(os.path.join(_AUDIO_SEGS_DIR, '1.wav')):
+    if is_cache_enabled() and os.path.exists(os.path.join(_AUDIO_SEGS_DIR, '1.wav')):
         rprint(Panel("Audio segments already exist, skipping extraction", title="Info", border_style="blue"))
         return
 

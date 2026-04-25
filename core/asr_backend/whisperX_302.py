@@ -13,7 +13,7 @@ OUTPUT_LOG_DIR = "output/log"
 def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: float = None, end: float = None):
     os.makedirs(OUTPUT_LOG_DIR, exist_ok=True)
     LOG_FILE = f"{OUTPUT_LOG_DIR}/whisperx302_{start}_{end}.json"
-    if os.path.exists(LOG_FILE):
+    if is_cache_enabled() and os.path.exists(LOG_FILE):
         with open(LOG_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
         
@@ -56,9 +56,10 @@ def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: floa
                 if 'end' in word:
                     word['end'] += start
     
-    with open(LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(response_json, f, indent=4, ensure_ascii=False)
-        print(response_json)
+    if is_cache_enabled():
+        with open(LOG_FILE, "w", encoding="utf-8") as f:
+            json.dump(response_json, f, indent=4, ensure_ascii=False)
+            print(response_json)
     
     elapsed_time = time.time() - start_time
     rprint(f"[green]✓ Transcription completed in {elapsed_time:.2f} seconds[/green]")

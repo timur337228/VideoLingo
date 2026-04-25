@@ -38,6 +38,10 @@ all_speakers: []
 
 get_only_sub_video: false
 
+# Persist intermediate pipeline files and GPT cache between runs.
+# When true, reruns can continue from existing outputs instead of starting over.
+save_cache: false
+
 # Whether to use Demucs for vocal separation before transcription
 demucs: true
 

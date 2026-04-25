@@ -75,6 +75,7 @@ def gender_inflection():
                 continue
                 # raise ValueError("LLM returned wrong number of lines")
             for idx, new_line in zip(chunk["indices"], new_lines):
+                print(new_line)
                 df.at[idx, "Translation"] = new_line
     df = df.drop(columns=["timestamp", "duration", "speaker_id"], errors="ignore")
     df.to_csv(_4_2_TRANSLATION, index=False)

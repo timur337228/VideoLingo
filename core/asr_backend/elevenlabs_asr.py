@@ -67,7 +67,7 @@ def elev2whisper(elev_json, word_level_timestamp = False):
 def transcribe_audio_elevenlabs(raw_audio_path, vocal_audio_path, start = None, end = None):
     rprint(f"[cyan]🎤 Processing audio transcription, file path: {vocal_audio_path}[/cyan]")
     LOG_FILE = f"output/log/elevenlabs_transcribe_{start}_{end}.json"
-    if os.path.exists(LOG_FILE):
+    if is_cache_enabled() and os.path.exists(LOG_FILE):
         with open(LOG_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     
@@ -126,8 +126,9 @@ def transcribe_audio_elevenlabs(raw_audio_path, vocal_audio_path, start = None, 
         rprint(f"[green]✓ Transcription completed in {time.time() - start_time:.2f} seconds[/green]")
         parsed_result = elev2whisper(result)
         os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
-            json.dump(parsed_result, f, indent=4, ensure_ascii=False)
+        if is_cache_enabled():
+            with open(LOG_FILE, "w", encoding="utf-8") as f:
+                json.dump(parsed_result, f, indent=4, ensure_ascii=False)
         return parsed_result
     finally:
         # Clean up the temporary file

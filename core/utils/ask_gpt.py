@@ -3,7 +3,7 @@ import json
 from threading import Lock
 import json_repair
 from openai import OpenAI
-from core.utils.config_utils import load_key
+from core.utils.config_utils import load_key, is_cache_enabled
 from rich import print as rprint
 from core.utils.decorator import except_handler
 
@@ -60,10 +60,11 @@ def ask_gpt(prompt, resp_type=None, valid_def=None, log_title="default"):
     if not load_key("api.key"):
         raise ValueError("API key is not set")
     # check cache
-    cached = _load_cache(prompt, resp_type, log_title)
-    if cached:
-        rprint("use cache response")
-        return cached
+    if is_cache_enabled():
+        cached = _load_cache(prompt, resp_type, log_title)
+        if cached:
+            rprint("use cache response")
+            return cached
 
     model = load_key("api.model")
     response_format = {"type": "json_object"} if resp_type == "json" and load_key("api.llm_support_json") else None
@@ -95,10 +96,12 @@ def ask_gpt(prompt, resp_type=None, valid_def=None, log_title="default"):
     if valid_def:
         valid_resp = valid_def(resp)
         if valid_resp['status'] != 'success':
-            _save_cache(model, prompt, resp_content, resp_type, resp, log_title="error", message=valid_resp['message'])
+            if is_cache_enabled():
+                _save_cache(model, prompt, resp_content, resp_type, resp, log_title="error", message=valid_resp['message'])
             raise ValueError(f"❎ API response error: {valid_resp['message']}")
 
-    _save_cache(model, prompt, resp_content, resp_type, resp, log_title=log_title)
+    if is_cache_enabled():
+        _save_cache(model, prompt, resp_content, resp_type, resp, log_title=log_title)
     return resp
 
 

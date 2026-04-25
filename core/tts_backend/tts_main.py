@@ -35,7 +35,7 @@ def tts_main(text, save_as, number, task_df, duration, speaker_id):
         return
     
     # Skip if file exists
-    if os.path.exists(save_as):
+    if is_cache_enabled() and os.path.exists(save_as):
         return
     
     print(f"Generating <{text}...>")

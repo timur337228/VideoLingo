@@ -12,6 +12,12 @@ from core.utils.models import *
 from core.tts_backend.tts_config import speakers_send    
 
 
+def normalize_speaker_id(value):
+    if pd.isna(value):
+        return None
+    return str(value)
+
+
 def extract_audio(audio_data, sr, start_time, end_time, out_file = None, is_save: bool = True):
     """Simplified audio extraction function"""
     start = int(start_time * sr)
@@ -22,6 +28,8 @@ def extract_audio(audio_data, sr, start_time, end_time, out_file = None, is_save
 
 def group_split(df):
     rows = [row for _, row in df.iterrows()]
+    if not rows:
+        return []
     groups = [
         [rows[0]],]
     index = 0
@@ -43,16 +51,29 @@ def get_gender_speakers():
     os.makedirs(_MERGED_AUDIO_DIR, exist_ok=True)
     
     df = pd.read_csv(_2_CLEANED_CHUNKS)
+    if "speaker_id" not in df.columns or df.empty:
+        update_key("genders_speakers", {})
+        rprint(Panel("No diarization speaker data found, skipping gender detection.", title="Info", border_style="yellow"))
+        return
+    df["speaker_id"] = df["speaker_id"].apply(normalize_speaker_id)
     data, sr = sf.read(_VOCAL_AUDIO_FILE)
 
     # speakers logic
-    speakers = load_key("all_speakers")
+    speakers = load_key("all_speakers") or []
+    speakers = [speaker for speaker in (normalize_speaker_id(s) for s in speakers) if speaker]
+    if not speakers:
+        speakers = [speaker for speaker in df["speaker_id"].dropna().unique().tolist()]
+        update_key("all_speakers", speakers)
     speakers = {speaker: [] for speaker in speakers}
     groups = group_split(df)
 
     for group in groups:
         for row in group:
-            speaker = row["speaker_id"]
+            speaker = normalize_speaker_id(row["speaker_id"])
+            if not speaker:
+                continue
+            if speaker not in speakers:
+                speakers[speaker] = []
             if len(speakers[speaker]) < 10:
                 speakers[speaker].append(row)
             

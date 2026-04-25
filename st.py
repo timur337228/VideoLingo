@@ -142,7 +142,7 @@ def text_processing_section():
             unsafe_allow_html=True,
         )
 
-        if not os.path.exists(SUB_VIDEO):
+        if not (is_cache_enabled() and os.path.exists(SUB_VIDEO)):
             if runner.is_active:
                 _task_control_panel("_text_runner")
             elif runner.is_done:
@@ -212,7 +212,7 @@ def audio_processing_section():
             unsafe_allow_html=True,
         )
 
-        if not os.path.exists(DUB_VIDEO):
+        if not (is_cache_enabled() and os.path.exists(DUB_VIDEO)):
             if runner.is_active:
                 _task_control_panel("_audio_runner")
             elif runner.is_done:

@@ -62,6 +62,13 @@ def update_key(key, new_value):
     return settings.update_key(key, new_value)
 
 
+def is_cache_enabled():
+    try:
+        return bool(load_key("save_cache"))
+    except KeyError:
+        return True
+
+
 def get_joiner(language):
     if language in load_key("language_split_with_space"):
         return " "

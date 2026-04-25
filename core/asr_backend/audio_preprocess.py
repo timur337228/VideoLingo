@@ -93,7 +93,7 @@ def normalize_audio_volume(audio_path, output_path, target_db = -20.0, format = 
 
 def convert_video_to_audio(video_file: str):
     os.makedirs(_AUDIO_DIR, exist_ok=True)
-    if not os.path.exists(_RAW_AUDIO_FILE):
+    if not is_cache_enabled() or not os.path.exists(_RAW_AUDIO_FILE):
         rprint(f"[blue]🎬➡️🎵 Converting to high quality audio with FFmpeg ......[/blue]")
         if _ffmpeg_has_encoder('libmp3lame'):
             cmd = [
