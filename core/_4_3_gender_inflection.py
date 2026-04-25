@@ -1,81 +1,264 @@
+from difflib import SequenceMatcher
+
 import pandas as pd
-import json
-from core.prompts import build_gender_prompt
-from core._4_2_translate import split_chunks_by_chars
-from core.translate_lines import translate_lines
-from core._4_1_summarize import search_things_to_note_in_prompt
-from core._8_1_audio_task import check_len_then_trim
+from rich.panel import Panel
+
 from core._6_gen_sub import align_timestamp
+from core.prompts import build_gender_prompt
 from core.utils import *
 from core.utils.models import *
+from core.utils.speaker_utils import normalize_gender_label, normalize_speaker_id
 
 
-def split_records_into_chunks(records, chunk_size=600, max_i=10):
+MAX_GENDER_ATTEMPTS = 2
+MIN_STABLE_SIMILARITY = 0.45
+
+
+def _clean_text(value):
+    if pd.isna(value):
+        return ""
+    return str(value).strip()
+
+
+def _text_similarity(a: str, b: str) -> float:
+    return SequenceMatcher(None, a, b).ratio()
+
+
+def _line_changed_too_much(original, revised):
+    original = _clean_text(original)
+    revised = _clean_text(revised).replace("\n", " ")
+
+    if not revised:
+        return True
+    if not original:
+        return False
+
+    if len(original) >= 15 and _text_similarity(original, revised) < MIN_STABLE_SIMILARITY:
+        return True
+
+    max_len = max(len(original) + 24, int(len(original) * 1.8))
+    return len(revised) > max_len
+
+
+def split_records_into_chunks(records, chunk_size=900, max_i=8):
     chunks = []
-    current_indices = []
-    current_lines = []
+    current_records = []
     current_len = 0
 
     for record in records:
-        line = str(record["text"]).strip()
-        add_len = len(line) + 1
+        add_len = len(record["source"]) + len(record["translation"]) + 16
 
-        if current_lines and (current_len + add_len > chunk_size or len(current_lines) >= max_i):
-            chunks.append({
-                "indices": current_indices,
-                "text": "\n".join(current_lines),
-            })
-            current_indices = []
-            current_lines = []
+        if current_records and (current_len + add_len > chunk_size or len(current_records) >= max_i):
+            chunks.append(current_records)
+            current_records = []
             current_len = 0
 
-        current_indices.append(record["idx"])
-        current_lines.append(line)
+        current_records.append(record)
         current_len += add_len
 
-    if current_lines:
-        chunks.append({
-            "indices": current_indices,
-            "text": "\n".join(current_lines),
-        })
+    if current_records:
+        chunks.append(current_records)
 
     return chunks
+
+
+def _normalize_gender_map(raw_genders):
+    normalized = {}
+    if not isinstance(raw_genders, dict):
+        return normalized
+
+    for speaker_id, gender in raw_genders.items():
+        speaker_key = normalize_speaker_id(speaker_id)
+        gender_label = normalize_gender_label(gender)
+        if speaker_key and gender_label:
+            normalized[speaker_key] = gender_label
+
+    return normalized
+
+
+def _validate_gender_result(response_data, records):
+    if not isinstance(response_data, dict):
+        return {"status": "error", "message": "Gender response is not a JSON object"}
+
+    expected_keys = [str(i) for i in range(1, len(records) + 1)]
+    missing_keys = [key for key in expected_keys if key not in response_data]
+    if missing_keys:
+        return {"status": "error", "message": f"Missing required key(s): {', '.join(missing_keys)}"}
+
+    for index, record in enumerate(records, start=1):
+        item = response_data.get(str(index))
+        if not isinstance(item, dict):
+            return {"status": "error", "message": f"Item {index} must be an object"}
+
+        text = item.get("text")
+        if not isinstance(text, str) or not text.strip():
+            return {"status": "error", "message": f"Item {index} must contain a non-empty text field"}
+
+        if _line_changed_too_much(record["translation"], text):
+            return {
+                "status": "error",
+                "message": f"Line {index} rewrites the translation too aggressively",
+            }
+
+    return {"status": "success", "message": "success"}
+
+
+def _best_effort_gender_result(response_data, records):
+    response_data = response_data if isinstance(response_data, dict) else {}
+    normalized = {}
+
+    for index, record in enumerate(records, start=1):
+        item = response_data.get(str(index), {})
+        text = item.get("text") if isinstance(item, dict) else None
+        cleaned_text = _clean_text(text).replace("\n", " ")
+
+        if _line_changed_too_much(record["translation"], cleaned_text):
+            cleaned_text = record["translation"]
+
+        normalized[str(index)] = {"text": cleaned_text or record["translation"]}
+
+    return normalized
+
+
+def _apply_gender_chunk(records, gender):
+    prompt = build_gender_prompt(records, gender)
+    last_result = None
+    last_error = None
+
+    for retry in range(MAX_GENDER_ATTEMPTS):
+        try:
+            result = ask_gpt(prompt + retry * " ", resp_type="json", log_title="gender_inflection")
+            last_result = result
+            valid_result = _validate_gender_result(result, records)
+            if valid_result["status"] == "success":
+                return _best_effort_gender_result(result, records)
+            last_error = valid_result["message"]
+        except Exception as exc:
+            last_error = str(exc)
+
+        if retry != MAX_GENDER_ATTEMPTS - 1:
+            rprint("[yellow]⚠️ Gender inflection chunk failed validation, retrying...[/yellow]")
+
+    if last_error:
+        rprint(f"[yellow]⚠️ Gender inflection is using best-effort fallback: {last_error}[/yellow]")
+
+    return _best_effort_gender_result(last_result, records)
+
+
+def _ensure_translation_metadata(df, df_text):
+    required_columns = {"speaker_id", "timestamp", "duration"}
+    if required_columns.issubset(df.columns):
+        return df
+
+    if not {"Source", "Translation"}.issubset(df.columns):
+        missing = sorted({"Source", "Translation"} - set(df.columns))
+        rprint(
+            Panel(
+                f"Skipping gender inflection because translation metadata is missing and "
+                f"the file also lacks columns needed for recovery: {', '.join(missing)}",
+                title="Warning",
+                border_style="yellow",
+            )
+        )
+        return df
+
+    rprint(
+        Panel(
+            "translation_results.csv is missing speaker metadata. Rebuilding speaker_id and "
+            "timestamps from cleaned_chunks.csv before gender inflection.",
+            title="Info",
+            border_style="yellow",
+        )
+    )
+
+    try:
+        rebuilt = align_timestamp(
+            df_text,
+            df[["Source", "Translation"]].copy(),
+            subtitle_output_configs=[],
+            output_dir=None,
+            for_display=False,
+        )
+    except Exception as exc:
+        rprint(
+            Panel(
+                f"Unable to rebuild speaker metadata for gender inflection: {exc}",
+                title="Warning",
+                border_style="yellow",
+            )
+        )
+        return df
+
+    for column in df.columns:
+        if column not in rebuilt.columns:
+            rebuilt[column] = df[column]
+
+    return rebuilt
 
 
 def gender_inflection():
     if not (load_key("is_gender_translate") and load_key("whisper.enable_diarization")):
         return
+
     df = pd.read_csv(_4_2_TRANSLATION)
     df_text = pd.read_csv(_2_CLEANED_CHUNKS)
-    df_text["text"] = df_text["text"].str.strip("").str.strip()
-    genders = load_key("genders_speakers")
+    df_text["text"] = df_text["text"].astype(str).str.strip('"').str.strip()
+
+    df = _ensure_translation_metadata(df, df_text)
+    if "speaker_id" not in df.columns:
+        rprint(Panel("No speaker metadata available, skipping gender inflection.", title="Info", border_style="yellow"))
+        return
+
+    df["speaker_id"] = df["speaker_id"].apply(normalize_speaker_id)
+    genders = _normalize_gender_map(load_key("genders_speakers"))
+    if not genders:
+        rprint(Panel("No speaker genders available, skipping gender inflection.", title="Info", border_style="yellow"))
+        return
+
+    changed_lines = 0
+    processed_speakers = 0
+
     for speaker_id, group_df in df.groupby("speaker_id", sort=False):
-        gender = genders.get(speaker_id)
+        speaker_key = normalize_speaker_id(speaker_id)
+        if not speaker_key:
+            continue
+
+        gender = genders.get(speaker_key)
         if not gender:
             continue
-        records = [
-            {"idx": idx, "text": row["Translation"]}
-            for idx, row in group_df.iterrows()
-        ]
 
-        chunks = split_records_into_chunks(records)
-        for chunk in chunks:
-            response = ask_gpt(
-                build_gender_prompt(chunk["text"], gender),
-                resp_type="json",
-                log_title="gender_inflection"
+        records = []
+        for idx, row in group_df.iterrows():
+            translation = _clean_text(row.get("Translation"))
+            if not translation:
+                continue
+
+            records.append(
+                {
+                    "idx": idx,
+                    "source": _clean_text(row.get("Source")),
+                    "translation": translation,
+                }
             )
 
-            new_lines = [
-                response[str(i)]["text"].strip()
-                for i in range(1, len(chunk["indices"]) + 1)
-            ]
-            if len(new_lines) != len(chunk["indices"]):
-                rprint("[red]LLM returned wrong number of lines[/red]")
-                continue
-                # raise ValueError("LLM returned wrong number of lines")
-            for idx, new_line in zip(chunk["indices"], new_lines):
-                print(new_line)
-                df.at[idx, "Translation"] = new_line
-    df = df.drop(columns=["timestamp", "duration", "speaker_id"], errors="ignore")
+        if not records:
+            continue
+
+        processed_speakers += 1
+        for chunk_records in split_records_into_chunks(records):
+            response = _apply_gender_chunk(chunk_records, gender)
+
+            for line_index, record in enumerate(chunk_records, start=1):
+                new_line = response[str(line_index)]["text"].strip()
+                if df.at[record["idx"], "Translation"] != new_line:
+                    changed_lines += 1
+                    df.at[record["idx"], "Translation"] = new_line
+
     df.to_csv(_4_2_TRANSLATION, index=False)
+    rprint(
+        Panel(
+            f"Gender inflection updated {changed_lines} subtitle line(s) across {processed_speakers} speaker(s).",
+            title="Success",
+            border_style="green",
+        )
+    )

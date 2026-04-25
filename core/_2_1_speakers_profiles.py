@@ -9,13 +9,8 @@ import pandas as pd
 import soundfile as sf
 from core.asr_backend.demucs_vl import demucs_audio
 from core.utils.models import *
-from core.tts_backend.tts_config import speakers_send    
-
-
-def normalize_speaker_id(value):
-    if pd.isna(value):
-        return None
-    return str(value)
+from core.tts_backend.tts_config import speakers_send
+from core.utils.speaker_utils import normalize_speaker_id
 
 
 def extract_audio(audio_data, sr, start_time, end_time, out_file = None, is_save: bool = True):
@@ -46,7 +41,9 @@ def get_gender_speakers():
     update_key("is_gender_translate", load_key("language_code") in load_key("language_with_gender"))
     if not load_key("whisper.enable_diarization") or not load_key("is_gender_translate"):
         return 
-    demucs_audio()
+
+    if not os.path.exists(_VOCAL_AUDIO_FILE):
+        demucs_audio()
 
     os.makedirs(_MERGED_AUDIO_DIR, exist_ok=True)
     

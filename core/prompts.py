@@ -374,29 +374,53 @@ Note: Start you answer with ```json and end with ```, do not add any other text.
 '''.strip()
 
 
-def build_gender_prompt(text, gender):
+def build_gender_prompt(records, gender):
     target_language = load_key("target_language")
+    language_code = load_key("language_code")
+    language_specific_rules = {
+        "ru": "Adjust only forms that agree with the speaker, such as first-person past tense verbs, short adjectives, participles, and explicit self-descriptions.",
+        "es": "Adjust only gendered self-reference, adjectives, participles, and nouns that clearly describe the speaker. Do not force gender where Spanish normally stays neutral.",
+        "fr": "Adjust only written agreement that refers to the speaker, such as self-descriptive adjectives and participles. Leave unchanged where French normally does not mark speaker gender.",
+    }
+    input_payload = {
+        str(index): {
+            "source": record["source"],
+            "translation": record["translation"],
+        }
+        for index, record in enumerate(records, start=1)
+    }
+
+    language_rule = language_specific_rules.get(
+        language_code,
+        "Only adjust forms that truly need speaker-gender agreement.",
+    )
 
     return f"""
-You will receive subtitle lines already translated into {target_language}.
+You will receive subtitle lines translated into {target_language}, together with their original source lines.
 
-Your task is to minimally revise each line so that grammatical agreement matches the speaker gender: {gender}.
+All lines in this batch belong to one speaker whose gender is: {gender}.
+
+Your goal is to make the smallest possible edits so the existing translation agrees with that speaker gender.
 
 Rules:
-1. Preserve the original meaning.
-2. Preserve the number of lines exactly.
-3. Do not merge or split lines.
-4. Do not rewrite the style unless grammatical agreement requires it.
-5. If a line does not require gender marking in {target_language}, leave it unchanged.
-6. If gender is ambiguous or not relevant for a line, leave it unchanged.
-7. Return one output line for each input line.
+1. Use the source line only for meaning and reference disambiguation.
+2. Keep every output line as close as possible to the current translation.
+3. Change only words that require speaker-gender agreement.
+4. Do not rewrite style, tone, wording, or sentence structure unless a gender fix requires it.
+5. If a line does not require gender marking in {target_language}, return it unchanged.
+6. If the line refers to someone other than the speaker, do not change that wording to match the speaker.
+7. Preserve the number of items exactly.
+8. Never merge or split lines.
+9. Return JSON only.
 
-Return JSON only in this format:
+Language-specific note for {language_code}: {language_rule}
+
+Return this format:
 {{
   "1": {{"text": "line 1"}},
   "2": {{"text": "line 2"}}
 }}
 
 Input:
-{text}
+{json.dumps(input_payload, ensure_ascii=False, indent=2)}
 """.strip()
