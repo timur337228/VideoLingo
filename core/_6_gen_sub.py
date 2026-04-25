@@ -56,6 +56,66 @@ def show_difference(str1, str2):
     print("Position markers: " + "".join("^" if i in diff_positions else " " for i in range(max(len(str1), len(str2)))))
     print(f"Difference indices: {diff_positions}")
 
+
+def _strip_text(value):
+    if pd.isna(value):
+        return ""
+    return str(value).strip()
+
+
+def _join_text(left, right, joiner):
+    left = _strip_text(left)
+    right = _strip_text(right)
+    if not left:
+        return right
+    if not right:
+        return left
+    return f"{left}{joiner}{right}" if joiner else f"{left}{right}"
+
+
+def _collapse_empty_translation_rows(df):
+    if "Translation" not in df.columns or df.empty:
+        return df
+
+    whisper_language = load_key("whisper.language")
+    source_language = load_key("whisper.detected_language") if whisper_language == 'auto' else whisper_language
+    source_joiner = get_joiner(source_language)
+    rows = [row.copy() for _, row in df.iterrows()]
+    index = 0
+
+    while index < len(rows):
+        translation = _strip_text(rows[index].get("Translation"))
+        if translation:
+            index += 1
+            continue
+
+        if index > 0:
+            previous = rows[index - 1]
+            current = rows[index]
+            previous["timestamp"] = (previous["timestamp"][0], current["timestamp"][1])
+            previous["duration"] = previous["timestamp"][1] - previous["timestamp"][0]
+            if "Source" in previous:
+                previous["Source"] = _join_text(previous.get("Source"), current.get("Source"), source_joiner)
+            rows.pop(index)
+            continue
+
+        if len(rows) > 1:
+            current = rows[index]
+            following = rows[index + 1]
+            following["timestamp"] = (current["timestamp"][0], following["timestamp"][1])
+            following["duration"] = following["timestamp"][1] - following["timestamp"][0]
+            if "Source" in following:
+                following["Source"] = _join_text(current.get("Source"), following.get("Source"), source_joiner)
+            rows.pop(index)
+            continue
+
+        rows.pop(index)
+
+    if not rows:
+        return df.iloc[0:0].copy()
+
+    return pd.DataFrame(rows, columns=df.columns)
+
 def get_sentence_timestamps(df_words, df_sentences):
     time_stamp_list = []
     speaker_list = []
@@ -123,6 +183,7 @@ def align_timestamp(df_text, df_translate, subtitle_output_configs: list, output
     
     df_trans_time['timestamp'] = time_stamp_list
     df_trans_time['duration'] = df_trans_time['timestamp'].apply(lambda x: x[1] - x[0])
+    df_trans_time = _collapse_empty_translation_rows(df_trans_time).reset_index(drop=True)
 
     # Remove gaps 🕳️
     for i in range(len(df_trans_time)-1):
