@@ -1,4 +1,4 @@
-from core.prompts import generate_shared_prompt, get_prompt_faithfulness, get_prompt_expressiveness
+from core.prompts import generate_shared_prompt, get_prompt_faithfulness, get_prompt_expressiveness, get_prompt_meaning_preservation
 from rich.panel import Panel
 from rich.console import Console
 from rich.table import Table
@@ -34,6 +34,8 @@ def _best_effort_translation_result(response_data, source_lines, value_key, fall
         if not isinstance(value, str) or not value.strip():
             if value_key == "free":
                 value = fallback_item.get("direct") or source_line
+            elif value_key == "final":
+                value = fallback_item.get("free") or fallback_item.get("direct") or source_line
             else:
                 value = source_line
 
@@ -96,10 +98,22 @@ def translate_lines(lines, previous_content_prompt, after_cotent_prompt, things_
             if base_check["status"] != "success":
                 return base_check
             return valid_express_alignment(response_data)
+        def valid_meaning_guard(response_data):
+            return valid_translate_result(response_data, [str(i) for i in range(1, length+1)], ['final'])
 
         source_lines = lines.split('\n')
-        validator = valid_faith if step_name == 'faithfulness' else valid_express
-        value_key = 'direct' if step_name == 'faithfulness' else 'free'
+        validator_map = {
+            'faithfulness': valid_faith,
+            'expressiveness': valid_express,
+            'meaning_preservation': valid_meaning_guard,
+        }
+        value_key_map = {
+            'faithfulness': 'direct',
+            'expressiveness': 'free',
+            'meaning_preservation': 'final',
+        }
+        validator = validator_map[step_name]
+        value_key = value_key_map[step_name]
         last_result = None
         last_error = None
 
@@ -154,18 +168,35 @@ def translate_lines(lines, previous_content_prompt, after_cotent_prompt, things_
     prompt2 = get_prompt_expressiveness(faith_result, lines, shared_prompt)
     express_result = retry_translation(prompt2, len(lines.split('\n')), 'expressiveness', fallback_items=faith_result)
 
+    ## Step 3: Preserve Meaning After Polishing
+    prompt3 = get_prompt_meaning_preservation(faith_result, express_result, shared_prompt)
+    meaning_guard_fallback = {}
+    for key in faith_result:
+        meaning_guard_fallback[key] = {
+            "origin": faith_result[key]["origin"],
+            "direct": faith_result[key]["direct"],
+            "free": express_result.get(key, {}).get("free", faith_result[key]["direct"]),
+            "final": express_result.get(key, {}).get("free", faith_result[key]["direct"]),
+        }
+    final_result = retry_translation(
+        prompt3,
+        len(lines.split('\n')),
+        'meaning_preservation',
+        fallback_items=meaning_guard_fallback,
+    )
+
     table = Table(title="Translation Results", show_header=False, box=box.ROUNDED)
     table.add_column("Translations", style="bold")
-    for i, key in enumerate(express_result):
+    for i, key in enumerate(final_result):
         table.add_row(f"[cyan]Origin:  {faith_result[key]['origin']}[/cyan]")
         table.add_row(f"[magenta]Direct:  {faith_result[key]['direct']}[/magenta]")
-        table.add_row(f"[green]Free:    {express_result[key]['free']}[/green]")
-        if i < len(express_result) - 1:
+        table.add_row(f"[green]Final:   {final_result[key]['final']}[/green]")
+        if i < len(final_result) - 1:
             table.add_row("[yellow]" + "-" * 50 + "[/yellow]")
 
     console.print(table)
 
-    translate_result = "\n".join([express_result[i]["free"].replace('\n', ' ').strip() for i in express_result])
+    translate_result = "\n".join([final_result[i]["final"].replace('\n', ' ').strip() for i in final_result])
 
     if len(lines.split('\n')) != len(translate_result.split('\n')):
         console.print(Panel(f'[red]❌ Translation of block {index} failed, Length Mismatch, Please check `output/gpt_log/translate_expressiveness.json`[/red]'))

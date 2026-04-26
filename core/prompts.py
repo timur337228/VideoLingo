@@ -192,8 +192,8 @@ def get_prompt_expressiveness(faithfulness_result, lines, shared_prompt):
         key: {
             "origin": value["origin"],
             "direct": value["direct"],
-            "reflect": "your reflection on direct translation",
-            "free": "your free translation"
+            "reflect": "briefly note only fluency or wording issues; write OK if no change is needed",
+            "free": "your polished but meaning-preserving translation"
         }
         for key, value in faithfulness_result.items()
     }
@@ -207,17 +207,18 @@ Your expertise lies not only in accurately understanding the original {src_langu
 
 ## Task
 We already have a direct translation version of the original {src_language} subtitles.
-Your task is to reflect on and improve these direct translations to create more natural and fluent {TARGET_LANGUAGE} subtitles.
+Your task is to polish these direct translations so they sound natural and fluent in {TARGET_LANGUAGE} without changing the meaning of the original text.
 
-1. Analyze the direct translation results line by line, pointing out existing issues
-2. Provide detailed modification suggestions
-3. Perform free translation based on your analysis
-4. Do not add comments or explanations in the translation, as the subtitles are for the audience to read
-5. Do not leave empty lines in the free translation, as the subtitles are for the audience to read
-6. Each output line must translate only its own input line
-7. Do not merge neighboring lines into one sentence
-8. Do not repeat or copy content from adjacent lines
-9. If an input line is a fragment, keep it as a matching fragment instead of expanding it with neighboring meaning
+1. Analyze the direct translation line by line, but only for fluency, concision, and idiomatic wording
+2. Make the smallest possible edits needed to improve readability
+3. Preserve every meaning-bearing element from the original source and the direct translation
+4. If the direct translation is already good, keep it unchanged
+5. Do not add comments or explanations in the translation, as the subtitles are for the audience to read
+6. Do not leave empty lines in the polished translation, as the subtitles are for the audience to read
+7. Each output line must translate only its own input line
+8. Do not merge neighboring lines into one sentence
+9. Do not repeat or copy content from adjacent lines
+10. If an input line is a fragment, keep it as a matching fragment instead of expanding it with neighboring meaning
 
 {shared_prompt}
 
@@ -228,18 +229,28 @@ Your task is to reflect on and improve these direct translations to create more 
 - Do not move key information from one line into another line
 </Line Boundary Rules>
 
+<Meaning Preservation Rules>
+- Treat `direct` as the semantic anchor and improve wording conservatively
+- Never delete or weaken qualifiers, scope markers, or specificity
+- Preserve subject identity, quantities, comparisons, degree, negation, modality, time references, and cause/effect relations
+- Words such as average, some, many, most, only, almost, nearly, about, at least, fewer, more, still, already, no, and not must be preserved in meaning, even if rephrased
+- If meaning and naturalness conflict, preserve meaning
+- Before finalizing each line, verify that the polished line still says everything important that both `origin` and `direct` say
+</Meaning Preservation Rules>
+
 <Translation Analysis Steps>
 Please use a two-step thinking process to handle the text line by line:
 
 1. Direct Translation Reflection:
    - Evaluate language fluency
    - Check if the language style is consistent with the original text
-   - Check the conciseness of the subtitles, point out where the translation is too wordy
+   - Check the conciseness of the subtitles, but do not remove meaning-bearing details
 
-2. {TARGET_LANGUAGE} Free Translation:
+2. {TARGET_LANGUAGE} Natural-but-Faithful Rewrite:
    - Aim for contextual smoothness and naturalness, conforming to {TARGET_LANGUAGE} expression habits
    - Ensure it's easy for {TARGET_LANGUAGE} audience to understand and accept
    - Adapt the language style to match the theme (e.g., use casual language for tutorials, professional terminology for technical content, formal language for documentaries)
+   - Keep every qualifier and factual detail that affects meaning
 </Translation Analysis Steps>
    
 ## INPUT
@@ -255,6 +266,59 @@ Please use a two-step thinking process to handle the text line by line:
 Note: Start you answer with ```json and end with ```, do not add any other text.
 '''
     return prompt_expressiveness.strip()
+
+
+def get_prompt_meaning_preservation(faithfulness_result, expressiveness_result, shared_prompt):
+    TARGET_LANGUAGE = load_key("target_language")
+    payload = {}
+    for key, value in faithfulness_result.items():
+        express_item = expressiveness_result.get(key, {})
+        payload[key] = {
+            "origin": value["origin"],
+            "direct": value["direct"],
+            "free": express_item.get("free", value["direct"]),
+            "final": "final subtitle after meaning check"
+        }
+    json_format = json.dumps(payload, indent=2, ensure_ascii=False)
+
+    src_language = load_key("whisper.detected_language")
+    prompt_meaning_preservation = f'''
+## Role
+You are a senior subtitle reviewer responsible for protecting meaning while keeping subtitles natural.
+
+## Task
+You will receive, for each subtitle line:
+- `origin`: the original {src_language} line
+- `direct`: a faithful direct translation into {TARGET_LANGUAGE}
+- `free`: a polished version that may be more natural
+
+Your job is to produce `final`, the best subtitle line for the audience.
+
+1. If `free` is natural and fully faithful to both `origin` and `direct`, copy it unchanged into `final`
+2. If `free` drops, weakens, or changes any meaning, repair it with the smallest possible edit
+3. Use `direct` as the semantic anchor whenever `free` becomes too loose
+4. When meaning and style conflict, choose meaning
+5. Keep one-to-one line alignment and never merge or split lines
+
+{shared_prompt}
+
+<Meaning Preservation Checklist>
+- Preserve qualifiers and scope: average, some, many, most, only, almost, nearly, about, at least, exactly
+- Preserve comparison and degree: more, less, fewer, better, worse, first, last
+- Preserve negation and modality: no, not, never, may, might, should, must
+- Preserve time and factual anchors: now, already, still, before, after, numbers, dates, durations
+- Preserve who did what to whom
+- If a detail is present in `origin` and `direct`, it must still be present in `final`
+</Meaning Preservation Checklist>
+
+## Output in only JSON format and no other text
+```json
+{json_format}
+```
+
+Note: Start you answer with ```json and end with ```, do not add any other text.
+'''
+    return prompt_meaning_preservation.strip()
 
 
 ## ================================================================
