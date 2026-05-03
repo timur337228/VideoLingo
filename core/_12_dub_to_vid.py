@@ -6,7 +6,6 @@ import numpy as np
 from rich.console import Console
 
 from core._1_ytdlp import find_video_files
-from core.asr_backend.audio_preprocess import normalize_audio_volume
 from core.utils import *
 from core.utils.models import *
 
@@ -32,10 +31,6 @@ def merge_video_audio():
     """Merge video and audio, and reduce video volume"""
     VIDEO_FILE = find_video_files()
     background_file = _BACKGROUND_AUDIO_FILE
-
-    # Normalize dub audio
-    normalized_dub_audio = 'output/normalized_dub.wav'
-    normalize_audio_volume(DUB_AUDIO, normalized_dub_audio)
     
     # Merge video and audio with translated subtitles
     video = cv2.VideoCapture(VIDEO_FILE)
@@ -56,7 +51,7 @@ def merge_video_audio():
         subtitle_filter = ""
     
     cmd = [
-        'ffmpeg', '-y', '-i', VIDEO_FILE, '-i', background_file, '-i', normalized_dub_audio,
+        'ffmpeg', '-y', '-i', VIDEO_FILE, '-i', background_file, '-i', DUB_AUDIO,
         '-filter_complex',
         f'[0:v]scale={TARGET_WIDTH}:{TARGET_HEIGHT}:force_original_aspect_ratio=decrease,'
         f'pad={TARGET_WIDTH}:{TARGET_HEIGHT}:(ow-iw)/2:(oh-ih)/2{subtitle_filter}[v];'

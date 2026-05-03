@@ -1,4 +1,5 @@
 import concurrent.futures
+import os
 
 from core.utils import *
 from core.asr_backend.demucs_vl import demucs_audio
@@ -26,6 +27,16 @@ def _transcribe_segments(ts, raw_audio, vocal_audio, segments, runtime):
 
     return results
 
+
+def _prepare_asr_audio(source_audio):
+    return normalize_audio_volume(source_audio, _ASR_NORMALIZED_AUDIO_FILE, format="mp3")
+
+
+def _cleanup_asr_audio(audio_path):
+    if audio_path == _ASR_NORMALIZED_AUDIO_FILE and os.path.exists(audio_path):
+        os.remove(audio_path)
+
+
 @check_file_exists(_2_CLEANED_CHUNKS)
 def transcribe():
     # 1. video to audio
@@ -35,9 +46,9 @@ def transcribe():
     # 2. Demucs vocal separation:
     if load_key("demucs"):
         demucs_audio()
-        vocal_audio = normalize_audio_volume(_VOCAL_AUDIO_FILE, _VOCAL_AUDIO_FILE, format="mp3")
+        vocal_audio = _prepare_asr_audio(_VOCAL_AUDIO_FILE)
     else:
-        vocal_audio = _RAW_AUDIO_FILE
+        vocal_audio = _prepare_asr_audio(_RAW_AUDIO_FILE)
 
     # 3. Extract audio
     segments = split_audio(_RAW_AUDIO_FILE)
@@ -56,7 +67,10 @@ def transcribe():
     else:
         raise ValueError(f"Unsupported whisper.runtime: {runtime}")
 
-    all_results = _transcribe_segments(ts, _RAW_AUDIO_FILE, vocal_audio, segments, runtime)
+    try:
+        all_results = _transcribe_segments(ts, _RAW_AUDIO_FILE, vocal_audio, segments, runtime)
+    finally:
+        _cleanup_asr_audio(vocal_audio)
     
     # 5. Combine results
     combined_result = {'segments': []}

@@ -21,6 +21,7 @@ _OUTPUT_DIR = "output"
 _AUDIO_DIR = "output/audio"
 _RAW_AUDIO_FILE = "output/audio/raw.mp3"
 _VOCAL_AUDIO_FILE = "output/audio/vocal.mp3"
+_ASR_NORMALIZED_AUDIO_FILE = "output/audio/tmp/asr_normalized.mp3"
 _BACKGROUND_AUDIO_FILE = "output/audio/background.mp3"
 _AUDIO_REFERS_DIR = "output/audio/refers"
 _AUDIO_SEGS_DIR = "output/audio/segs"
@@ -44,6 +45,7 @@ __all__ = [
     "_AUDIO_DIR",
     "_RAW_AUDIO_FILE",
     "_VOCAL_AUDIO_FILE",
+    "_ASR_NORMALIZED_AUDIO_FILE",
     "_BACKGROUND_AUDIO_FILE",
     "_AUDIO_REFERS_DIR",
     "_AUDIO_SEGS_DIR",

@@ -87,6 +87,9 @@ def normalize_audio_volume(audio_path, output_path, target_db = -20.0, format = 
     audio = AudioSegment.from_file(audio_path)
     change_in_dBFS = target_db - audio.dBFS
     normalized_audio = audio.apply_gain(change_in_dBFS)
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
     normalized_audio.export(output_path, format=format)
     rprint(f"[green]✅ Audio normalized from {audio.dBFS:.1f}dB to {target_db:.1f}dB[/green]")
     return output_path
