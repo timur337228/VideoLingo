@@ -21,7 +21,7 @@ class PreloadedSeparator(Separator):
                             segment=segment, jobs=jobs, progress=True, callback=None, callback_arg=None)
 
 def demucs_audio():
-    if is_cache_enabled() and os.path.exists(_VOCAL_AUDIO_FILE) and os.path.exists(_BACKGROUND_AUDIO_FILE):
+    if os.path.exists(_VOCAL_AUDIO_FILE) and os.path.exists(_BACKGROUND_AUDIO_FILE):
         rprint(f"[yellow]⚠️ {_VOCAL_AUDIO_FILE} and {_BACKGROUND_AUDIO_FILE} already exist, skip Demucs processing.[/yellow]")
         return
     
