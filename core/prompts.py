@@ -186,6 +186,59 @@ Note: Start you answer with ```json and end with ```, do not add any other text.
     return prompt_faithfulness.strip()
 
 
+def get_prompt_fast_translation(lines, shared_prompt):
+    TARGET_LANGUAGE = load_key("target_language")
+    src_language = load_key("whisper.detected_language")
+    language_code = load_key("language_code")
+    line_splits = lines.split('\n')
+    json_dict = {}
+    for i, line in enumerate(line_splits, 1):
+        json_dict[f"{i}"] = {
+            "origin": line,
+            "direct": f"faithful {TARGET_LANGUAGE} translation {i}",
+            "reflect": "OK or brief wording/meaning note",
+            "final": f"natural, meaning-preserving {TARGET_LANGUAGE} subtitle {i}"
+        }
+    json_format = json.dumps(json_dict, indent=2, ensure_ascii=False)
+
+    prompt_fast_translation = f'''
+## Role
+You are a professional Netflix subtitle translator fluent in {src_language} and {TARGET_LANGUAGE}.
+
+## Task
+Translate the original {src_language} subtitles into natural {TARGET_LANGUAGE} subtitles in one pass.
+For each line, do three compact steps internally:
+1. Create `direct`: a faithful translation of the source line
+2. Create `reflect`: write `OK` or a very brief note if `direct` needs polishing
+3. Create `final`: a natural subtitle that preserves every meaning-bearing detail from `origin` and `direct`
+
+{shared_prompt}
+
+## Non-negotiable Rules
+- Keep one-to-one alignment: one input line -> one output item
+- Do not merge, split, repeat, or move meaning between neighboring lines
+- Preserve subject identity, quantities, comparisons, degree, negation, modality, time references, and cause/effect
+- Preserve qualifiers and scope markers such as average, some, many, most, only, almost, nearly, about, at least, fewer, more, still, already, no, and not
+- If naturalness and meaning conflict, choose meaning
+- If the target language ({language_code}) requires grammatical gender and the source or context makes gender clear, use the correct gendered forms
+- If speaker gender is not clear from the source/context, keep the translation faithful and natural; the separate gender-inflection stage may adjust speaker-specific agreement later
+- Do not add explanations or comments to `final`
+
+## INPUT
+<subtitles>
+{lines}
+</subtitles>
+
+## Output in only JSON format and no other text
+```json
+{json_format}
+```
+
+Note: Start you answer with ```json and end with ```, do not add any other text.
+'''
+    return prompt_fast_translation.strip()
+
+
 def get_prompt_expressiveness(faithfulness_result, lines, shared_prompt):
     TARGET_LANGUAGE = load_key("target_language")
     json_format = {

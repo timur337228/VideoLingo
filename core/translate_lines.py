@@ -1,4 +1,4 @@
-from core.prompts import generate_shared_prompt, get_prompt_faithfulness, get_prompt_expressiveness, get_prompt_meaning_preservation
+from core.prompts import generate_shared_prompt, get_prompt_faithfulness, get_prompt_fast_translation, get_prompt_expressiveness, get_prompt_meaning_preservation
 from rich.panel import Panel
 from rich.console import Console
 from rich.table import Table
@@ -35,7 +35,7 @@ def _best_effort_translation_result(response_data, source_lines, value_key, fall
             if value_key == "free":
                 value = fallback_item.get("direct") or source_line
             elif value_key == "final":
-                value = fallback_item.get("free") or fallback_item.get("direct") or source_line
+                value = item.get("free") or item.get("direct") or fallback_item.get("free") or fallback_item.get("direct") or source_line
             else:
                 value = source_line
 
@@ -46,32 +46,36 @@ def _best_effort_translation_result(response_data, source_lines, value_key, fall
 
     return normalized
 
-def valid_express_alignment(response_data):
+def valid_output_alignment(response_data, value_key):
     keys = sorted(response_data.keys(), key=int)
     for idx in range(len(keys) - 1):
         current = response_data[keys[idx]]
         following = response_data[keys[idx + 1]]
 
-        current_free = current["free"].strip()
-        next_free = following["free"].strip()
+        current_value = current[value_key].strip()
+        next_value = following[value_key].strip()
         current_origin = current["origin"].strip()
         next_origin = following["origin"].strip()
 
-        if not current_free or not next_free:
+        if not current_value or not next_value:
             continue
 
-        free_similarity = _text_similarity(current_free, next_free)
+        output_similarity = _text_similarity(current_value, next_value)
         origin_similarity = _text_similarity(current_origin, next_origin)
-        long_enough = min(len(current_free), len(next_free)) >= 18
+        long_enough = min(len(current_value), len(next_value)) >= 18
 
         # Catch the common failure mode where the model merges neighboring source lines
         # into one natural sentence and copies it into both adjacent outputs.
-        if free_similarity >= 0.97 and origin_similarity <= 0.75 and long_enough:
+        if output_similarity >= 0.97 and origin_similarity <= 0.75 and long_enough:
             return {
                 "status": "error",
-                "message": f"Suspicious duplicated neighboring free translations at lines {keys[idx]} and {keys[idx + 1]}",
+                "message": f"Suspicious duplicated neighboring {value_key} translations at lines {keys[idx]} and {keys[idx + 1]}",
             }
     return {"status": "success", "message": "success validate"}
+
+
+def valid_express_alignment(response_data):
+    return valid_output_alignment(response_data, "free")
 
 
 def valid_translate_result(result: dict, required_keys: list, required_sub_keys: list):
@@ -100,14 +104,21 @@ def translate_lines(lines, previous_content_prompt, after_cotent_prompt, things_
             return valid_express_alignment(response_data)
         def valid_meaning_guard(response_data):
             return valid_translate_result(response_data, [str(i) for i in range(1, length+1)], ['final'])
+        def valid_fast(response_data):
+            base_check = valid_translate_result(response_data, [str(i) for i in range(1, length+1)], ['direct', 'final'])
+            if base_check["status"] != "success":
+                return base_check
+            return valid_output_alignment(response_data, "final")
 
         source_lines = lines.split('\n')
         validator_map = {
+            'fast_translation': valid_fast,
             'faithfulness': valid_faith,
             'expressiveness': valid_express,
             'meaning_preservation': valid_meaning_guard,
         }
         value_key_map = {
+            'fast_translation': 'final',
             'faithfulness': 'direct',
             'expressiveness': 'free',
             'meaning_preservation': 'final',
@@ -139,6 +150,29 @@ def translate_lines(lines, previous_content_prompt, after_cotent_prompt, things_
             console.print(f'[yellow]↳ Last validation error: {last_error}[/yellow]')
 
         return _best_effort_translation_result(last_result, source_lines, value_key, fallback_items)
+
+    if load_key('is_fast_translate'):
+        prompt_fast = get_prompt_fast_translation(lines, shared_prompt)
+        fast_result = retry_translation(prompt_fast, len(lines.split('\n')), 'fast_translation')
+
+        table = Table(title="Fast Translation Results", show_header=False, box=box.ROUNDED)
+        table.add_column("Translations", style="bold")
+        for i, key in enumerate(fast_result):
+            table.add_row(f"[cyan]Origin:  {fast_result[key]['origin']}[/cyan]")
+            table.add_row(f"[magenta]Direct:  {fast_result[key].get('direct', '')}[/magenta]")
+            table.add_row(f"[green]Final:   {fast_result[key]['final']}[/green]")
+            if i < len(fast_result) - 1:
+                table.add_row("[yellow]" + "-" * 50 + "[/yellow]")
+
+        console.print(table)
+
+        translate_result = "\n".join([fast_result[i]["final"].replace('\n', ' ').strip() for i in fast_result])
+
+        if len(lines.split('\n')) != len(translate_result.split('\n')):
+            console.print(Panel(f'[red]❌ Translation of block {index} failed, Length Mismatch, Please check `output/gpt_log/translate_fast_translation.json`[/red]'))
+            raise ValueError(f'Origin ···{lines}···,\nbut got ···{translate_result}···')
+
+        return translate_result, lines
 
     ## Step 1: Faithful to the Original Text
     prompt1 = get_prompt_faithfulness(lines, shared_prompt)
