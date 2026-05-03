@@ -2,6 +2,7 @@ import os
 import io
 import json
 import time
+import threading
 import requests
 import librosa
 import soundfile as sf
@@ -10,6 +11,25 @@ from core.utils import *
 from core.utils.models import *
 
 OUTPUT_LOG_DIR = "output/log"
+_AUDIO_CACHE = {}
+_AUDIO_CACHE_LOCK = threading.Lock()
+
+
+def _load_cached_audio(audio_path: str):
+    abs_path = os.path.abspath(audio_path)
+    stat = os.stat(abs_path)
+    signature = (stat.st_mtime_ns, stat.st_size)
+
+    with _AUDIO_CACHE_LOCK:
+        cached = _AUDIO_CACHE.get(abs_path)
+        if cached and cached["signature"] == signature:
+            return cached["audio"]
+
+        audio = librosa.load(abs_path, sr=16000)
+        _AUDIO_CACHE[abs_path] = {"signature": signature, "audio": audio}
+        return audio
+
+
 def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: float = None, end: float = None):
     os.makedirs(OUTPUT_LOG_DIR, exist_ok=True)
     LOG_FILE = f"{OUTPUT_LOG_DIR}/whisperx302_{start}_{end}.json"
@@ -21,7 +41,7 @@ def transcribe_audio_302(raw_audio_path: str, vocal_audio_path: str, start: floa
     update_key("whisper.language", WHISPER_LANGUAGE)
     url = "https://api.302.ai/302/whisperx"
     
-    y, sr = librosa.load(vocal_audio_path, sr=16000)
+    y, sr = _load_cached_audio(vocal_audio_path)
     audio_duration = len(y) / sr
     
     if start is None or end is None:

@@ -1,8 +1,30 @@
+import concurrent.futures
+
 from core.utils import *
 from core.asr_backend.demucs_vl import demucs_audio
 from core.asr_backend.audio_preprocess import process_transcription, convert_video_to_audio, split_audio, save_results, normalize_audio_volume
 from core._1_ytdlp import find_video_files
 from core.utils.models import *
+
+
+def _transcribe_segments(ts, raw_audio, vocal_audio, segments, runtime):
+    if runtime != "cloud" or len(segments) <= 1:
+        return [ts(raw_audio, vocal_audio, start, end) for start, end in segments]
+
+    max_workers = max(1, min(int(load_key("max_workers")), len(segments)))
+    rprint(f"[cyan]🎤 Transcribing {len(segments)} cloud ASR segments in parallel with {max_workers} workers...[/cyan]")
+
+    results = [None] * len(segments)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_index = {
+            executor.submit(ts, raw_audio, vocal_audio, start, end): index
+            for index, (start, end) in enumerate(segments)
+        }
+        for future in concurrent.futures.as_completed(future_to_index):
+            index = future_to_index[future]
+            results[index] = future.result()
+
+    return results
 
 @check_file_exists(_2_CLEANED_CHUNKS)
 def transcribe():
@@ -21,7 +43,6 @@ def transcribe():
     segments = split_audio(_RAW_AUDIO_FILE)
     
     # 4. Transcribe audio by clips
-    all_results = []
     runtime = load_key("whisper.runtime")
     if runtime == "local":
         from core.asr_backend.whisperX_local import transcribe_audio as ts
@@ -32,10 +53,10 @@ def transcribe():
     elif runtime == "elevenlabs":
         from core.asr_backend.elevenlabs_asr import transcribe_audio_elevenlabs as ts
         rprint("[cyan]🎤 Transcribing audio with ElevenLabs API...[/cyan]")
+    else:
+        raise ValueError(f"Unsupported whisper.runtime: {runtime}")
 
-    for start, end in segments:
-        result = ts(_RAW_AUDIO_FILE, vocal_audio, start, end)
-        all_results.append(result)
+    all_results = _transcribe_segments(ts, _RAW_AUDIO_FILE, vocal_audio, segments, runtime)
     
     # 5. Combine results
     combined_result = {'segments': []}
