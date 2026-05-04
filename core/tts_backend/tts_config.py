@@ -13,6 +13,8 @@ DEFAULT_SPEAKERS = {
     "ru": "Dmitry",
 }
 
+FEMALE_GENDER_LABEL = "female"
+
 SPEAKERS_VOICE = {
     "ru": {"male": ["Dmitry",
                     "default-hglgrqgxmxsw2sn3ovpfuw__design-voice-5608986b",
@@ -59,6 +61,8 @@ def speakers_send(is_gender_classification: bool = False):
         if speaker_id not in result:
             full_path = os.path.join(_MERGED_AUDIO_DIR, file)
             gender = classify_audio(full_path)
+            if is_gender_classification and gender != FEMALE_GENDER_LABEL:
+                continue
             tag = get_voices(gender) if not is_gender_classification else gender
             result[speaker_id] = tag
     tts_method = load_key("tts_method")

@@ -8,12 +8,17 @@ from core.utils.models import *
 
 
 MAX_GENDER_ATTEMPTS = 2
+FEMALE_GENDER_LABELS = {"female", "f", "woman", "feminine"}
 
 
 def _clean_text(value):
     if pd.isna(value):
         return ""
     return str(value).strip()
+
+
+def _is_female_gender(gender):
+    return str(gender).strip().casefold() in FEMALE_GENDER_LABELS
 
 
 def split_records_into_chunks(records, chunk_size=900, max_i=8):
@@ -174,7 +179,7 @@ def gender_inflection():
             continue
 
         gender = genders.get(speaker_id)
-        if not gender:
+        if not _is_female_gender(gender):
             continue
 
         records = []
