@@ -12,7 +12,7 @@ def _transcribe_segments(ts, raw_audio, vocal_audio, segments, runtime):
     if runtime != "cloud" or len(segments) <= 1:
         return [ts(raw_audio, vocal_audio, start, end) for start, end in segments]
 
-    max_workers = max(1, min(int(load_key("max_workers")), len(segments)))
+    max_workers = min(load_worker_count("network_max_workers"), len(segments))
     rprint(f"[cyan]🎤 Transcribing {len(segments)} cloud ASR segments in parallel with {max_workers} workers...[/cyan]")
 
     results = [None] * len(segments)

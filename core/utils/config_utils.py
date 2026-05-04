@@ -62,6 +62,23 @@ def update_key(key, new_value):
     return settings.update_key(key, new_value)
 
 
+def load_worker_count(key="max_workers", fallback_key="max_workers"):
+    try:
+        value = load_key(key)
+    except KeyError:
+        value = load_key(fallback_key)
+
+    if value in (None, ""):
+        value = load_key(fallback_key)
+
+    try:
+        return max(1, int(value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"Config key '{key}' must be a positive integer, got {value!r}"
+        ) from exc
+
+
 def is_cache_enabled():
     try:
         return bool(load_key("save_cache"))

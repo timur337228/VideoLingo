@@ -23,8 +23,11 @@ api:
   presence_penalty: 0.0
   seed:
   max_tokens:
-# *Number of LLM multi-threaded accesses, set to 1 if using local LLM
+# *Number of local/pipeline worker threads. Set to 1 if using local LLM/GPU-heavy local models.
 max_workers: 4
+# *Number of simultaneous network/API requests for LLM, cloud ASR, and API TTS.
+# Increase this separately when your provider rate limits allow it.
+network_max_workers: 30
 hf_token: 
 # Language settings, written into the prompt, can be described in natural language
 target_language: 'Русский язык'
@@ -91,7 +94,7 @@ max_split_length: 20
 reflect_translate: true
 
 # *Fast translation mode: combine faithful translation, polishing, and meaning check in one shorter LLM prompt
-is_fast_translate: true
+is_fast_translate: false
 
 # *Whether to pause after extracting professional terms and before translation, allowing users to manually adjust the terminology table output\log\terminology.json
 pause_before_translate: false
@@ -119,7 +122,7 @@ sf_fish_tts:
 
 inworld_tts:
   api_key: YOUR_INWORLD_API_KEY
-  model_id: inworld-tts-1.5-max
+  model_id: inworld-tts-1.5-mini
   speakers:
 
 # OpenAI TTS-1 API configuration, 302.ai API only

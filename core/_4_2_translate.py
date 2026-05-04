@@ -58,7 +58,9 @@ def translate_all():
     # 🔄 Use concurrent execution for translation
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), transient=True) as progress:
         task = progress.add_task("[cyan]Translating chunks...", total=len(chunks))
-        with concurrent.futures.ThreadPoolExecutor(max_workers=load_key("max_workers")) as executor:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=load_worker_count("network_max_workers")
+        ) as executor:
             futures = []
             for i, chunk in enumerate(chunks):
                 future = executor.submit(translate_chunk, chunk, chunks, theme_prompt, i)
