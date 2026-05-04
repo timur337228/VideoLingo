@@ -111,6 +111,8 @@ tts_clone: false
 # background_music: mix dubbing with Demucs background-only track (requires demucs/background.mp3)
 # original_audio: mix dubbing with the original video's full audio track (keeps original voices)
 dub_background_audio: 'original_audio'
+# *Background audio volume in percent when mixing with dubbing. 100 = original volume.
+dub_background_volume_percent: 30
 
 # SiliconFlow FishTTS
 sf_fish_tts:

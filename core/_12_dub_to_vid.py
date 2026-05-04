@@ -32,6 +32,7 @@ TRANS_BACK_COLOR = '&H33000000'
 BACKGROUND_MUSIC_MODE = "background_music"
 ORIGINAL_AUDIO_MODE = "original_audio"
 DUB_BACKGROUND_AUDIO_KEY = "dub_background_audio"
+DUB_BACKGROUND_VOLUME_KEY = "dub_background_volume_percent"
 
 
 def get_dub_background_audio_mode():
@@ -58,10 +59,34 @@ def get_dub_background_audio_mode():
     return aliases[normalized]
 
 
+def get_dub_background_volume_ratio():
+    try:
+        volume_percent = load_key(DUB_BACKGROUND_VOLUME_KEY)
+    except KeyError:
+        volume_percent = 30
+
+    try:
+        volume_percent = float(volume_percent)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"{DUB_BACKGROUND_VOLUME_KEY} must be a number from 0 to 100, "
+            f"got {volume_percent!r}."
+        ) from exc
+
+    if not 0 <= volume_percent <= 100:
+        raise ValueError(
+            f"{DUB_BACKGROUND_VOLUME_KEY} must be between 0 and 100, "
+            f"got {volume_percent}."
+        )
+
+    return volume_percent / 100
+
+
 def merge_video_audio():
     """Merge video and audio, and reduce video volume"""
     VIDEO_FILE = find_video_files()
     background_mode = get_dub_background_audio_mode()
+    background_volume_ratio = get_dub_background_volume_ratio()
     
     # Merge video and audio with translated subtitles
     video = cv2.VideoCapture(VIDEO_FILE)
@@ -87,9 +112,15 @@ def merge_video_audio():
     )
 
     if background_mode == ORIGINAL_AUDIO_MODE:
-        rprint("[cyan]🎚️ Using original video audio as dubbing background.[/cyan]")
+        rprint(
+            "[cyan]🎚️ Using original video audio as dubbing background "
+            f"at {background_volume_ratio * 100:.0f}% volume.[/cyan]"
+        )
         cmd = ['ffmpeg', '-y', '-i', VIDEO_FILE, '-i', DUB_AUDIO]
-        audio_filter = '[0:a][1:a]amix=inputs=2:duration=first:dropout_transition=3[a]'
+        audio_filter = (
+            f'[0:a]volume={background_volume_ratio:.4f}[bg];'
+            '[bg][1:a]amix=inputs=2:duration=first:dropout_transition=3:normalize=0[a]'
+        )
     else:
         background_file = _BACKGROUND_AUDIO_FILE
         if not os.path.exists(background_file):
@@ -98,9 +129,15 @@ def merge_video_audio():
                 f"Use {DUB_BACKGROUND_AUDIO_KEY}: '{ORIGINAL_AUDIO_MODE}' "
                 "or enable Demucs to create background music."
             )
-        rprint("[cyan]🎚️ Using Demucs background music as dubbing background.[/cyan]")
+        rprint(
+            "[cyan]🎚️ Using Demucs background music as dubbing background "
+            f"at {background_volume_ratio * 100:.0f}% volume.[/cyan]"
+        )
         cmd = ['ffmpeg', '-y', '-i', VIDEO_FILE, '-i', background_file, '-i', DUB_AUDIO]
-        audio_filter = '[1:a][2:a]amix=inputs=2:duration=first:dropout_transition=3[a]'
+        audio_filter = (
+            f'[1:a]volume={background_volume_ratio:.4f}[bg];'
+            '[bg][2:a]amix=inputs=2:duration=first:dropout_transition=3:normalize=0[a]'
+        )
     
     cmd.extend(['-filter_complex', f'{video_filter}{audio_filter}'])
 
