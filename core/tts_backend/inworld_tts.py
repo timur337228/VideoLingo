@@ -6,6 +6,15 @@ from core.tts_backend.tts_config import DEFAULT_SPEAKERS
 from core.utils.config_utils import load_key
 
 url = "https://api.inworld.ai/tts/v1/voice"
+DEFAULT_MODEL_ID = "inworld-tts-1.5-mini"
+
+
+def get_model_id() -> str:
+    try:
+        return load_key("inworld_tts.model_id") or DEFAULT_MODEL_ID
+    except KeyError:
+        return DEFAULT_MODEL_ID
+
 
 def inworld_tts(text: str, save_path: str | Path, duration: float, speaker_id: str = None):
     speech_file_path = Path(save_path)
@@ -20,7 +29,7 @@ def inworld_tts(text: str, save_path: str | Path, duration: float, speaker_id: s
     payload = {
         "text": text,
         "voice_id": voice_id,
-        "model_id": "inworld-tts-1.5-max",
+        "model_id": get_model_id(),
         "audio_config": {
             "audio_encoding": "LINEAR16",
             "sample_rate_hertz": 48000,

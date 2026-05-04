@@ -107,6 +107,11 @@ compute_type: float32
 
 tts_clone: false
 
+# *Final dubbed video background audio mode:
+# background_music: mix dubbing with Demucs background-only track (requires demucs/background.mp3)
+# original_audio: mix dubbing with the original video's full audio track (keeps original voices)
+dub_background_audio: 'original_audio'
+
 # SiliconFlow FishTTS
 sf_fish_tts:
   # SiliconFlow API key
@@ -122,7 +127,7 @@ sf_fish_tts:
 
 inworld_tts:
   api_key: YOUR_INWORLD_API_KEY
-  model_id: inworld-tts-1.5-mini
+  model_id: inworld-tts-1.5-max
   speakers:
 
 # OpenAI TTS-1 API configuration, 302.ai API only
