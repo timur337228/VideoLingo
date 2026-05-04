@@ -2,6 +2,7 @@
 try:
     from .ask_gpt import ask_gpt
     from .decorator import except_handler, check_file_exists
+    from .timing import format_duration
     from .config_utils import (
         load_key,
         update_key,
@@ -20,6 +21,7 @@ __all__ = [
     "load_key",
     "update_key",
     "rprint",
+    "format_duration",
     "get_joiner",
     "is_cache_enabled",
     "load_worker_count",

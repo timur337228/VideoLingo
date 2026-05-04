@@ -1,11 +1,14 @@
 import os
+import time
 from core.st_utils.imports_and_utils import *
 from core.utils.onekeycleanup import cleanup
 from core.utils import load_key
+from core.utils.timing import format_duration
 import shutil
 from functools import partial
 from rich.panel import Panel
 from rich.console import Console
+from rich.table import Table
 from core import *
 
 console = Console()
@@ -16,7 +19,26 @@ SAVE_DIR = 'batch/output'
 ERROR_OUTPUT_DIR = 'batch/output/ERROR'
 YTB_RESOLUTION_KEY = "ytb_resolution"
 
+
+def print_video_timing_summary(timings, total_elapsed):
+    table = Table(title="Video timing summary", show_lines=False)
+    table.add_column("Step", style="green")
+    table.add_column("Time", justify="right", style="yellow")
+
+    for label, elapsed in timings:
+        table.add_row(label, format_duration(elapsed))
+
+    table.add_section()
+    table.add_row(
+        "[bold]Total video[/bold]",
+        f"[bold]{format_duration(total_elapsed)}[/bold]",
+    )
+    console.print(table)
+
+
 def process_video(file, dubbing=False, is_retry=False):
+    video_started_at = time.perf_counter()
+    timings = []
     if not is_retry:
         prepare_output_folder(OUTPUT_DIR)
     
@@ -42,6 +64,7 @@ def process_video(file, dubbing=False, is_retry=False):
     current_step = ""
     for step_name, step_func in text_steps:
         current_step = step_name
+        step_started_at = time.perf_counter()
         for attempt in range(3):
             try:
                 console.print(Panel(
@@ -55,8 +78,12 @@ def process_video(file, dubbing=False, is_retry=False):
                 break
             except Exception as e:
                 if attempt == 2:
+                    elapsed = time.perf_counter() - step_started_at
                     error_panel = Panel(
-                        f"[bold red]Error in step '{current_step}':[/]\n{str(e)}",
+                        (
+                            f"[bold red]Error in step '{current_step}':[/]\n"
+                            f"Elapsed: {format_duration(elapsed)}\n\n{str(e)}"
+                        ),
                         border_style="red"
                     )
                     console.print(error_panel)
@@ -66,8 +93,29 @@ def process_video(file, dubbing=False, is_retry=False):
                     f"[yellow]Attempt {attempt + 1} failed. Retrying...[/]",
                     border_style="yellow"
                 ))
+        elapsed = time.perf_counter() - step_started_at
+        timings.append((step_name, elapsed))
+        console.print(
+            Panel(
+                (
+                    f"[bold green]{step_name} completed[/]\n"
+                    f"Elapsed: [bold yellow]{format_duration(elapsed)}[/]"
+                ),
+                border_style="green",
+            )
+        )
     
-    console.print(Panel("[bold green]All steps completed successfully! 🎉[/]", border_style="green"))
+    total_elapsed = time.perf_counter() - video_started_at
+    console.print(
+        Panel(
+            (
+                "[bold green]All steps completed successfully! 🎉[/]\n"
+                f"Total video time: [bold yellow]{format_duration(total_elapsed)}[/]"
+            ),
+            border_style="green",
+        )
+    )
+    print_video_timing_summary(timings, total_elapsed)
     cleanup(SAVE_DIR)
     return True, "", ""
 

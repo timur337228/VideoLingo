@@ -1,7 +1,8 @@
 import streamlit as st
-import os, sys, time
+import os, sys
 from core.st_utils.imports_and_utils import *
 from core.st_utils.task_runner import TaskRunner
+from core.utils.timing import format_duration
 from core import *
 
 # SET PATH
@@ -26,6 +27,24 @@ def _task_control_panel(runner_key: str):
     if runner.state == "idle":
         return
 
+    def render_timing_details():
+        if runner.is_active:
+            st.caption(
+                "⏱️ "
+                f"Current step: {format_duration(runner.current_step_elapsed)} · "
+                f"Total: {format_duration(runner.total_elapsed)}"
+            )
+        else:
+            st.caption(f"⏱️ Total: {format_duration(runner.total_elapsed)}")
+        step_durations = list(runner.step_durations)
+        if step_durations:
+            st.table(
+                [
+                    {"Step": label, "Time": format_duration(elapsed)}
+                    for label, elapsed in step_durations
+                ]
+            )
+
     # Progress
     step_text = (
         f"({runner.current_step + 1}/{runner.total_steps}) {runner.current_label}"
@@ -39,6 +58,7 @@ def _task_control_panel(runner_key: str):
         else:
             st.info(f"⏳ {t('Running...')} {step_text}")
         st.progress(runner.progress)
+        render_timing_details()
 
         # Control buttons
         col1, col2 = st.columns(2)
@@ -70,20 +90,29 @@ def _task_control_panel(runner_key: str):
                 st.rerun()
 
     elif runner.state == "completed":
-        st.success(t("Task completed!"))
+        st.success(
+            f"{t('Task completed!')} Total: {format_duration(runner.total_elapsed)}"
+        )
         st.progress(1.0)
-        runner.reset()
-        time.sleep(0.5)
-        st.rerun(scope="app")
+        render_timing_details()
+        if st.button(
+            t("OK"),
+            key=f"{runner_key}_ack_completed",
+            use_container_width=True,
+        ):
+            runner.reset()
+            st.rerun(scope="app")
 
     elif runner.state == "stopped":
         st.warning(f"⏹️ {t('Task stopped')} {step_text}")
+        render_timing_details()
         if st.button(t("OK"), key=f"{runner_key}_ack_stop", use_container_width=True):
             runner.reset()
             st.rerun(scope="app")
 
     elif runner.state == "error":
         st.error(f"❌ {t('Task error')}: {runner.error_msg}")
+        render_timing_details()
         if st.button(t("OK"), key=f"{runner_key}_ack_error", use_container_width=True):
             runner.reset()
             st.rerun(scope="app")

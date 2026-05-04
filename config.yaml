@@ -27,7 +27,7 @@ api:
 max_workers: 4
 # *Number of simultaneous network/API requests for LLM, cloud ASR, and API TTS.
 # Increase this separately when your provider rate limits allow it.
-network_max_workers: 30
+network_max_workers: 60
 hf_token: 
 # Language settings, written into the prompt, can be described in natural language
 target_language: 'Русский язык'

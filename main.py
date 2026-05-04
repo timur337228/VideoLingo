@@ -1,9 +1,11 @@
 import os
 import sys
+import time
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.rule import Rule
+from rich.table import Table
 
 from core import *
 
@@ -43,9 +45,33 @@ def get_dubbing_steps():
     ]
 
 
+def print_timing_summary(timings, total_elapsed):
+    table = Table(title="Pipeline timing summary", show_lines=False)
+    table.add_column("Stage", style="cyan")
+    table.add_column("Step", style="green")
+    table.add_column("Time", justify="right", style="yellow")
+
+    for item in timings:
+        table.add_row(
+            item["stage"],
+            item["label"],
+            format_duration(item["elapsed"]),
+        )
+
+    table.add_section()
+    table.add_row(
+        "[bold]Total[/bold]",
+        "[bold]Whole video[/bold]",
+        f"[bold]{format_duration(total_elapsed)}[/bold]",
+    )
+    console.print(table)
+
+
 def run_steps(stage_name, steps):
     console.print(Rule(f"[bold cyan]{stage_name}[/bold cyan]"))
     total_steps = len(steps)
+    stage_timings = []
+    stage_started_at = time.perf_counter()
 
     for index, (label, func) in enumerate(steps, start=1):
         console.print(
@@ -55,42 +81,77 @@ def run_steps(stage_name, steps):
                 border_style="blue",
             )
         )
+        step_started_at = time.perf_counter()
         try:
             func()
         except Exception as exc:
+            elapsed = time.perf_counter() - step_started_at
             console.print(
                 Panel(
-                    f"[bold red]Stage failed:[/]\n{label}\n\n{exc}",
+                    (
+                        f"[bold red]Stage failed:[/]\n{label}\n\n"
+                        f"Elapsed: {format_duration(elapsed)}\n\n{exc}"
+                    ),
                     title="Error",
                     border_style="red",
                 )
             )
             raise
+        elapsed = time.perf_counter() - step_started_at
+        stage_timings.append(
+            {
+                "stage": stage_name,
+                "label": label,
+                "elapsed": elapsed,
+            }
+        )
+        console.print(
+            Panel(
+                (
+                    f"[bold green]{label} completed[/]\n"
+                    f"Elapsed: [bold yellow]{format_duration(elapsed)}[/]"
+                ),
+                title=f"{stage_name} | step {index}/{total_steps}",
+                border_style="green",
+            )
+        )
 
+    stage_elapsed = time.perf_counter() - stage_started_at
     console.print(
         Panel(
-            f"[bold green]{stage_name} completed successfully[/]",
+            (
+                f"[bold green]{stage_name} completed successfully[/]\n"
+                f"Stage time: [bold yellow]{format_duration(stage_elapsed)}[/]"
+            ),
             border_style="green",
         )
     )
+    return stage_timings
 
 
 def main():
+    pipeline_started_at = time.perf_counter()
+    timings = []
     console.print(
         Panel(
             "[bold magenta]VideoLingo CLI pipeline started[/]",
             border_style="magenta",
         )
     )
-    run_steps("Subtitle Pipeline", get_translate_steps())
+    timings.extend(run_steps("Subtitle Pipeline", get_translate_steps()))
     if not load_key("get_only_sub_video"):
-        run_steps("Dubbing Pipeline", get_dubbing_steps())
+        timings.extend(run_steps("Dubbing Pipeline", get_dubbing_steps()))
+    total_elapsed = time.perf_counter() - pipeline_started_at
     console.print(
         Panel(
-            "[bold green]All stages completed successfully[/]",
+            (
+                "[bold green]All stages completed successfully[/]\n"
+                f"Total video time: [bold yellow]{format_duration(total_elapsed)}[/]"
+            ),
             border_style="green",
         )
     )
+    print_timing_summary(timings, total_elapsed)
 
 
 if __name__ == "__main__":

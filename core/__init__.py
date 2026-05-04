@@ -28,7 +28,9 @@ except ImportError:
 __all__ = [
     'ask_gpt',
     'load_key',
+    'load_worker_count',
     'update_key',
+    'format_duration',
     'cleanup',
     'delete_dubbing_files',
     '_1_ytdlp',
