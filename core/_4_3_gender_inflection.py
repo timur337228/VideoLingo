@@ -71,8 +71,8 @@ def _best_effort_gender_result(response_data, records):
     for index, record in enumerate(records, start=1):
         item = response_data.get(str(index), {})
         text = item.get("text") if isinstance(item, dict) else None
-        cleaned_text = _clean_text(text).replace("\n", " ")
-        normalized[str(index)] = {"text": cleaned_text or record["translation"]}
+        cleaned_text = _clean_text(text).replace("\n", " ") or record["translation"]
+        normalized[str(index)] = {"text": cleaned_text}
 
     return normalized
 
@@ -154,7 +154,9 @@ def _ensure_translation_metadata(df, df_text):
 
 
 def gender_inflection():
-    if not (load_key("is_gender_translate") and load_key("whisper.enable_diarization")):
+    should_translate_gender = load_key("language_code") in load_key("language_with_gender")
+    update_key("is_gender_translate", should_translate_gender)
+    if not (should_translate_gender and load_key("whisper.enable_diarization")):
         return
 
     df = pd.read_csv(_4_2_TRANSLATION)

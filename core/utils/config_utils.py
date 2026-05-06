@@ -5,7 +5,7 @@ from ruamel.yaml import YAML
 from dotenv import load_dotenv
 
 
-load_dotenv()
+load_dotenv('.env')
 
 yaml = YAML()
 yaml.preserve_quotes = True

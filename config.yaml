@@ -24,7 +24,7 @@ api:
   seed:
   max_tokens:
 # *Number of local/pipeline worker threads. Set to 1 if using local LLM/GPU-heavy local models.
-max_workers: 4
+max_workers: 6
 # *Number of simultaneous network/API requests for LLM, cloud ASR, and API TTS.
 # Increase this separately when your provider rate limits allow it.
 network_max_workers: 60
@@ -112,7 +112,7 @@ tts_clone: false
 # original_audio: mix dubbing with the original video's full audio track (keeps original voices)
 dub_background_audio: 'original_audio'
 # *Background audio volume in percent when mixing with dubbing. 100 = original volume.
-dub_background_volume_percent: 30
+dub_background_volume_percent: 12
 
 # SiliconFlow FishTTS
 sf_fish_tts:

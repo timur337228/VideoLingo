@@ -495,9 +495,9 @@ def build_gender_prompt(records, gender):
     target_language = load_key("target_language")
     language_code = load_key("language_code")
     language_specific_rules = {
-        "ru": "Adjust only forms that agree with the speaker, such as first-person past tense verbs, short adjectives, participles, and explicit self-descriptions.",
-        "es": "Adjust only gendered self-reference, adjectives, participles, and nouns that clearly describe the speaker. Do not force gender where Spanish normally stays neutral.",
-        "fr": "Adjust only written agreement that refers to the speaker, such as self-descriptive adjectives and participles. Leave unchanged where French normally does not mark speaker gender.",
+        "ru": "Adjust first-person verbs, reflexive forms, short adjectives, participles, and explicit self-descriptions that refer to the speaker. Example for a female speaker: `Я хотел объяснить` -> `Я хотела объяснить`.",
+        "es": "Adjust gendered self-reference, adjectives, participles, and nouns that clearly describe the speaker. Do not force gender where Spanish normally stays neutral. Example for a female speaker: `Estoy listo` -> `Estoy lista`.",
+        "fr": "Adjust written agreement that refers to the speaker, such as self-descriptive adjectives and participles. Leave unchanged where French normally does not mark speaker gender. Example for a female speaker: `Je suis prêt` -> `Je suis prête`.",
     }
     input_payload = {
         str(index): {
@@ -518,11 +518,12 @@ You will receive subtitle lines translated into {target_language}, together with
 All lines in this batch belong to one speaker whose gender is: {gender}.
 
 Your goal is to make the smallest possible edits so the existing translation agrees with that speaker gender.
+The current translation may contain the wrong default gender. If so, fixing that gender is required, not optional.
 
 Rules:
 1. Use the source line only for meaning and reference disambiguation.
 2. Keep every output line as close as possible to the current translation.
-3. Change only words that require speaker-gender agreement.
+3. Change every word that requires speaker-gender agreement.
 4. Do not rewrite style, tone, wording, or sentence structure unless a gender fix requires it.
 5. If a line does not require gender marking in {target_language}, return it unchanged.
 6. If the line refers to someone other than the speaker, do not change that wording to match the speaker.
