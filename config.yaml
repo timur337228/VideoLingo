@@ -69,7 +69,7 @@ burn_subtitles_dub: true
 
 ## ======================== Advanced Settings ======================== ##
 # *🔬 h264_nvenc GPU acceleration for ffmpeg, make sure your GPU supports it
-ffmpeg_gpu: true
+ffmpeg_gpu: false
 
 # *Youtube settings
 youtube:

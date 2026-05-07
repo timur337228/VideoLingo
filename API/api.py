@@ -1,21 +1,24 @@
+from celery.result import AsyncResult
 from fastapi import FastAPI
-from core.utils.config_utils import update_key
+from API.tasks import run_pipeline_task
 from API.query_models import PipelineInput
-from API.s3 import s3
-from main import main
-import os
-import shutil
+from API.celery_app import celery
+
 
 app = FastAPI()
 
 @app.post("/run-pipeline")
 def run_pipeline(data: PipelineInput):
-    for key, value in data.model_dump(exclude={"save_as"}).items():
-        update_key(key, value)
-    main()
-    video_path = s3.upload_file("output/output_dub.mp4", data.save_as)
-    shutil.rmtree("output")
-    os.mkdir("output")
-    return video_path
+    task = run_pipeline_task.delay(data.model_dump())
+    return {"task_id": task.id}
 
+
+@app.get("/status/{task_id}")
+def get_status(task_id: str):
+    task = AsyncResult(task_id, app=celery)
+
+    return {
+        "status": task.status,
+        "result": task.result
+    }
 
