@@ -1,0 +1,64 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Регистрация | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-copy">
+      <div class="hero-tag">AI · Новый аккаунт</div>
+      <h1>Создайте профиль<br><em>для переводов</em></h1>
+      <p>После регистрации вы сможете хранить историю роликов, учитывать кредиты и связывать платежи с конкретным пользователем.</p>
+      <div class="auth-note-card">
+        <h3>Почему это удобно</h3>
+        <p>Вы сразу получите основу для дополнительных полей: кредиты, тариф, история оплат, статус подписки и всё остальное, что понадобится дальше.</p>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="section-tag">Регистрация</div>
+      <h2 class="auth-title">Создать аккаунт</h2>
+      <p class="auth-subtitle">Используйте email как логин и задайте пароль для входа.</p>
+
+      <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form-errors">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.password1.id_for_label }}">Пароль</label>
+          {{ form.password1 }}
+          {% for error in form.password1.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.password2.id_for_label }}">Повторите пароль</label>
+          {{ form.password2 }}
+          {% for error in form.password2.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-primary btn-block">Зарегистрироваться</button>
+      </form>
+
+      <p class="auth-switch">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+    </div>
+  </section>
+{% endblock %}

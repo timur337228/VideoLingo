@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MixxTranslate{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'accounts/css/site.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <nav class="site-nav">
+    <a class="logo" href="{% url 'home' %}">Mixx<span>Translate</span></a>
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}#how-it-works">Возможности</a></li>
+      <li><a href="{% url 'home' %}#languages">Языки</a></li>
+      {% if user.is_authenticated %}
+        <li><span class="nav-pill">Кредиты: {{ user.credits }}</span></li>
+        <li><a href="{% url 'logout' %}" class="nav-cta">Выйти</a></li>
+      {% else %}
+        <li><a href="{% url 'login' %}">Вход</a></li>
+        <li><a href="{% url 'register' %}" class="nav-cta">Регистрация</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <a class="footer-logo" href="{% url 'home' %}">Mixx<span>Translate</span></a>
+    <p>© {% now "Y" %} MixxTranslate. Все права защищены.</p>
+    <ul class="footer-links">
+      <li><a href="{% url 'home' %}#how-it-works">Как это работает</a></li>
+      <li><a href="{% url 'home' %}#languages">Языки</a></li>
+    </ul>
+  </footer>
+</body>
+</html>
