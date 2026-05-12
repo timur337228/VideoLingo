@@ -16,31 +16,35 @@ class StyledFieldsMixin:
                 field.widget.attrs["placeholder"] = placeholder
 
 
-class UserRegister(StyledFieldsMixin, UserCreationForm):
+class StartRegistrationForm(StyledFieldsMixin, forms.Form):
     email = forms.EmailField(label="Email")
-
-    class Meta:
-        model = User
-        fields = ("email", "password1", "password2")
 
     field_placeholders = {
         "email": "you@example.com",
-        "password1": "Минимум 8 символов",
-        "password2": "Повторите пароль",
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_styles()
         self.fields["email"].widget.attrs["autocomplete"] = "email"
-        self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
-        self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("Пользователь с таким email уже существует.")
         return email
+
+
+class CompleteRegistrationForm(StyledFieldsMixin, UserCreationForm):
+    first_name = forms.CharField(required=False,)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styles()
+        
+    class Meta:
+        model = User
+        fields = ("password1", "password2")
 
 
 class UserLogin(StyledFieldsMixin, AuthenticationForm):
@@ -61,3 +65,7 @@ class UserLogin(StyledFieldsMixin, AuthenticationForm):
         self.apply_styles()
         self.fields["username"].widget.attrs["autocomplete"] = "email"
         self.fields["password"].widget.attrs["autocomplete"] = "current-password"
+
+    def clean_username(self):
+        return self.cleaned_data["username"].strip().lower()
+        

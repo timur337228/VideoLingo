@@ -6,19 +6,23 @@
 {% block content %}
   <section class="auth-layout">
     <div class="auth-copy">
-      <div class="hero-tag">AI · Новый аккаунт</div>
-      <h1>Создайте профиль<br><em>для переводов</em></h1>
-      <p>После регистрации вы сможете хранить историю роликов, учитывать кредиты и связывать платежи с конкретным пользователем.</p>
+      <div class="hero-tag">AI · Шаг 1 из 2</div>
+      <h1>Сначала подтвердим<br><em>вашу почту</em></h1>
+      <p>Мы отправим ссылку на email, а пароль вы зададите уже после подтверждения. Так никто не сможет занять чужой адрес и закончить регистрацию за вас.</p>
       <div class="auth-note-card">
-        <h3>Почему это удобно</h3>
-        <p>Вы сразу получите основу для дополнительных полей: кредиты, тариф, история оплат, статус подписки и всё остальное, что понадобится дальше.</p>
+        <h3>Как устроен процесс</h3>
+        <div class="auth-checklist">
+          <p>1. Вводите email и получаете письмо со ссылкой.</p>
+          <p>2. Открываете письмо и подтверждаете адрес.</p>
+          <p>3. На следующем шаге задаёте пароль и имя.</p>
+        </div>
       </div>
     </div>
 
     <div class="auth-card">
       <div class="section-tag">Регистрация</div>
-      <h2 class="auth-title">Создать аккаунт</h2>
-      <p class="auth-subtitle">Используйте email как логин и задайте пароль для входа.</p>
+      <h2 class="auth-title">Получить ссылку</h2>
+      <p class="auth-subtitle">Введите рабочий email. После подтверждения мы откроем второй шаг с установкой пароля и остальными полями профиля.</p>
 
       <form method="post" class="auth-form">
         {% csrf_token %}
@@ -39,23 +43,11 @@
           {% endfor %}
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="{{ form.password1.id_for_label }}">Пароль</label>
-          {{ form.password1 }}
-          {% for error in form.password1.errors %}
-            <p class="field-error">{{ error }}</p>
-          {% endfor %}
+        <div class="auth-inline-note">
+          <strong>Важно:</strong> пока вы не подтвердите email, аккаунт не будет создан.
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="{{ form.password2.id_for_label }}">Повторите пароль</label>
-          {{ form.password2 }}
-          {% for error in form.password2.errors %}
-            <p class="field-error">{{ error }}</p>
-          {% endfor %}
-        </div>
-
-        <button type="submit" class="btn-primary btn-block">Зарегистрироваться</button>
+        <button type="submit" class="btn-primary btn-block">Отправить ссылку</button>
       </form>
 
       <p class="auth-switch">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>

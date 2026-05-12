@@ -1,0 +1,35 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Письмо отправлено | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-copy">
+      <div class="hero-tag">AI · Шаг 1 завершён</div>
+      <h1>Письмо уже<br><em>в пути</em></h1>
+      <p>Откройте письмо от MixxTranslate и перейдите по ссылке. Как только адрес подтвердится, мы перенаправим вас на финальный шаг, где останется только задать пароль и заполнить профиль.</p>
+      <div class="auth-note-card">
+        <h3>Если письма нет</h3>
+        <div class="auth-checklist">
+          <p>Проверьте папку “Спам”.</p>
+          <p>Убедитесь, что email введён без опечаток.</p>
+          <p>Если нужно, вернитесь и отправьте письмо заново.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-card auth-status-card">
+      <div class="status-badge">Проверьте почту</div>
+      <h2 class="auth-title">Ссылка для подтверждения отправлена</h2>
+      <p class="auth-subtitle">Как только вы откроете письмо, сможете завершить создание аккаунта и зайти в систему.</p>
+      <div class="auth-inline-note">
+        Ссылка действует ограниченное время. Если она устареет, просто начните регистрацию заново.
+      </div>
+      <div class="auth-actions">
+        <a class="btn-primary btn-block" href="{% url 'register' %}">Отправить письмо ещё раз</a>
+        <a class="btn-secondary btn-block" href="{% url 'login' %}">Перейти ко входу</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}
