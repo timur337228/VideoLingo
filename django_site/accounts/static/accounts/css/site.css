@@ -928,3 +928,25 @@ input {
     padding-bottom: 64px;
   }
 }
+.btn-primary.is-disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary.is-disabled:hover {
+  background: var(--accent);
+  color: var(--surface-strong);
+  transform: none;
+}
+
+.btn-timer {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}

@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 import uuid
 from datetime import timedelta
 from django.utils import timezone
@@ -15,24 +16,37 @@ from django.utils import timezone
 from .models import User, PendingRegistration
 from .forms import StartRegistrationForm, UserLogin, CompleteRegistrationForm
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "")
+
 
 def register(request):
     if request.user.is_authenticated:
         return redirect("home")
-
+    
     if request.method == "POST":
+        if request.session.session_key is None:
+            request.session.create()
         form = StartRegistrationForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data["email"]
-            pending, _ = PendingRegistration.objects.update_or_create(
-                email=email,
-                defaults={
-                    "token": uuid.uuid4(),
-                    "expires_at": timezone.now() + timedelta(hours=24),
-                },
-            )
-            send_verification_email(request, pending)
-            return redirect("verify_email_sent")
+            allowed = cache.add(f"register.ip:{get_client_ip(request)}", True, timeout=120)
+            session_key = cache.add(f"register:session:{request.session.session_key}", True, timeout=120)
+            if not allowed or not session_key:
+                form.add_error(None, "Превышен лимит по количеству попыток")
+            else:
+                email = form.cleaned_data["email"]
+                pending, _ = PendingRegistration.objects.update_or_create(
+                    email=email,
+                    defaults={
+                        "token": uuid.uuid4(),
+                        "expires_at": timezone.now() + timedelta(hours=24),
+                    },
+                )
+                send_verification_email(request, pending)
+                return redirect("verify_email_sent")
     else:
         form = StartRegistrationForm()
 
@@ -122,3 +136,4 @@ def complete_registration(request):
         "accounts/complete_registration.html",
         {"form": form, "email": pending.email},
     )
+

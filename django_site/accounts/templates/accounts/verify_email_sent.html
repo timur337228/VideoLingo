@@ -27,9 +27,80 @@
         Ссылка действует ограниченное время. Если она устареет, просто начните регистрацию заново.
       </div>
       <div class="auth-actions">
-        <a class="btn-primary btn-block" href="{% url 'register' %}">Отправить письмо ещё раз</a>
-        <a class="btn-secondary btn-block" href="{% url 'login' %}">Перейти ко входу</a>
-      </div>
+  <a
+    id="resend-email-btn"
+    class="btn-primary btn-block is-disabled"
+    href="{% url 'register' %}"
+    data-wait="120"
+    aria-disabled="true"
+  >
+    Отправить письмо ещё раз
+    <span class="btn-timer" id="resend-timer"></span>
+  </a>
+
+  <a class="btn-secondary btn-block" href="{% url 'login' %}">
+    Перейти ко входу
+  </a>
+</div>
+
+<script>
+  const resendBtn = document.getElementById("resend-email-btn");
+  const resendTimer = document.getElementById("resend-timer");
+
+  if (resendBtn && resendTimer) {
+    const waitSeconds = Number(resendBtn.dataset.wait);
+    const storageKey = "resendEmailCooldownEnd";
+    let timerId = null;
+
+    let endTime = Number(localStorage.getItem(storageKey));
+
+    if (!endTime || endTime < Date.now()) {
+      endTime = Date.now() + waitSeconds * 1000;
+      localStorage.setItem(storageKey, String(endTime));
+    }
+
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+
+      if (mins > 0) {
+        return `${mins}:${String(secs).padStart(2, "0")}`;
+      }
+
+      return `${secs} сек`;
+    };
+
+    const updateButton = () => {
+      const secondsLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+
+      if (secondsLeft > 0) {
+        resendBtn.classList.add("is-disabled");
+        resendBtn.setAttribute("aria-disabled", "true");
+        resendTimer.textContent = formatTime(secondsLeft);
+        return;
+      }
+
+      resendBtn.classList.remove("is-disabled");
+      resendBtn.removeAttribute("aria-disabled");
+      resendTimer.textContent = "сейчас";
+      localStorage.removeItem(storageKey);
+
+      if (timerId) {
+        clearInterval(timerId);
+      }
+    };
+
+    resendBtn.addEventListener("click", (event) => {
+      if (resendBtn.classList.contains("is-disabled")) {
+        event.preventDefault();
+      }
+    });
+
+    updateButton();
+    timerId = setInterval(updateButton, 1000);
+    }
+  </script>
+
     </div>
   </section>
 {% endblock %}

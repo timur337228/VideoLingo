@@ -36,8 +36,7 @@ class StartRegistrationForm(StyledFieldsMixin, forms.Form):
 
 
 class CompleteRegistrationForm(StyledFieldsMixin, UserCreationForm):
-    first_name = forms.CharField(required=False,)
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_styles()
