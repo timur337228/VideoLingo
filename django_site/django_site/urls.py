@@ -25,4 +25,6 @@ urlpatterns = [
     path("preview/", preview, name="preview"),
     path("admin/", admin.site.urls),
     path("auth/", include("accounts.urls")),
+    path("social-auth/", include("social_django.urls", namespace="social")),
+
 ]

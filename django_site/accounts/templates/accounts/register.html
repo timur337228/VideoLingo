@@ -24,6 +24,14 @@
       <h2 class="auth-title">Получить ссылку</h2>
       <p class="auth-subtitle">Введите рабочий email. После подтверждения мы откроем второй шаг с установкой пароля и остальными полями профиля.</p>
 
+      {% if messages %}
+        <div class="form-errors">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       <form method="post" class="auth-form">
         {% csrf_token %}
 
@@ -49,6 +57,9 @@
 
         <button type="submit" class="btn-primary btn-block">Отправить ссылку</button>
       </form>
+      <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path|urlencode }}" class="btn-secondary btn-block">
+        Зарегистрироваться через Google
+      </a>
 
       <p class="auth-switch">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
     </div>

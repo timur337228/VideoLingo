@@ -30,6 +30,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
+    is_google_auth = models.BooleanField(default=False)
     credits = models.PositiveIntegerField(default=0)
 
     USERNAME_FIELD = "email"
