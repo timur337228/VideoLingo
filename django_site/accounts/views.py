@@ -12,9 +12,11 @@ from django.core.cache import cache
 import uuid
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth.forms import SetPasswordForm
 
 from .models import User, PendingRegistration
-from .forms import StartRegistrationForm, UserLogin, CompleteRegistrationForm
+from .forms import StartRegistrationForm, UserLogin, \
+    CompleteRegistrationForm, ResetPasswordForm
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -51,6 +53,48 @@ def register(request):
         form = StartRegistrationForm()
 
     return render(request, "accounts/register.html", {"form": form})
+
+
+def reset_password(request):
+    if request.method == "POST":
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            user = User.objects.get(email__iexact=email)
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_link = request.build_absolute_uri(
+                reverse("complite_reset_password", kwargs={"uidb64": uidb64, "token": token})
+            )
+            send_mail(
+                "Сброс пароля",
+                f"Ссылка на сброс пароля: {reset_link}",
+                from_email=None,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+    else:
+        form = ResetPasswordForm()
+    return render(request, "password_reset.html", {"form": form})
+
+
+def complite_reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == "POST":
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return render(request, "password_reset_complete.html")
+        else:
+            form = SetPasswordForm(user)
+        return render(request, "password_reset_confirm.html", {"form": form})
+    else:
+        return render(request, "password_reset_invalid.html")
 
 
 def login_view(request):

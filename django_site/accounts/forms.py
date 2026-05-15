@@ -34,6 +34,27 @@ class StartRegistrationForm(StyledFieldsMixin, forms.Form):
             raise forms.ValidationError("Пользователь с таким email уже существует.")
         return email
 
+class ResetPasswordForm(StyledFieldsMixin, forms.Form):
+    email = forms.EmailField(label="Email")
+
+    field_placeholders = {
+        "email": "you@example.com",
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styles()
+        self.fields["email"].widget.attrs["autocomplete"] = "email"
+    
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        user = User.objects.filter(email__iexact=email)
+        if not user.exists():
+            raise forms.ValidationError("Пользователя с таким email не существует.")
+        if user.first().is_google_auth:
+            raise forms.ValidationError("Вы авторизовались через google, войдите с помощью google")
+        return email
+
 
 class CompleteRegistrationForm(StyledFieldsMixin, UserCreationForm):
     

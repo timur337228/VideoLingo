@@ -7,6 +7,8 @@ from .views import (
     register,
     verify_email,
     verify_email_sent,
+    reset_password,
+    complite_reset_password,
 )
 
 urlpatterns = [
@@ -16,4 +18,6 @@ urlpatterns = [
     path("verify-email-sent/", verify_email_sent, name="verify_email_sent"),
     path("verify-email/<uuid:token>/", verify_email, name="verify_email"),
     path("complete-registration/", complete_registration, name="complete_registration"),
+    path("reset-password/", reset_password, name="reset_password"),
+    path("complite-reset-password/<uidb64>/<token>/", complite_reset_password, name="complite_reset_password"),
 ]
