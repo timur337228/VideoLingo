@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Статус перевода | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-copy">
+      <div class="hero-tag">AI · Статус задачи</div>
+      <h1>Следим за<br><em>обработкой</em></h1>
+      <p>На этой странице можно проверить, взял ли worker задачу в работу, завершилась ли она успешно и появилась ли ссылка на результат.</p>
+      <div class="auth-note-card">
+        <h3>Текущее состояние</h3>
+        <div class="auth-checklist">
+          <p>ID задачи: {{ video.task_id }}</p>
+          <p>Статус Celery: {{ api_status }}</p>
+          <p>Создано: {{ video.created_at|date:"d.m.Y H:i" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-card auth-status-card">
+      <div class="status-badge">Статус: {{ api_status }}</div>
+      <h2 class="auth-title">Задача {{ video.pk }}</h2>
+
+      {% if api_status == "SUCCESS" %}
+        <p class="auth-subtitle">Перевод завершен. Если ссылка уже записана, можно открыть итоговый ролик.</p>
+        <div class="auth-actions">
+          {% if video.path_to_s3 %}
+            <a class="btn-primary btn-block" href="{{ video.path_to_s3 }}" target="_blank" rel="noopener noreferrer">Открыть готовое видео</a>
+          {% endif %}
+          <a class="btn-secondary btn-block" href="{% url 'translate_status' video.pk %}">Обновить статус</a>
+          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Загрузить еще видео</a>
+        </div>
+      {% elif api_status == "FAILURE" %}
+        <p class="auth-subtitle">Во время обработки произошла ошибка. Ниже мы показываем текст, который вернул API.</p>
+        <div class="form-errors">
+          <p>{{ api_result }}</p>
+        </div>
+        <div class="auth-actions">
+          <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Проверить еще раз</a>
+          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Отправить другое видео</a>
+        </div>
+      {% else %}
+        <p class="auth-subtitle">Задача еще в очереди или уже выполняется. Страница обновляется автоматически, пока не появится финальный статус.</p>
+        <div class="auth-inline-note">
+          Текущий ответ API: {{ api_result|default:"пока без дополнительной информации" }}
+        </div>
+        <div class="auth-actions">
+          <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Обновить сейчас</a>
+          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Вернуться к загрузке</a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if api_status != "SUCCESS" and api_status != "FAILURE" %}
+    <script>
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+    </script>
+  {% endif %}
+{% endblock %}

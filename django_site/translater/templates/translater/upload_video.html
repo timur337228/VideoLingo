@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка видео | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-copy">
+      <div class="hero-tag">AI · Перевод видео</div>
+      <h1>Загрузите ролик<br><em>для перевода</em></h1>
+      <p>Мы отправим видео в очередь обработки, а затем покажем статус задачи и ссылку на готовый результат.</p>
+      <div class="auth-note-card">
+        <h3>Что можно настроить</h3>
+        <div class="auth-checklist">
+          <p>Язык итогового перевода.</p>
+          <p>Нужно ли вшивать субтитры в готовый ролик.</p>
+          <p>Насколько громким оставить фоновый звук.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="section-tag">Новая задача</div>
+      <h2 class="auth-title">Отправить видео</h2>
+      <p class="auth-subtitle">Выберите один видеофайл и параметры обработки. После отправки вы попадете на страницу статуса.</p>
+
+      <form method="post" enctype="multipart/form-data" class="auth-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form-errors">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.file.id_for_label }}">Видео</label>
+          {{ form.file }}
+          {% for error in form.file.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.language.id_for_label }}">Язык перевода</label>
+          {{ form.language }}
+          {% for error in form.language.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.volume.id_for_label }}">Громкость фона: <span id="volume-value">{{ form.volume.value|default:12 }}</span>%</label>
+          {{ form.volume }}
+          {% for error in form.volume.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.is_sub.id_for_label }}">{{ form.is_sub }} Вшить субтитры</label>
+          {% for error in form.is_sub.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.is_del_vocal.id_for_label }}">{{ form.is_del_vocal }} Убирать оригинальный голос с фона</label>
+          {% for error in form.is_del_vocal.errors %}
+            <p class="field-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-primary btn-block">Запустить перевод</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const volumeInput = document.getElementById("{{ form.volume.id_for_label }}");
+    const volumeValue = document.getElementById("volume-value");
+
+    if (volumeInput && volumeValue) {
+      const syncVolume = () => {
+        volumeValue.textContent = volumeInput.value;
+      };
+
+      syncVolume();
+      volumeInput.addEventListener("input", syncVolume);
+    }
+  </script>
+{% endblock %}
