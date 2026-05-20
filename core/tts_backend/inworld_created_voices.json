@@ -1,0 +1,1180 @@
+{
+  "meta": {
+    "created_at": "2026-05-16T09:12:26.997419+00:00",
+    "updated_at": "2026-05-18T09:04:11.442819+00:00",
+    "request_interval_seconds": 30.0,
+    "publish_enabled": true
+  },
+  "voices": {
+    "ru": {
+      "language_name": "Russian",
+      "lang_code": "RU_RU",
+      "male": [
+        {
+          "display_name": "VideoLingo Russian Male 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b1c1c082",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b1c1c082",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "male",
+          "slot": 1,
+          "preview_text": "Здравствуйте, я готов помочь озвучить и перевести ваше видео естественным голосом.",
+          "design_prompt": "Confident, grounded male voice, Russian with a neutral Moscow Russian, 30-40 years old. Warm and dependable tone, clear conversational delivery, steady medium pacing. Natural low-mid timbre with clean articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-b1c1c082",
+          "tags": [
+            "videolingo",
+            "ru",
+            "male",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Male 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0bfa86f",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0bfa86f",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "male",
+          "slot": 2,
+          "preview_text": "Пусть эта речь звучит спокойно, понятно и приятно для долгого прослушивания.",
+          "design_prompt": "Calm, thoughtful male voice, Russian with a neutral Moscow Russian, 35-45 years old. Measured and reassuring tone, smooth explanatory delivery, slightly slow, deliberate pacing. Subtle depth and a relaxed vocal texture. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-b0bfa86f",
+          "tags": [
+            "videolingo",
+            "ru",
+            "male",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Male 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5ad46e0b",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5ad46e0b",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "male",
+          "slot": 3,
+          "preview_text": "Важно сохранить ровный темп, чистую дикцию и живую человеческую подачу.",
+          "design_prompt": "Energetic, articulate male voice, Russian with a neutral Moscow Russian, mid-20s to early 30s. Bright and engaged tone, crisp presenter-style delivery, lively but controlled pacing. Clean projection with natural enthusiasm. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-5ad46e0b",
+          "tags": [
+            "videolingo",
+            "ru",
+            "male",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Male 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-487e2c97",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-487e2c97",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "male",
+          "slot": 4,
+          "preview_text": "Такой голос должен хорошо подходить для озвучки роликов, гайдов и объяснений.",
+          "design_prompt": "Rich, cinematic male voice, Russian with a neutral Moscow Russian, 40-50 years old. Serious but welcoming tone, polished narration style, steady pacing with natural pauses. Slightly resonant timbre without sounding overly dramatic. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-487e2c97",
+          "tags": [
+            "videolingo",
+            "ru",
+            "male",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Male 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-0cb12e78",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-0cb12e78",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "male",
+          "slot": 5,
+          "preview_text": "Каждая фраза должна звучать выразительно, но без лишней театральности.",
+          "design_prompt": "Friendly, modern male voice, Russian with a neutral Moscow Russian, late 20s to mid-30s. Open and upbeat tone, natural digital-host delivery, balanced pacing. Smooth, youthful texture with precise consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-0cb12e78",
+          "tags": [
+            "videolingo",
+            "ru",
+            "male",
+            "slot-05"
+          ]
+        }
+      ],
+      "female": [
+        {
+          "display_name": "VideoLingo Russian Female 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-47eb37e0",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-47eb37e0",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "female",
+          "slot": 1,
+          "preview_text": "Здравствуйте, я готов помочь озвучить и перевести ваше видео естественным голосом.",
+          "design_prompt": "Warm, soothing female voice, Russian with a neutral Moscow Russian, 28-38 years old. Gentle and reassuring tone, smooth conversational delivery, steady medium pacing. Soft timbre with clear articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-47eb37e0",
+          "tags": [
+            "videolingo",
+            "ru",
+            "female",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Female 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-7f972cae",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-7f972cae",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "female",
+          "slot": 2,
+          "preview_text": "Пусть эта речь звучит спокойно, понятно и приятно для долгого прослушивания.",
+          "design_prompt": "Bright, articulate female voice, Russian with a neutral Moscow Russian, mid-20s to early 30s. Friendly and confident tone, clean presenter-style delivery, lively but controlled pacing. Light, polished texture with natural sparkle. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-7f972cae",
+          "tags": [
+            "videolingo",
+            "ru",
+            "female",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Female 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-52dfb9f8",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-52dfb9f8",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "female",
+          "slot": 3,
+          "preview_text": "Важно сохранить ровный темп, чистую дикцию и живую человеческую подачу.",
+          "design_prompt": "Calm, intelligent female voice, Russian with a neutral Moscow Russian, 30-40 years old. Professional and composed tone, clear instructional delivery, slightly slow, deliberate pacing. Balanced mid-range tone with subtle warmth. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-52dfb9f8",
+          "tags": [
+            "videolingo",
+            "ru",
+            "female",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Female 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-63cb52c1",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-63cb52c1",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "female",
+          "slot": 4,
+          "preview_text": "Такой голос должен хорошо подходить для озвучки роликов, гайдов и объяснений.",
+          "design_prompt": "Elegant, mature female voice, Russian with a neutral Moscow Russian, 40-50 years old. Poised and trustworthy tone, polished narration style, steady pacing with natural pauses. Refined texture and smooth phrasing. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-63cb52c1",
+          "tags": [
+            "videolingo",
+            "ru",
+            "female",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Russian Female 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a96157df",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a96157df",
+          "lang_code": "RU_RU",
+          "language_name": "Russian",
+          "gender": "female",
+          "slot": 5,
+          "preview_text": "Каждая фраза должна звучать выразительно, но без лишней театральности.",
+          "design_prompt": "Energetic, modern female voice, Russian with a neutral Moscow Russian, late 20s to mid-30s. Upbeat and engaging tone, natural digital-host delivery, balanced pacing. Fresh vocal color with crisp consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-a96157df",
+          "tags": [
+            "videolingo",
+            "ru",
+            "female",
+            "slot-05"
+          ]
+        }
+      ]
+    },
+    "de": {
+      "language_name": "German",
+      "lang_code": "DE_DE",
+      "male": [
+        {
+          "display_name": "VideoLingo German Male 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-c83f5cd8",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-c83f5cd8",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "male",
+          "slot": 1,
+          "preview_text": "Hallo, ich bin bereit, Ihr Video mit einer klaren und natuerlichen Stimme zu vertonen.",
+          "design_prompt": "Confident, grounded male voice, German with a neutral High German, 30-40 years old. Warm and dependable tone, clear conversational delivery, steady medium pacing. Natural low-mid timbre with clean articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-c83f5cd8",
+          "tags": [
+            "videolingo",
+            "de",
+            "male",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Male 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a6243507",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a6243507",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "male",
+          "slot": 2,
+          "preview_text": "Diese Stimme soll ruhig, praezise und ueber lange Zeit angenehm anzuhoeren sein.",
+          "design_prompt": "Calm, thoughtful male voice, German with a neutral High German, 35-45 years old. Measured and reassuring tone, smooth explanatory delivery, slightly slow, deliberate pacing. Subtle depth and a relaxed vocal texture. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-a6243507",
+          "tags": [
+            "videolingo",
+            "de",
+            "male",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Male 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-72472f52",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-72472f52",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "male",
+          "slot": 3,
+          "preview_text": "Ich spreche mit sauberer Aussprache, gutem Rhythmus und sicherer Praesenz.",
+          "design_prompt": "Energetic, articulate male voice, German with a neutral High German, mid-20s to early 30s. Bright and engaged tone, crisp presenter-style delivery, lively but controlled pacing. Clean projection with natural enthusiasm. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-72472f52",
+          "tags": [
+            "videolingo",
+            "de",
+            "male",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Male 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-e32ea3a2",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-e32ea3a2",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "male",
+          "slot": 4,
+          "preview_text": "Das Ergebnis soll professionell, menschlich und leicht verstaendlich wirken.",
+          "design_prompt": "Rich, cinematic male voice, German with a neutral High German, 40-50 years old. Serious but welcoming tone, polished narration style, steady pacing with natural pauses. Slightly resonant timbre without sounding overly dramatic. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-e32ea3a2",
+          "tags": [
+            "videolingo",
+            "de",
+            "male",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Male 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5e5b5b82",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5e5b5b82",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "male",
+          "slot": 5,
+          "preview_text": "Jeder Satz braucht Ausdruck, aber ohne kuenstlich oder uebertrieben zu klingen.",
+          "design_prompt": "Friendly, modern male voice, German with a neutral High German, late 20s to mid-30s. Open and upbeat tone, natural digital-host delivery, balanced pacing. Smooth, youthful texture with precise consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-5e5b5b82",
+          "tags": [
+            "videolingo",
+            "de",
+            "male",
+            "slot-05"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Male 06",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-319aebe4",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-319aebe4",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "male",
+          "slot": 6,
+          "preview_text": "Diese Stimme passt gut zu Erklaervideos, Tutorials und uebersetzten Inhalten.",
+          "design_prompt": "Soft-spoken, intelligent male voice, German with a neutral High German, 30-45 years old. Calm and professional tone, gentle instructional delivery, slower, easy-to-follow pacing. Subtle breath warmth and refined clarity. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-319aebe4",
+          "tags": [
+            "videolingo",
+            "de",
+            "male",
+            "slot-06"
+          ]
+        }
+      ],
+      "female": [
+        {
+          "display_name": "VideoLingo German Female 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-3398bc50",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-3398bc50",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "female",
+          "slot": 1,
+          "preview_text": "Hallo, ich bin bereit, Ihr Video mit einer klaren und natuerlichen Stimme zu vertonen.",
+          "design_prompt": "Warm, soothing female voice, German with a neutral High German, 28-38 years old. Gentle and reassuring tone, smooth conversational delivery, steady medium pacing. Soft timbre with clear articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-3398bc50",
+          "tags": [
+            "videolingo",
+            "de",
+            "female",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Female 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-fc25db0d",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-fc25db0d",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "female",
+          "slot": 2,
+          "preview_text": "Diese Stimme soll ruhig, praezise und ueber lange Zeit angenehm anzuhoeren sein.",
+          "design_prompt": "Bright, articulate female voice, German with a neutral High German, mid-20s to early 30s. Friendly and confident tone, clean presenter-style delivery, lively but controlled pacing. Light, polished texture with natural sparkle. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-fc25db0d",
+          "tags": [
+            "videolingo",
+            "de",
+            "female",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Female 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-c24ad8d0",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-c24ad8d0",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "female",
+          "slot": 3,
+          "preview_text": "Ich spreche mit sauberer Aussprache, gutem Rhythmus und sicherer Praesenz.",
+          "design_prompt": "Calm, intelligent female voice, German with a neutral High German, 30-40 years old. Professional and composed tone, clear instructional delivery, slightly slow, deliberate pacing. Balanced mid-range tone with subtle warmth. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-c24ad8d0",
+          "tags": [
+            "videolingo",
+            "de",
+            "female",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Female 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-83d33a50",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-83d33a50",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "female",
+          "slot": 4,
+          "preview_text": "Das Ergebnis soll professionell, menschlich und leicht verstaendlich wirken.",
+          "design_prompt": "Elegant, mature female voice, German with a neutral High German, 40-50 years old. Poised and trustworthy tone, polished narration style, steady pacing with natural pauses. Refined texture and smooth phrasing. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-83d33a50",
+          "tags": [
+            "videolingo",
+            "de",
+            "female",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Female 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-e4cf9337",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-e4cf9337",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "female",
+          "slot": 5,
+          "preview_text": "Jeder Satz braucht Ausdruck, aber ohne kuenstlich oder uebertrieben zu klingen.",
+          "design_prompt": "Energetic, modern female voice, German with a neutral High German, late 20s to mid-30s. Upbeat and engaging tone, natural digital-host delivery, balanced pacing. Fresh vocal color with crisp consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-e4cf9337",
+          "tags": [
+            "videolingo",
+            "de",
+            "female",
+            "slot-05"
+          ]
+        },
+        {
+          "display_name": "VideoLingo German Female 06",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-abcea90b",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-abcea90b",
+          "lang_code": "DE_DE",
+          "language_name": "German",
+          "gender": "female",
+          "slot": 6,
+          "preview_text": "Diese Stimme passt gut zu Erklaervideos, Tutorials und uebersetzten Inhalten.",
+          "design_prompt": "Soft, empathetic female voice, German with a neutral High German, 30-45 years old. Kind and comforting tone, gentle explanatory delivery, slow, easy-to-follow pacing. Airy warmth with stable clarity. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-abcea90b",
+          "tags": [
+            "videolingo",
+            "de",
+            "female",
+            "slot-06"
+          ]
+        }
+      ]
+    },
+    "zh": {
+      "language_name": "Chinese",
+      "lang_code": "ZH_CN",
+      "male": [
+        {
+          "display_name": "VideoLingo Chinese Male 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-8b88f597",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-8b88f597",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "male",
+          "slot": 1,
+          "preview_text": "你好，我准备好用自然清晰的声音为你的视频完成配音。",
+          "design_prompt": "Confident, grounded male voice, Chinese with a standard Mandarin with a neutral Beijing accent, 30-40 years old. Warm and dependable tone, clear conversational delivery, steady medium pacing. Natural low-mid timbre with clean articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-8b88f597",
+          "tags": [
+            "videolingo",
+            "zh",
+            "male",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Male 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-efcba425",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-efcba425",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "male",
+          "slot": 2,
+          "preview_text": "这个声音需要从头到尾都保持稳定、温和并且容易理解。",
+          "design_prompt": "Calm, thoughtful male voice, Chinese with a standard Mandarin with a neutral Beijing accent, 35-45 years old. Measured and reassuring tone, smooth explanatory delivery, slightly slow, deliberate pacing. Subtle depth and a relaxed vocal texture. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-efcba425",
+          "tags": [
+            "videolingo",
+            "zh",
+            "male",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Male 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-4a66a030",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-4a66a030",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "male",
+          "slot": 3,
+          "preview_text": "我会用清楚的咬字、自然的节奏和可靠的表达来进行旁白。",
+          "design_prompt": "Energetic, articulate male voice, Chinese with a standard Mandarin with a neutral Beijing accent, mid-20s to early 30s. Bright and engaged tone, crisp presenter-style delivery, lively but controlled pacing. Clean projection with natural enthusiasm. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-4a66a030",
+          "tags": [
+            "videolingo",
+            "zh",
+            "male",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Male 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-95af4625",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-95af4625",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "male",
+          "slot": 4,
+          "preview_text": "这个声音应该适合教程、讲解和翻译后的视频内容。",
+          "design_prompt": "Rich, cinematic male voice, Chinese with a standard Mandarin with a neutral Beijing accent, 40-50 years old. Serious but welcoming tone, polished narration style, steady pacing with natural pauses. Slightly resonant timbre without sounding overly dramatic. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-95af4625",
+          "tags": [
+            "videolingo",
+            "zh",
+            "male",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Male 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-af69a1e8",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-af69a1e8",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "male",
+          "slot": 5,
+          "preview_text": "每一句话都要有表现力，但不能夸张或显得做作。",
+          "design_prompt": "Friendly, modern male voice, Chinese with a standard Mandarin with a neutral Beijing accent, late 20s to mid-30s. Open and upbeat tone, natural digital-host delivery, balanced pacing. Smooth, youthful texture with precise consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-af69a1e8",
+          "tags": [
+            "videolingo",
+            "zh",
+            "male",
+            "slot-05"
+          ]
+        }
+      ],
+      "female": [
+        {
+          "display_name": "VideoLingo Chinese Female 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-6a721600",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-6a721600",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "female",
+          "slot": 1,
+          "preview_text": "你好，我准备好用自然清晰的声音为你的视频完成配音。",
+          "design_prompt": "Warm, soothing female voice, Chinese with a standard Mandarin with a neutral Beijing accent, 28-38 years old. Gentle and reassuring tone, smooth conversational delivery, steady medium pacing. Soft timbre with clear articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-6a721600",
+          "tags": [
+            "videolingo",
+            "zh",
+            "female",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Female 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5b3405af",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5b3405af",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "female",
+          "slot": 2,
+          "preview_text": "这个声音需要从头到尾都保持稳定、温和并且容易理解。",
+          "design_prompt": "Bright, articulate female voice, Chinese with a standard Mandarin with a neutral Beijing accent, mid-20s to early 30s. Friendly and confident tone, clean presenter-style delivery, lively but controlled pacing. Light, polished texture with natural sparkle. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-5b3405af",
+          "tags": [
+            "videolingo",
+            "zh",
+            "female",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Female 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-e3de3218",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-e3de3218",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "female",
+          "slot": 3,
+          "preview_text": "我会用清楚的咬字、自然的节奏和可靠的表达来进行旁白。",
+          "design_prompt": "Calm, intelligent female voice, Chinese with a standard Mandarin with a neutral Beijing accent, 30-40 years old. Professional and composed tone, clear instructional delivery, slightly slow, deliberate pacing. Balanced mid-range tone with subtle warmth. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-e3de3218",
+          "tags": [
+            "videolingo",
+            "zh",
+            "female",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Female 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-41d6fec4",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-41d6fec4",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "female",
+          "slot": 4,
+          "preview_text": "这个声音应该适合教程、讲解和翻译后的视频内容。",
+          "design_prompt": "Elegant, mature female voice, Chinese with a standard Mandarin with a neutral Beijing accent, 40-50 years old. Poised and trustworthy tone, polished narration style, steady pacing with natural pauses. Refined texture and smooth phrasing. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-41d6fec4",
+          "tags": [
+            "videolingo",
+            "zh",
+            "female",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Female 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-59f7d318",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-59f7d318",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "female",
+          "slot": 5,
+          "preview_text": "每一句话都要有表现力，但不能夸张或显得做作。",
+          "design_prompt": "Energetic, modern female voice, Chinese with a standard Mandarin with a neutral Beijing accent, late 20s to mid-30s. Upbeat and engaging tone, natural digital-host delivery, balanced pacing. Fresh vocal color with crisp consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-59f7d318",
+          "tags": [
+            "videolingo",
+            "zh",
+            "female",
+            "slot-05"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Chinese Female 06",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-1c936644",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-1c936644",
+          "lang_code": "ZH_CN",
+          "language_name": "Chinese",
+          "gender": "female",
+          "slot": 6,
+          "preview_text": "希望最终效果听起来真实、专业，而且适合长时间收听。",
+          "design_prompt": "Soft, empathetic female voice, Chinese with a standard Mandarin with a neutral Beijing accent, 30-45 years old. Kind and comforting tone, gentle explanatory delivery, slow, easy-to-follow pacing. Airy warmth with stable clarity. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-1c936644",
+          "tags": [
+            "videolingo",
+            "zh",
+            "female",
+            "slot-06"
+          ]
+        }
+      ]
+    },
+    "fr": {
+      "language_name": "French",
+      "lang_code": "FR_FR",
+      "male": [
+        {
+          "display_name": "VideoLingo French Male 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-c159a984",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-c159a984",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "male",
+          "slot": 1,
+          "preview_text": "Bonjour, je suis pret a donner a votre video une voix claire, naturelle et fluide.",
+          "design_prompt": "Confident, grounded male voice, French with a neutral Parisian French, 30-40 years old. Warm and dependable tone, clear conversational delivery, steady medium pacing. Natural low-mid timbre with clean articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-c159a984",
+          "tags": [
+            "videolingo",
+            "fr",
+            "male",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Male 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-241c658e",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-241c658e",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "male",
+          "slot": 2,
+          "preview_text": "Cette voix doit rester chaleureuse, precise et agreable a ecouter du debut a la fin.",
+          "design_prompt": "Calm, thoughtful male voice, French with a neutral Parisian French, 35-45 years old. Measured and reassuring tone, smooth explanatory delivery, slightly slow, deliberate pacing. Subtle depth and a relaxed vocal texture. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-241c658e",
+          "tags": [
+            "videolingo",
+            "fr",
+            "male",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Male 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-0bfac39e",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-0bfac39e",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "male",
+          "slot": 3,
+          "preview_text": "Je parle avec un rythme regulier, une diction nette et une presence rassurante.",
+          "design_prompt": "Energetic, articulate male voice, French with a neutral Parisian French, mid-20s to early 30s. Bright and engaged tone, crisp presenter-style delivery, lively but controlled pacing. Clean projection with natural enthusiasm. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-0bfac39e",
+          "tags": [
+            "videolingo",
+            "fr",
+            "male",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Male 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-f9b38f95",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-f9b38f95",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "male",
+          "slot": 4,
+          "preview_text": "L'objectif est une narration elegante, humaine et facile a suivre.",
+          "design_prompt": "Rich, cinematic male voice, French with a neutral Parisian French, 40-50 years old. Serious but welcoming tone, polished narration style, steady pacing with natural pauses. Slightly resonant timbre without sounding overly dramatic. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-f9b38f95",
+          "tags": [
+            "videolingo",
+            "fr",
+            "male",
+            "slot-04"
+          ]
+        }
+      ],
+      "female": [
+        {
+          "display_name": "VideoLingo French Female 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-54e5bda9",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-54e5bda9",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "female",
+          "slot": 1,
+          "preview_text": "Bonjour, je suis pret a donner a votre video une voix claire, naturelle et fluide.",
+          "design_prompt": "Warm, soothing female voice, French with a neutral Parisian French, 28-38 years old. Gentle and reassuring tone, smooth conversational delivery, steady medium pacing. Soft timbre with clear articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-54e5bda9",
+          "tags": [
+            "videolingo",
+            "fr",
+            "female",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Female 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0faa3c2",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0faa3c2",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "female",
+          "slot": 2,
+          "preview_text": "Cette voix doit rester chaleureuse, precise et agreable a ecouter du debut a la fin.",
+          "design_prompt": "Bright, articulate female voice, French with a neutral Parisian French, mid-20s to early 30s. Friendly and confident tone, clean presenter-style delivery, lively but controlled pacing. Light, polished texture with natural sparkle. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-b0faa3c2",
+          "tags": [
+            "videolingo",
+            "fr",
+            "female",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Female 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a060a155",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a060a155",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "female",
+          "slot": 3,
+          "preview_text": "Je parle avec un rythme regulier, une diction nette et une presence rassurante.",
+          "design_prompt": "Calm, intelligent female voice, French with a neutral Parisian French, 30-40 years old. Professional and composed tone, clear instructional delivery, slightly slow, deliberate pacing. Balanced mid-range tone with subtle warmth. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-a060a155",
+          "tags": [
+            "videolingo",
+            "fr",
+            "female",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Female 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-7fdde702",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-7fdde702",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "female",
+          "slot": 4,
+          "preview_text": "L'objectif est une narration elegante, humaine et facile a suivre.",
+          "design_prompt": "Elegant, mature female voice, French with a neutral Parisian French, 40-50 years old. Poised and trustworthy tone, polished narration style, steady pacing with natural pauses. Refined texture and smooth phrasing. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-7fdde702",
+          "tags": [
+            "videolingo",
+            "fr",
+            "female",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Female 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b85ab983",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b85ab983",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "female",
+          "slot": 5,
+          "preview_text": "Chaque phrase doit sonner vivante sans devenir trop theatrale ou trop rapide.",
+          "design_prompt": "Energetic, modern female voice, French with a neutral Parisian French, late 20s to mid-30s. Upbeat and engaging tone, natural digital-host delivery, balanced pacing. Fresh vocal color with crisp consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-b85ab983",
+          "tags": [
+            "videolingo",
+            "fr",
+            "female",
+            "slot-05"
+          ]
+        },
+        {
+          "display_name": "VideoLingo French Female 06",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-af999658",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-af999658",
+          "lang_code": "FR_FR",
+          "language_name": "French",
+          "gender": "female",
+          "slot": 6,
+          "preview_text": "Cette voix convient bien aux explications, tutoriels et videos traduites.",
+          "design_prompt": "Soft, empathetic female voice, French with a neutral Parisian French, 30-45 years old. Kind and comforting tone, gentle explanatory delivery, slow, easy-to-follow pacing. Airy warmth with stable clarity. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-af999658",
+          "tags": [
+            "videolingo",
+            "fr",
+            "female",
+            "slot-06"
+          ]
+        }
+      ]
+    },
+    "es": {
+      "language_name": "Spanish",
+      "lang_code": "ES_ES",
+      "male": [
+        {
+          "display_name": "VideoLingo Spanish Male 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-4d57810e",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-4d57810e",
+          "lang_code": "ES_ES",
+          "language_name": "Spanish",
+          "gender": "male",
+          "slot": 1,
+          "preview_text": "Hola, estoy listo para dar a tu video una voz natural, clara y agradable.",
+          "design_prompt": "Confident, grounded male voice, Spanish with a neutral Castilian Spanish, 30-40 years old. Warm and dependable tone, clear conversational delivery, steady medium pacing. Natural low-mid timbre with clean articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-4d57810e",
+          "tags": [
+            "videolingo",
+            "es",
+            "male",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Spanish Male 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0aaf2c8",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0aaf2c8",
+          "lang_code": "ES_ES",
+          "language_name": "Spanish",
+          "gender": "male",
+          "slot": 2,
+          "preview_text": "Esta voz debe sonar cercana, precisa y facil de escuchar de principio a fin.",
+          "design_prompt": "Calm, thoughtful male voice, Spanish with a neutral Castilian Spanish, 35-45 years old. Measured and reassuring tone, smooth explanatory delivery, slightly slow, deliberate pacing. Subtle depth and a relaxed vocal texture. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-b0aaf2c8",
+          "tags": [
+            "videolingo",
+            "es",
+            "male",
+            "slot-02"
+          ]
+        }
+      ],
+      "female": [
+        {
+          "display_name": "VideoLingo Spanish Female 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-29c86b02",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-29c86b02",
+          "lang_code": "ES_ES",
+          "language_name": "Spanish",
+          "gender": "female",
+          "slot": 1,
+          "preview_text": "Hola, estoy listo para dar a tu video una voz natural, clara y agradable.",
+          "design_prompt": "Warm, soothing female voice, Spanish with a neutral Castilian Spanish, 28-38 years old. Gentle and reassuring tone, smooth conversational delivery, steady medium pacing. Soft timbre with clear articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-29c86b02",
+          "tags": [
+            "videolingo",
+            "es",
+            "female",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Spanish Female 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-54c63c58",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-54c63c58",
+          "lang_code": "ES_ES",
+          "language_name": "Spanish",
+          "gender": "female",
+          "slot": 2,
+          "preview_text": "Esta voz debe sonar cercana, precisa y facil de escuchar de principio a fin.",
+          "design_prompt": "Bright, articulate female voice, Spanish with a neutral Castilian Spanish, mid-20s to early 30s. Friendly and confident tone, clean presenter-style delivery, lively but controlled pacing. Light, polished texture with natural sparkle. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-54c63c58",
+          "tags": [
+            "videolingo",
+            "es",
+            "female",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Spanish Female 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-bdf596a9",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-bdf596a9",
+          "lang_code": "ES_ES",
+          "language_name": "Spanish",
+          "gender": "female",
+          "slot": 3,
+          "preview_text": "Hablo con ritmo estable, buena diccion y una presencia humana confiable.",
+          "design_prompt": "Calm, intelligent female voice, Spanish with a neutral Castilian Spanish, 30-40 years old. Professional and composed tone, clear instructional delivery, slightly slow, deliberate pacing. Balanced mid-range tone with subtle warmth. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-bdf596a9",
+          "tags": [
+            "videolingo",
+            "es",
+            "female",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Spanish Female 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5f0b1af1",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-5f0b1af1",
+          "lang_code": "ES_ES",
+          "language_name": "Spanish",
+          "gender": "female",
+          "slot": 4,
+          "preview_text": "Buscamos una narracion fluida, profesional y comoda para videos traducidos.",
+          "design_prompt": "Elegant, mature female voice, Spanish with a neutral Castilian Spanish, 40-50 years old. Poised and trustworthy tone, polished narration style, steady pacing with natural pauses. Refined texture and smooth phrasing. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-5f0b1af1",
+          "tags": [
+            "videolingo",
+            "es",
+            "female",
+            "slot-04"
+          ]
+        }
+      ]
+    },
+    "ja": {
+      "language_name": "Japanese",
+      "lang_code": "JA_JP",
+      "male": [
+        {
+          "display_name": "VideoLingo Japanese Male 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-bbdfd6f7",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-bbdfd6f7",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "male",
+          "slot": 1,
+          "preview_text": "こんにちは。自然で聞き取りやすい声で、動画の翻訳音声を仕上げます。",
+          "design_prompt": "Confident, grounded male voice, Japanese with a standard Tokyo Japanese, 30-40 years old. Warm and dependable tone, clear conversational delivery, steady medium pacing. Natural low-mid timbre with clean articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-bbdfd6f7",
+          "tags": [
+            "videolingo",
+            "ja",
+            "male",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Male 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-df6ab453",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-df6ab453",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "male",
+          "slot": 2,
+          "preview_text": "この声は、最初から最後まで落ち着いて心地よく聞こえる必要があります。",
+          "design_prompt": "Calm, thoughtful male voice, Japanese with a standard Tokyo Japanese, 35-45 years old. Measured and reassuring tone, smooth explanatory delivery, slightly slow, deliberate pacing. Subtle depth and a relaxed vocal texture. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-df6ab453",
+          "tags": [
+            "videolingo",
+            "ja",
+            "male",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Male 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a0dc047f",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a0dc047f",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "male",
+          "slot": 3,
+          "preview_text": "はっきりした発音と安定したテンポで、自然な話し方を目指します。",
+          "design_prompt": "Energetic, articulate male voice, Japanese with a standard Tokyo Japanese, mid-20s to early 30s. Bright and engaged tone, crisp presenter-style delivery, lively but controlled pacing. Clean projection with natural enthusiasm. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-a0dc047f",
+          "tags": [
+            "videolingo",
+            "ja",
+            "male",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Male 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-8db37ca7",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-8db37ca7",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "male",
+          "slot": 4,
+          "preview_text": "説明動画やチュートリアルに合う、信頼感のあるナレーションが理想です。",
+          "design_prompt": "Rich, cinematic male voice, Japanese with a standard Tokyo Japanese, 40-50 years old. Serious but welcoming tone, polished narration style, steady pacing with natural pauses. Slightly resonant timbre without sounding overly dramatic. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-8db37ca7",
+          "tags": [
+            "videolingo",
+            "ja",
+            "male",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Male 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-39832191",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-39832191",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "male",
+          "slot": 5,
+          "preview_text": "大げさになりすぎず、ほどよい表現力のある読み上げにしたいです。",
+          "design_prompt": "Friendly, modern male voice, Japanese with a standard Tokyo Japanese, late 20s to mid-30s. Open and upbeat tone, natural digital-host delivery, balanced pacing. Smooth, youthful texture with precise consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-39832191",
+          "tags": [
+            "videolingo",
+            "ja",
+            "male",
+            "slot-05"
+          ]
+        }
+      ],
+      "female": [
+        {
+          "display_name": "VideoLingo Japanese Female 01",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-22acee03",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-22acee03",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "female",
+          "slot": 1,
+          "preview_text": "こんにちは。自然で聞き取りやすい声で、動画の翻訳音声を仕上げます。",
+          "design_prompt": "Warm, soothing female voice, Japanese with a standard Tokyo Japanese, 28-38 years old. Gentle and reassuring tone, smooth conversational delivery, steady medium pacing. Soft timbre with clear articulation. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-22acee03",
+          "tags": [
+            "videolingo",
+            "ja",
+            "female",
+            "slot-01"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Female 02",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-acd3a7d6",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-acd3a7d6",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "female",
+          "slot": 2,
+          "preview_text": "この声は、最初から最後まで落ち着いて心地よく聞こえる必要があります。",
+          "design_prompt": "Bright, articulate female voice, Japanese with a standard Tokyo Japanese, mid-20s to early 30s. Friendly and confident tone, clean presenter-style delivery, lively but controlled pacing. Light, polished texture with natural sparkle. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-acd3a7d6",
+          "tags": [
+            "videolingo",
+            "ja",
+            "female",
+            "slot-02"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Female 03",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-4ef9a3bb",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-4ef9a3bb",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "female",
+          "slot": 3,
+          "preview_text": "はっきりした発音と安定したテンポで、自然な話し方を目指します。",
+          "design_prompt": "Calm, intelligent female voice, Japanese with a standard Tokyo Japanese, 30-40 years old. Professional and composed tone, clear instructional delivery, slightly slow, deliberate pacing. Balanced mid-range tone with subtle warmth. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-4ef9a3bb",
+          "tags": [
+            "videolingo",
+            "ja",
+            "female",
+            "slot-03"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Female 04",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a6aceb36",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-a6aceb36",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "female",
+          "slot": 4,
+          "preview_text": "説明動画やチュートリアルに合う、信頼感のあるナレーションが理想です。",
+          "design_prompt": "Elegant, mature female voice, Japanese with a standard Tokyo Japanese, 40-50 years old. Poised and trustworthy tone, polished narration style, steady pacing with natural pauses. Refined texture and smooth phrasing. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-a6aceb36",
+          "tags": [
+            "videolingo",
+            "ja",
+            "female",
+            "slot-04"
+          ]
+        },
+        {
+          "display_name": "VideoLingo Japanese Female 05",
+          "voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-9a3c37d8",
+          "preview_voice_id": "default-e2wua3xkbjqhz5qigoakxw__design-voice-9a3c37d8",
+          "lang_code": "JA_JP",
+          "language_name": "Japanese",
+          "gender": "female",
+          "slot": 5,
+          "preview_text": "大げさになりすぎず、ほどよい表現力のある読み上げにしたいです。",
+          "design_prompt": "Energetic, modern female voice, Japanese with a standard Tokyo Japanese, late 20s to mid-30s. Upbeat and engaging tone, natural digital-host delivery, balanced pacing. Fresh vocal color with crisp consonants. Perfect broadcast quality audio.",
+          "status": "published",
+          "published_name": "workspaces/default-e2wua3xkbjqhz5qigoakxw/voices/design-voice-9a3c37d8",
+          "tags": [
+            "videolingo",
+            "ja",
+            "female",
+            "slot-05"
+          ]
+        }
+      ]
+    }
+  },
+  "pending_publish": []
+}

@@ -91,5 +91,6 @@ def translate_status(request, video_id):
         "video": video,
         "api_status": payload.get("status"),
         "api_result": result,
+        "video_playback_url": payload.get("video_url"),
     }
     return render(request, "translater/translate_status.html", context)

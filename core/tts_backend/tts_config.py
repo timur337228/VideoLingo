@@ -9,27 +9,163 @@ from transformers import Wav2Vec2ForSequenceClassification, Wav2Vec2FeatureExtra
 from core.utils.config_utils import *
 from core.utils.models import *
 
-DEFAULT_SPEAKERS = {
-    "ru": "Dmitry",
-}
-
 FEMALE_GENDER_LABEL = "female"
-
+VOICE_INDEX = {}
 SPEAKERS_VOICE = {
-    "ru": {"male": ["Dmitry",
-                    "default-hglgrqgxmxsw2sn3ovpfuw__design-voice-5608986b",
-                    "Nikolai",
-                    "default-hglgrqgxmxsw2sn3ovpfuw__design-voice-920bd5cd",
-                    "default-hglgrqgxmxsw2sn3ovpfuw__design-voice-4b7fbee6",],
-           "female": ["Svetlana",
-                      "default-hglgrqgxmxsw2sn3ovpfuw__design-voice-22abffc4",
-                      "Elena",
-                      ]}
+    "en": {
+        "male": ["Blake",
+                 "Clive",
+                 "Hades",
+                 "Jason",
+                 "Mark",
+                 "Reed",
+                 "Theodore",],
+        "female": ["Ashley",
+                   "Eleanor",
+                   "Hana",
+                   "Luna",
+                   "Olivia",
+                   "Sarah",
+                   "Sophie",]
+    },
+    "ru": {
+        "male": [
+            "Dmitry",
+            "Nikolai",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-b1c1c082",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0bfa86f",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-5ad46e0b",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-487e2c97",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-0cb12e78",
+        ],
+        "female": [
+            "Svetlana",
+            "Elena",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-47eb37e0",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-7f972cae",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-52dfb9f8",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-63cb52c1",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-a96157df",
+        ],
+    },
+    "de": {
+        "male": [
+            "Josef",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-c83f5cd8",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-a6243507",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-72472f52",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-e32ea3a2",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-5e5b5b82",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-319aebe4",
+        ],
+        "female": [
+            "Johanna",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-3398bc50",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-fc25db0d",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-c24ad8d0",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-83d33a50",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-e4cf9337",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-abcea90b",
+        ],
+    },
+    "zh": {
+        "male": [
+            "Ming",
+            "Yichen",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-8b88f597",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-efcba425",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-4a66a030",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-95af4625",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-af69a1e8",
+        ],
+        "female": [
+            "Jing",
+            "Mei",
+            "Xiaoyin",
+            "Xiaoyin",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-6a721600",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-5b3405af",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-e3de3218",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-41d6fec4",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-59f7d318",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-1c936644",
+        ],
+    },
+    "fr": {
+        "male": [
+            "Alain",
+            "Étienne",
+            "Mathieu",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-c159a984",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-241c658e",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-0bfac39e",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-f9b38f95",
+        ],
+        "female": [
+            "Hélène",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-54e5bda9",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0faa3c2",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-a060a155",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-7fdde702",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-b85ab983",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-af999658",
+        ],
+    },
+    "es": {
+        "male": [
+            "Mateo",
+            "Rafael",
+            "Diego",
+            "Mauricio",
+            "Miguel",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-4d57810e",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-b0aaf2c8",
+        ],
+        "female": [
+            "Sofia",
+            "Camila",
+            "Lupita",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-29c86b02",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-54c63c58",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-bdf596a9",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-5f0b1af1",
+        ],
+    },
+    "ja": {
+        "male": [
+            "Haruto",
+            "Satoshi",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-bbdfd6f7",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-df6ab453",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-a0dc047f",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-8db37ca7",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-39832191",
+        ],
+        "female": [
+            "Asuka",
+            "Hina",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-22acee03",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-acd3a7d6",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-4ef9a3bb",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-a6aceb36",
+            "default-e2wua3xkbjqhz5qigoakxw__design-voice-9a3c37d8",
+        ],
+    },
 }
 
 def get_voices(label):
     language = load_key("language_code")
-    return SPEAKERS_VOICE[language][label].pop(0)
+    key = (language, label)
+    voices = SPEAKERS_VOICE[language][label]
+
+    i = VOICE_INDEX.get(key, 0)
+    if i < len(voices):
+        voice = voices[i]
+    else:
+        tail = voices[:-1][::-1] or voices
+        voice = tail[(i - len(voices)) % len(tail)]
+    VOICE_INDEX[key] = i + 1
+    return voice
 
 
 model_name = "prithivMLmods/Common-Voice-Gender-Detection"

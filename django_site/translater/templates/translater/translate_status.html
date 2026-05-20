@@ -24,10 +24,38 @@
       <h2 class="auth-title">Задача {{ video.pk }}</h2>
 
       {% if api_status == "SUCCESS" %}
-        <p class="auth-subtitle">Перевод завершен. Если ссылка уже записана, можно открыть итоговый ролик.</p>
+        <p class="auth-subtitle">Перевод завершен. Итоговый ролик можно посмотреть прямо на странице, а если ссылка устареет после долгой паузы, просто обнови статус.</p>
+
+        {% if video_playback_url %}
+          <div class="video-preview-card">
+            <div class="video-preview-top">
+              <div>
+                <p class="video-preview-kicker">Готовое видео</p>
+                <h3 class="video-preview-title">Встроенный плеер результата</h3>
+              </div>
+              <span class="lang-badge">MP4</span>
+            </div>
+
+            <div class="result-video-frame">
+              <video class="result-video" controls preload="metadata" playsinline>
+                <source src="{{ video_playback_url }}" type="video/mp4">
+                Ваш браузер не поддерживает встроенное видео.
+              </video>
+            </div>
+
+            <p class="video-preview-note">
+              Видео загружается по подписанной ссылке, поэтому оно не открывается как публичный файл из бакета напрямую.
+            </p>
+          </div>
+        {% else %}
+          <div class="auth-inline-note">
+            Видео уже собрано, но ссылка для воспроизведения пока не готова. Нажми «Обновить статус» через пару секунд.
+          </div>
+        {% endif %}
+
         <div class="auth-actions">
-          {% if video.path_to_s3 %}
-            <a class="btn-primary btn-block" href="{{ video.path_to_s3 }}" target="_blank" rel="noopener noreferrer">Открыть готовое видео</a>
+          {% if video_playback_url %}
+            <a class="btn-primary btn-block" href="{{ video_playback_url }}" target="_blank" rel="noopener noreferrer">Открыть видео в новой вкладке</a>
           {% endif %}
           <a class="btn-secondary btn-block" href="{% url 'translate_status' video.pk %}">Обновить статус</a>
           <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Загрузить еще видео</a>

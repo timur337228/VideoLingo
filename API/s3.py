@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 import boto3
 from botocore.client import Config
@@ -45,7 +46,7 @@ class S3Client:
             object_key,
             Config=TransferConfig(use_threads=False),
         )
-        return self.public_url(object_key)
+        return object_key
 
     def download_file(self, key: str, file_path: str):
         self.s3.download_file(self.bucket, key, file_path)
@@ -63,6 +64,28 @@ class S3Client:
     def public_url(self, key: str) -> str:
         endpoint = self.s3.meta.endpoint_url.rstrip("/")
         return f"{endpoint}/{self.bucket}/{key.lstrip('/')}"
+
+    def resolve_key(self, value: str) -> str:
+        if not value:
+            raise ValueError("S3 object key is empty")
+
+        if "://" not in value:
+            return value.lstrip("/")
+
+        parsed = urlparse(value)
+        object_path = parsed.path.lstrip("/")
+        bucket_prefix = f"{self.bucket}/"
+        if object_path.startswith(bucket_prefix):
+            object_path = object_path[len(bucket_prefix):]
+        return unquote(object_path)
+
+    def signed_url(self, key: str, expires_in: int = 3600) -> str:
+        object_key = self.resolve_key(key)
+        return self.s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": self.bucket, "Key": object_key},
+            ExpiresIn=expires_in,
+        )
 
 
 s3 = S3Client()
