@@ -94,3 +94,13 @@ def translate_status(request, video_id):
         "video_playback_url": payload.get("video_url"),
     }
     return render(request, "translater/translate_status.html", context)
+
+
+@login_required
+def get_my_videos(request):
+    videos = request.user.videos.order_by("-created_at")
+    return render(
+        request,
+        "translater/my_videos.html",
+        {"videos": videos},
+    )

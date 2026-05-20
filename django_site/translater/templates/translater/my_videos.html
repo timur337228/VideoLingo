@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Мои видео | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="section videos-page">
+    <div class="videos-hero">
+      <div>
+        <div class="hero-tag">AI · История переводов</div>
+        <h1 class="section-title">Ваши <em>видео</em> и текущие статусы</h1>
+        <p class="videos-subtitle">
+          Здесь собраны все отправленные ролики. Можно быстро открыть страницу статуса и проверить, завершилась ли обработка.
+        </p>
+      </div>
+      <a class="btn-primary" href="{% url 'upload_video' %}">Загрузить новое видео</a>
+    </div>
+
+    {% if videos %}
+      <div class="videos-grid">
+        {% for video in videos %}
+          <article class="video-card video-status-card">
+            <div class="video-status-head">
+              <div>
+                <div class="video-title">Видео #{{ video.pk }}</div>
+                <small>Задача {{ video.task_id }}</small>
+              </div>
+              <span class="lang-badge">{{ video.status }}</span>
+            </div>
+
+            <div class="video-status-meta">
+              <p><strong>Создано:</strong> {{ video.created_at|date:"d.m.Y H:i" }}</p>
+              <p><strong>Результат:</strong>
+                {% if video.path_to_s3 %}
+                  видео готово к просмотру
+                {% else %}
+                  ссылка на готовое видео пока не появилась
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="auth-actions">
+              <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Открыть статус</a>
+              <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Загрузить ещё одно видео</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="auth-card empty-videos-card">
+        <div class="section-tag">Пока пусто</div>
+        <h2 class="auth-title">Видео пока нету</h2>
+        <p class="auth-subtitle">
+          Вы ещё не отправляли ролики на перевод, но можно загрузить новое видео и сразу запустить обработку.
+        </p>
+        <div class="auth-actions">
+          <a class="btn-primary btn-block" href="{% url 'upload_video' %}">Загрузить новое видео</a>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

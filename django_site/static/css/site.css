@@ -634,6 +634,81 @@ input {
   align-items: center;
 }
 
+.videos-page {
+  width: 100%;
+}
+
+.videos-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.videos-hero .section-title {
+  margin: 22px 0 14px;
+  max-width: 680px;
+}
+
+.videos-subtitle {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.video-status-card {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+
+.video-status-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.video-status-head small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.video-status-meta {
+  display: grid;
+  gap: 10px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.video-status-meta p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.video-status-meta strong {
+  color: var(--text);
+}
+
+.empty-videos-card {
+  max-width: 560px;
+}
+
 .auth-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
@@ -919,6 +994,10 @@ input {
     gap: 40px;
   }
 
+  .videos-grid {
+    grid-template-columns: 1fr;
+  }
+
   .float-chip {
     position: static;
     margin-bottom: 14px;
@@ -953,6 +1032,11 @@ input {
 
 @media (max-width: 720px) {
   .site-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .videos-hero {
     align-items: flex-start;
     flex-direction: column;
   }

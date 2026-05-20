@@ -17,6 +17,7 @@
       <li><a href="{% url 'home' %}#how-it-works">Возможности</a></li>
       <li><a href="{% url 'home' %}#languages">Языки</a></li>
       {% if user.is_authenticated %}
+        <li><a href="{% url 'my_videos' %}">Мои видео</a></li>
         <li><span class="nav-pill">Кредиты: {{ user.credits }}</span></li>
         <li><a href="{% url 'logout' %}" class="nav-cta">Выйти</a></li>
       {% else %}
