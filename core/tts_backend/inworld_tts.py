@@ -5,7 +5,7 @@ from core.tts_backend.get_tts_coef import get_coefficient_tts
 from core.utils.config_utils import load_key
 
 url = "https://api.inworld.ai/tts/v1/voice"
-DEFAULT_MODEL_ID = "inworld-tts-1.5-max"
+DEFAULT_MODEL_ID = "inworld-tts-2"
 
 
 def get_model_id() -> str:

@@ -941,6 +941,51 @@ input {
   color: var(--muted);
 }
 
+.artifact-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(45, 90, 61, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.artifact-links {
+  display: grid;
+  gap: 10px;
+}
+
+.artifact-link {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(237, 234, 226, 0.44);
+  transition: transform 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.artifact-link:hover {
+  border-color: var(--accent-light);
+  background: rgba(231, 240, 232, 0.7);
+  transform: translateY(-1px);
+}
+
+.artifact-link-label,
+.artifact-link-note {
+  display: block;
+}
+
+.artifact-link-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.artifact-link-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .auth-status-card .auth-title,
 .auth-status-card .auth-subtitle {
   margin: 0;

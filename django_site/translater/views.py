@@ -38,28 +38,30 @@ def upload_video(request):
             with open(input_path, 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
-            
-            payload = {
-                "save_as": f"tmp/{user.pk}_{uuid.uuid4()}.mp4",
-                "language_code": form.cleaned_data["language"],
-                "dub_background_audio": dub_background_audio,
-                "dub_background_volume_percent": form.cleaned_data["volume"],
-                "burn_subtitles_dub": form.cleaned_data["is_sub"],
-            }
             try:
+                video = Video.objects.create(
+                    user=user,
+                    task_id=f"pending-{uuid.uuid4()}",
+                )
+                payload = {
+                    "save_dir": f"tmp/{user.pk}/{video.pk}",
+                    "language_code": form.cleaned_data["language"],
+                    "dub_background_audio": dub_background_audio,
+                    "dub_background_volume_percent": form.cleaned_data["volume"],
+                    "burn_subtitles_dub": form.cleaned_data["is_sub"],
+                }
                 response = requests.post(
                     f"{settings.API_BASE_URL}/run-pipeline",
                     json=payload,
                     timeout=30
                 )
                 response.raise_for_status()
-                video = Video.objects.create(
-                    user=user,
-                    task_id=response.json()["task_id"],
-                    status="PENDING",
-                )
+                
+                video.task_id = response.json()["task_id"]
+                video.save(update_fields=["task_id"])
                 return redirect("translate_status", video_id=video.pk)
             except requests.RequestException as e:
+                video.delete()
                 return render(request, "translater/error_as_upload.html", {"error": str(e)})
     else:
         form = UploadVideo()
@@ -87,11 +89,36 @@ def translate_status(request, video_id):
         video.path_to_s3 = result
     video.save(update_fields=["status", "path_to_s3"])
 
+    subtitle_links = [
+        {
+            "label": "Исходные субтитры",
+            "description": "Оригинальная дорожка",
+            "url": payload.get("src_url"),
+        },
+        {
+            "label": "Переведенные субтитры",
+            "description": "Только перевод",
+            "url": payload.get("trans_url"),
+        },
+        {
+            "label": "Source + Translation",
+            "description": "Сначала оригинал, потом перевод",
+            "url": payload.get("src_trans_url"),
+        },
+        {
+            "label": "Translation + Source",
+            "description": "Сначала перевод, потом оригинал",
+            "url": payload.get("trans_src_url"),
+        },
+    ]
+    subtitle_links = [item for item in subtitle_links if item["url"]]
+
     context = {
         "video": video,
         "api_status": payload.get("status"),
         "api_result": result,
         "video_playback_url": payload.get("video_url"),
+        "subtitle_links": subtitle_links,
     }
     return render(request, "translater/translate_status.html", context)
 

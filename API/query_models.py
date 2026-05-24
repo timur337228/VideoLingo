@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class PipelineInput(BaseModel):
-    save_as: str
+    save_dir: str
     language_code: str
     target_language: str | None = None
     dub_background_audio: str = "original_audio"

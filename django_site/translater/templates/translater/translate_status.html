@@ -53,6 +53,27 @@
           </div>
         {% endif %}
 
+        {% if subtitle_links %}
+          <div class="artifact-card">
+            <div class="video-preview-top">
+              <div>
+                <p class="video-preview-kicker">Файлы проекта</p>
+                <h3 class="video-preview-title">Скачать субтитры</h3>
+              </div>
+              <span class="lang-badge">SRT</span>
+            </div>
+
+            <div class="artifact-links">
+              {% for subtitle in subtitle_links %}
+                <a class="artifact-link" href="{{ subtitle.url }}" target="_blank" rel="noopener noreferrer">
+                  <span class="artifact-link-label">{{ subtitle.label }}</span>
+                  <span class="artifact-link-note">{{ subtitle.description }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
         <div class="auth-actions">
           {% if video_playback_url %}
             <a class="btn-primary btn-block" href="{{ video_playback_url }}" target="_blank" rel="noopener noreferrer">Открыть видео в новой вкладке</a>

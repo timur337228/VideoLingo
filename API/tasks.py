@@ -17,17 +17,26 @@ LANGUAGE_NAMES = {
     "zh": "中文",
 }
 
+
 @celery.task
 def run_pipeline_task(data: dict):
-    data["target_language"] = LANGUAGE_NAMES[data["language_code"]]
-    save_as = data.pop("save_as")
-    for key, value in data.items():
-        update_key(key, value)
-        
-    main()
-    video_path = s3.upload_file("output/output_dub.mp4", save_as)
+    try:
+        data["target_language"] = LANGUAGE_NAMES[data["language_code"]]
+        save_dir = data.pop("save_dir")
+        for key, value in data.items():
+            update_key(key, value)
+        main()
+        AUDIO_FILE_NAMES = {
+            "output_dub.mp4",
+            "src.srt",
+            "trans.srt",
+            "src_trans.srt",
+            "trans_src.srt",
+        }
+        for file in AUDIO_FILE_NAMES:
+            s3.upload_file(f"output/{file}", f"{save_dir}/{file}")
+    finally:
+        shutil.rmtree("output")
+        os.mkdir("output")
 
-    shutil.rmtree("output")
-    os.mkdir("output")
-
-    return video_path
+    return save_dir

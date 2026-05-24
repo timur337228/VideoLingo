@@ -31,12 +31,16 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     is_google_auth = models.BooleanField(default=False)
-    credits = models.PositiveIntegerField(default=0)
+    avalible_seconds = models.PositiveIntegerField(default=0)
     
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
+
+    @property
+    def available_minutes(self):
+        return self.avalible_seconds // 60
 
 def pending_expiration():
     return timezone.now() + timedelta(hours=24)
@@ -46,6 +50,8 @@ class PendingRegistration(models.Model):
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(default=pending_expiration)
+
+
 
     @property
     def expired(self):
