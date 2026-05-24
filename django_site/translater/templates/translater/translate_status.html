@@ -53,21 +53,21 @@
           </div>
         {% endif %}
 
-        {% if subtitle_links %}
+        {% if artifact_links %}
           <div class="artifact-card">
             <div class="video-preview-top">
               <div>
                 <p class="video-preview-kicker">Файлы проекта</p>
-                <h3 class="video-preview-title">Скачать субтитры</h3>
+                <h3 class="video-preview-title">Скачать файлы</h3>
               </div>
-              <span class="lang-badge">SRT</span>
+              <span class="lang-badge">SRT / MP3</span>
             </div>
 
             <div class="artifact-links">
-              {% for subtitle in subtitle_links %}
-                <a class="artifact-link" href="{{ subtitle.url }}" target="_blank" rel="noopener noreferrer">
-                  <span class="artifact-link-label">{{ subtitle.label }}</span>
-                  <span class="artifact-link-note">{{ subtitle.description }}</span>
+              {% for artifact in artifact_links %}
+                <a class="artifact-link" href="{{ artifact.url }}" target="_blank" rel="noopener noreferrer">
+                  <span class="artifact-link-label">{{ artifact.label }}</span>
+                  <span class="artifact-link-note">{{ artifact.description }}</span>
                 </a>
               {% endfor %}
             </div>

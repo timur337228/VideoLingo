@@ -89,7 +89,7 @@ def translate_status(request, video_id):
         video.path_to_s3 = result
     video.save(update_fields=["status", "path_to_s3"])
 
-    subtitle_links = [
+    artifact_links = [
         {
             "label": "Исходные субтитры",
             "description": "Оригинальная дорожка",
@@ -110,15 +110,25 @@ def translate_status(request, video_id):
             "description": "Сначала перевод, потом оригинал",
             "url": payload.get("trans_src_url"),
         },
+        {
+            "label": "Перевод: аудиодорожка",
+            "description": "Голос перевода без видео",
+            "url": payload.get("dub_audio_url"),
+        },
+        {
+            "label": "Фоновая дорожка",
+            "description": "Фон или музыка без голоса перевода",
+            "url": payload.get("background_audio_url"),
+        },
     ]
-    subtitle_links = [item for item in subtitle_links if item["url"]]
+    artifact_links = [item for item in artifact_links if item["url"]]
 
     context = {
         "video": video,
         "api_status": payload.get("status"),
         "api_result": result,
         "video_playback_url": payload.get("video_url"),
-        "subtitle_links": subtitle_links,
+        "artifact_links": artifact_links,
     }
     return render(request, "translater/translate_status.html", context)
 
