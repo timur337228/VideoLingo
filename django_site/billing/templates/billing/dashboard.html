@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Баланс | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="section billing-page">
+    <div class="videos-hero">
+      <div>
+        <div class="hero-tag">Billing · Баланс</div>
+        <h1 class="section-title">Пополнение <em>минут</em></h1>
+        <p class="videos-subtitle">
+          Сейчас на аккаунте доступно {{ user.available_minutes }} мин. Цена по умолчанию: {{ billing_settings.price_rub_per_minute }} ₽ за минуту.
+        </p>
+      </div>
+    </div>
+
+    <div class="billing-grid">
+      <article class="video-card billing-card">
+        <div class="video-status-head">
+          <div>
+            <div class="video-title">Своя сумма</div>
+            <small>Введите сумму в рублях, а скидка от подходящего пакета применится автоматически.</small>
+          </div>
+          <span class="lang-badge">Custom</span>
+        </div>
+        <form method="post" action="{% url 'billing_create_custom_payment' %}" class="billing-custom-form">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label" for="custom-amount-rub">Сумма пополнения</label>
+            <input
+              id="custom-amount-rub"
+              class="form-input"
+              type="number"
+              name="amount_rub"
+              min="0.01"
+              step="0.01"
+              inputmode="decimal"
+              placeholder="Например, 736.25"
+              value="{{ custom_amount_value }}"
+              required
+            >
+          </div>
+          {% if custom_payment_error %}
+            <div class="form-errors">
+              <p>{{ custom_payment_error }}</p>
+            </div>
+          {% endif %}
+          {% if custom_topup_preview and custom_topup_preview.seconds_to_credit > 0 %}
+            <div class="auth-inline-note">
+              Будет начислено примерно {{ custom_topup_preview.credited_minutes }} мин.
+              {% if custom_topup_preview.applied_package and custom_topup_preview.discount_percent > 0 %}
+                Пакетная скидка: {{ custom_topup_preview.discount_percent }}% от «{{ custom_topup_preview.applied_package.name }}».
+              {% else %}
+                Будет применена базовая цена без скидки.
+              {% endif %}
+            </div>
+          {% endif %}
+          <button class="btn-primary btn-block" type="submit">Создать платёж</button>
+        </form>
+      </article>
+
+      {% for package in packages %}
+        <article class="video-card billing-card">
+          <div class="video-status-head">
+            <div>
+              <div class="video-title">{{ package.name }}</div>
+              <small>{{ package.minutes }} минут{% if package.description %} · {{ package.description }}{% endif %}</small>
+            </div>
+            <span class="lang-badge">{{ package.get_price_rub }} ₽</span>
+          </div>
+          <form method="post" action="{% url 'billing_create_payment' package.pk %}">
+            {% csrf_token %}
+            <button class="btn-primary btn-block" type="submit">Выбрать пакет</button>
+          </form>
+        </article>
+      {% empty %}
+        <div class="auth-card empty-videos-card">
+          <div class="section-tag">Пакеты не настроены</div>
+          <h2 class="auth-title">Добавь пакеты в админке</h2>
+          <p class="auth-subtitle">После этого пользователи смогут создавать платежи и пополнять минуты.</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="billing-columns">
+      <div class="auth-card billing-history-card">
+        <div class="section-tag">История оплат</div>
+        <h2 class="auth-title">Последние платежи</h2>
+        <div class="billing-list">
+          {% for payment in payments %}
+            <div class="billing-row">
+              <span>#{{ payment.pk }} · {{ payment.amount_rub }} ₽</span>
+              <span>{{ payment.get_status_display }}</span>
+            </div>
+          {% empty %}
+            <p class="auth-subtitle">Платежей пока нет.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="auth-card billing-history-card">
+        <div class="section-tag">История минут</div>
+        <h2 class="auth-title">Операции по балансу</h2>
+        <div class="billing-list">
+          {% for item in transactions %}
+            <div class="billing-row">
+              <span>{{ item.get_type_display }} · {{ item.seconds_delta }} сек</span>
+              <span>{{ item.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+          {% empty %}
+            <p class="auth-subtitle">Операций пока нет.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

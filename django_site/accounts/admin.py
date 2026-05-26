@@ -8,14 +8,14 @@ from .models import User
 class CustomUserAdmin(UserAdmin):
     model = User
 
-    list_display = ("email", "avalible_seconds", "is_staff", "is_active", "is_superuser")
+    list_display = ("email", "available_seconds", "is_staff", "is_active", "is_superuser")
     list_filter = ("is_staff", "is_active", "is_superuser")
     ordering = ("email",)
     search_fields = ("email",)
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Профиль", {"fields": ("first_name", "last_name", "avalible_seconds")}),
+        ("Профиль", {"fields": ("first_name", "last_name", "available_seconds")}),
         ("Права доступа", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Даты", {"fields": ("last_login", "date_joined")}),
     )
@@ -23,6 +23,6 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("email", "password1", "password2", "avalible_seconds", "is_active", "is_staff", "is_superuser"),
+            "fields": ("email", "password1", "password2", "available_seconds", "is_active", "is_staff", "is_superuser"),
         }),
     )

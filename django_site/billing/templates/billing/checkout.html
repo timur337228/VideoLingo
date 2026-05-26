@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-copy">
+      <div class="hero-tag">Billing · Checkout</div>
+      <h1>Платёж <em>#{{ payment.pk }}</em></h1>
+      <p>Этот экран уже готов под интеграцию с платёжкой. Здесь собраны данные, которые нужно отправить в провайдера.</p>
+    </div>
+
+    <div class="auth-card billing-history-card">
+      <div class="section-tag">Данные платежа</div>
+      <h2 class="auth-title">{{ payment.amount_rub }} ₽</h2>
+      <p class="auth-subtitle">{{ payment.description }}</p>
+      <pre class="billing-payload">{{ gateway_payload_pretty }}</pre>
+      <div class="auth-actions">
+        <a class="btn-secondary btn-block" href="{% url 'billing_dashboard' %}">Назад к балансу</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}

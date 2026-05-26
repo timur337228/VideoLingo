@@ -709,6 +709,65 @@ input {
   max-width: 560px;
 }
 
+.billing-page {
+  width: 100%;
+}
+
+.billing-grid,
+.billing-columns {
+  display: grid;
+  gap: 20px;
+}
+
+.billing-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 28px;
+}
+
+.billing-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.billing-card,
+.billing-history-card {
+  display: grid;
+  gap: 18px;
+}
+
+.billing-custom-form {
+  display: grid;
+  gap: 14px;
+}
+
+.billing-list {
+  display: grid;
+  gap: 10px;
+}
+
+.billing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(237, 234, 226, 0.4);
+  font-size: 14px;
+}
+
+.billing-payload {
+  overflow-x: auto;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #161915;
+  color: #edf7ef;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 .auth-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
@@ -1040,6 +1099,11 @@ input {
   }
 
   .videos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .billing-grid,
+  .billing-columns {
     grid-template-columns: 1fr;
   }
 

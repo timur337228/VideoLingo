@@ -13,5 +13,6 @@ class Video(models.Model):
 
     duration_seconds = models.PositiveIntegerField(default=0)
     charged_seconds = models.PositiveIntegerField(default=0)
+    is_charge_confirmed = models.BooleanField(default=False)
     is_refunded = models.BooleanField(default=False)
     

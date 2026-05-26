@@ -51,6 +51,7 @@ SOCIAL_AUTH_PIPELINE = (
 
 INSTALLED_APPS = [
     "accounts",
+    "billing",
     "translater",
 
     "django.contrib.admin",

@@ -31,7 +31,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     is_google_auth = models.BooleanField(default=False)
-    avalible_seconds = models.PositiveIntegerField(default=0)
+    available_seconds = models.PositiveIntegerField(default=0)
     
 
     USERNAME_FIELD = "email"
@@ -40,7 +40,7 @@ class User(AbstractUser):
 
     @property
     def available_minutes(self):
-        return self.avalible_seconds // 60
+        return self.available_seconds // 60
 
 def pending_expiration():
     return timezone.now() + timedelta(hours=24)

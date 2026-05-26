@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Платёж создан | MixxTranslate{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-copy">
+      <div class="hero-tag">Billing · Успех</div>
+      <h1>Платёж <em>создан</em></h1>
+      <p>Как только провайдер пришлёт webhook со статусом `paid`, минуты автоматически начислятся на баланс.</p>
+    </div>
+    <div class="auth-card">
+      <div class="status-badge">Платёж #{{ payment.pk }}</div>
+      <h2 class="auth-title">{{ payment.amount_rub }} ₽</h2>
+      <p class="auth-subtitle">Текущий статус: {{ payment.get_status_display }}</p>
+      <div class="auth-actions">
+        <a class="btn-primary btn-block" href="{% url 'billing_dashboard' %}">Вернуться к балансу</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}
