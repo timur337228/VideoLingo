@@ -7,13 +7,11 @@
   <section class="section videos-page">
     <div class="videos-hero">
       <div>
-        <div class="hero-tag">AI · История переводов</div>
-        <h1 class="section-title">Ваши <em>видео</em> и текущие статусы</h1>
-        <p class="videos-subtitle">
-          Здесь собраны все отправленные ролики. Можно быстро открыть страницу статуса и проверить, завершилась ли обработка.
-        </p>
+        <div class="hero-tag">История переводов</div>
+        <h1 class="section-title">Ваши <em>видео</em></h1>
+        <p class="videos-subtitle">Все переводы в одном списке.</p>
       </div>
-      <a class="btn-primary" href="{% url 'upload_video' %}">Загрузить новое видео</a>
+      <a class="btn-primary" href="{% url 'upload_video' %}">Новое видео</a>
     </div>
 
     {% if videos %}
@@ -22,26 +20,41 @@
           <article class="video-card video-status-card">
             <div class="video-status-head">
               <div>
-                <div class="video-title">Видео #{{ video.pk }}</div>
-                <small>Задача {{ video.task_id }}</small>
+                <div class="video-title">Видео от {{ video.created_at|date:"d.m.Y H:i" }}</div>
+                <small>
+                  {% if video.duration_seconds %}
+                    {% widthratio video.duration_seconds 60 1 %} мин.
+                  {% else %}
+                    Без длительности
+                  {% endif %}
+                </small>
               </div>
-              <span class="lang-badge">{{ video.status }}</span>
+              <span class="lang-badge">
+                {% if video.status == "SUCCESS" %}
+                  Готово
+                {% elif video.status == "FAILURE" or video.status == "REVOKED" %}
+                  Ошибка
+                {% else %}
+                  В работе
+                {% endif %}
+              </span>
             </div>
 
             <div class="video-status-meta">
-              <p><strong>Создано:</strong> {{ video.created_at|date:"d.m.Y H:i" }}</p>
-              <p><strong>Результат:</strong>
+              <p><strong>Статус:</strong>
                 {% if video.path_to_s3 %}
-                  видео готово к просмотру
+                  готово к просмотру
+                {% elif video.status == "FAILURE" or video.status == "REVOKED" %}
+                  нужна повторная попытка
                 {% else %}
-                  ссылка на готовое видео пока не появилась
+                  идёт обработка
                 {% endif %}
               </p>
+              <p><strong>Загружено:</strong> {{ video.created_at|date:"d.m.Y H:i" }}</p>
             </div>
 
             <div class="auth-actions">
-              <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Открыть статус</a>
-              <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Загрузить ещё одно видео</a>
+              <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Открыть</a>
             </div>
           </article>
         {% endfor %}
@@ -49,12 +62,10 @@
     {% else %}
       <div class="auth-card empty-videos-card">
         <div class="section-tag">Пока пусто</div>
-        <h2 class="auth-title">Видео пока нету</h2>
-        <p class="auth-subtitle">
-          Вы ещё не отправляли ролики на перевод, но можно загрузить новое видео и сразу запустить обработку.
-        </p>
+        <h2 class="auth-title">Видео пока нет</h2>
+        <p class="auth-subtitle">Загрузите первое видео, чтобы увидеть историю переводов.</p>
         <div class="auth-actions">
-          <a class="btn-primary btn-block" href="{% url 'upload_video' %}">Загрузить новое видео</a>
+          <a class="btn-primary btn-block" href="{% url 'upload_video' %}">Загрузить видео</a>
         </div>
       </div>
     {% endif %}

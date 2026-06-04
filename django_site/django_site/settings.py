@@ -17,6 +17,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = os.path.join(BASE_DIR.parent, 'output')
+UPLOADS_DIR = os.path.join(BASE_DIR.parent, 'uploads')
 API_BASE_URL = "http://127.0.0.1:8001"
 
 load_dotenv(BASE_DIR / ".env")

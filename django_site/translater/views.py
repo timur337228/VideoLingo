@@ -14,24 +14,40 @@ from billing.utils import (
     confirm_video_charge,
     refund_video_charge,
     reserve_video_minutes,
+    seconds_to_charge,
 )
 from .forms import UploadVideo
 from .models import Video
 from .utils import get_video_duration_seconds
 
 
-def _reset_output_dir():
-    os.makedirs(settings.OUTPUT_DIR, exist_ok=True)
-    for item in os.listdir(settings.OUTPUT_DIR):
-        path = os.path.join(settings.OUTPUT_DIR, item)
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-        else:
-            os.remove(path)
+def _get_video_upload_dir(video_id):
+    return os.path.join(settings.UPLOADS_DIR, str(video_id))
+
+
+def _save_uploaded_source_file(file, video_id):
+    upload_dir = _get_video_upload_dir(video_id)
+    os.makedirs(upload_dir, exist_ok=True)
+
+    _, ext = os.path.splitext(file.name)
+    source_filename = f"source{ext.lower()}"
+    source_path = os.path.join(upload_dir, source_filename)
+
+    with open(source_path, "wb+") as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+
+    return source_path
+
+
+def _delete_video_upload_dir(video_id):
+    shutil.rmtree(_get_video_upload_dir(video_id), ignore_errors=True)
 
 
 @login_required
 def upload_video(request):
+    insufficient_balance = None
+
     if request.method == "POST":
         form = UploadVideo(request.POST, request.FILES)
         if form.is_valid():
@@ -41,25 +57,23 @@ def upload_video(request):
                 }[form.cleaned_data["is_del_vocal"]]
             file = request.FILES["file"]
             user = request.user
-            _reset_output_dir()
-            _, ext = os.path.splitext(file.name)
-            input_filename = f"source_{user.pk}_{uuid.uuid4().hex}{ext.lower()}"
-            input_path = os.path.join(settings.OUTPUT_DIR, input_filename)
-            with open(input_path, 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
             video = None
+            source_path = None
             try:
-                duration_seconds = get_video_duration_seconds(input_path)
                 video = Video.objects.create(
                     user=user,
+                    status="QUEUED",
                     task_id=f"pending-{uuid.uuid4()}",
-                    duration=timedelta(seconds=duration_seconds),
-                    duration_seconds=duration_seconds,
                 )
+                source_path = _save_uploaded_source_file(file, video.pk)
+                duration_seconds = get_video_duration_seconds(source_path)
+                video.duration = timedelta(seconds=duration_seconds)
+                video.duration_seconds = duration_seconds
+                video.save(update_fields=["duration", "duration_seconds"])
                 reserve_video_minutes(user, duration_seconds, video)
                 payload = {
                     "save_dir": f"users/{user.pk}/videos/{video.pk}",
+                    "source_path": source_path,
                     "language_code": form.cleaned_data["language"],
                     "dub_background_audio": dub_background_audio,
                     "dub_background_volume_percent": form.cleaned_data["volume"],
@@ -78,21 +92,36 @@ def upload_video(request):
                 return redirect("translate_status", video_id=video.pk)
             except InsufficientBalanceError as e:
                 if video is not None:
+                    _delete_video_upload_dir(video.pk)
                     video.delete()
-                form.add_error(None, str(e))
+                required_minutes = seconds_to_charge(duration_seconds) // 60 if duration_seconds else 0
+                insufficient_balance = {
+                    "message": str(e),
+                    "required_minutes": required_minutes,
+                    "available_minutes": user.available_minutes,
+                }
             except requests.RequestException as e:
                 if video is not None:
                     refund_video_charge(video, "Возврат: задача не была поставлена в очередь")
+                    _delete_video_upload_dir(video.pk)
                     video.delete()
                 return render(request, "translater/error_as_upload.html", {"error": str(e)})
             except Exception as e:
                 if video is not None:
                     refund_video_charge(video, "Возврат после ошибки запуска обработки")
+                    _delete_video_upload_dir(video.pk)
                     video.delete()
                 form.add_error(None, f"Не удалось подготовить видео к отправке: {e}")
     else:
         form = UploadVideo()
-    return render(request, "translater/upload_video.html", {"form": form})
+    return render(
+        request,
+        "translater/upload_video.html",
+        {
+            "form": form,
+            "insufficient_balance": insufficient_balance,
+        },
+    )
 
 
 

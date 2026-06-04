@@ -2,7 +2,7 @@ from celery.result import AsyncResult
 from fastapi import FastAPI
 from API.tasks import run_pipeline_task
 from API.query_models import PipelineInput
-from API.celery_app import celery
+from API.celery_app import PIPELINE_QUEUE, celery
 from API.s3 import s3
 
 
@@ -10,7 +10,10 @@ app = FastAPI()
 
 @app.post("/run-pipeline")
 def run_pipeline(data: PipelineInput):
-    task = run_pipeline_task.delay(data.model_dump())
+    task = run_pipeline_task.apply_async(
+        args=[data.model_dump()],
+        queue=PIPELINE_QUEUE,
+    )
     return {"task_id": task.id}
 
 

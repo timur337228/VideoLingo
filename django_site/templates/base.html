@@ -14,13 +14,14 @@
   <nav class="site-nav">
     <a class="logo" href="{% url 'home' %}">Mixx<span>Translate</span></a>
     <ul class="nav-links">
-      <li><a href="{% url 'home' %}#how-it-works">Возможности</a></li>
+      <li><a href="{% url 'home' %}#how-it-works">Как это работает</a></li>
       <li><a href="{% url 'home' %}#languages">Языки</a></li>
       {% if user.is_authenticated %}
+        <li><a href="{% url 'upload_video' %}" class="nav-cta">Перевести видео</a></li>
         <li><a href="{% url 'my_videos' %}">Мои видео</a></li>
         <li><a href="{% url 'billing_dashboard' %}">Баланс</a></li>
-        <li><span class="nav-pill">Минуты: {{ user.available_minutes }}</span></li>
-        <li><a href="{% url 'logout' %}" class="nav-cta">Выйти</a></li>
+        <li><span class="nav-pill">{{ user.available_minutes }} мин.</span></li>
+        <li><a href="{% url 'logout' %}">Выйти</a></li>
       {% else %}
         <li><a href="{% url 'login' %}">Вход</a></li>
         <li><a href="{% url 'register' %}" class="nav-cta">Регистрация</a></li>
@@ -34,7 +35,7 @@
 
   <footer class="site-footer">
     <a class="footer-logo" href="{% url 'home' %}">Mixx<span>Translate</span></a>
-    <p>© {% now "Y" %} MixxTranslate. Все права защищены.</p>
+    <p>© {% now "Y" %} MixxTranslate. Перевод видео в одном окне.</p>
     <ul class="footer-links">
       <li><a href="{% url 'home' %}#how-it-works">Как это работает</a></li>
       <li><a href="{% url 'home' %}#languages">Языки</a></li>

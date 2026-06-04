@@ -4,40 +4,49 @@
 {% block body_class %}auth-page{% endblock %}
 
 {% block content %}
-  <section class="auth-layout">
+  <section class="auth-layout auth-layout-split">
     <div class="auth-copy">
-      <div class="hero-tag">AI · Перевод видео</div>
-      <h1>Загрузите ролик<br><em>для перевода</em></h1>
-      <p>Мы отправим видео в очередь обработки, а затем покажем статус задачи и ссылку на готовый результат.</p>
+      <div class="hero-tag">Перевод видео</div>
+      <h1>Загрузите видео<br><em>и выберите язык</em></h1>
+      <p>После отправки вы сразу перейдёте на страницу статуса, где появится результат.</p>
       <div class="auth-note-card">
-        <h3>Что можно настроить</h3>
+        <h3>Коротко</h3>
         <div class="auth-checklist">
-          <p>Язык итогового перевода.</p>
-          <p>Нужно ли вшивать субтитры в готовый ролик.</p>
-          <p>Насколько громким оставить фоновый звук.</p>
+          <p>Один файл за раз.</p>
+          <p>Язык и дополнительные опции выбираются ниже.</p>
+          <p>Готовое видео появится на следующем экране.</p>
         </div>
       </div>
     </div>
 
     <div class="auth-card">
-      <div class="section-tag">Новая задача</div>
-      <h2 class="auth-title">Отправить видео</h2>
-      <p class="auth-subtitle">Выберите один видеофайл и параметры обработки. После отправки вы попадете на страницу статуса.</p>
+      <div class="section-tag">Новый перевод</div>
+      <h2 class="auth-title">Начать перевод</h2>
+      <p class="auth-subtitle">Только нужные параметры.</p>
+
+      {% if insufficient_balance %}
+        <div class="form-errors">
+          <p>{{ insufficient_balance.message }}</p>
+          <p>Для этого видео нужно {{ insufficient_balance.required_minutes }} мин., сейчас доступно {{ insufficient_balance.available_minutes }} мин.</p>
+        </div>
+        <div class="auth-actions">
+          <a class="btn-secondary btn-block" href="{% url 'billing_dashboard' %}">Перейти к оплате</a>
+        </div>
+      {% endif %}
 
       <form method="post" enctype="multipart/form-data" class="auth-form">
         {% csrf_token %}
 
-        {% if form.non_field_errors %}
+        {% if form.non_field_errors and not insufficient_balance %}
           <div class="form-errors">
-            {% for error in form.non_field_errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
+            <p>Не удалось запустить перевод. Проверьте заполнение формы и попробуйте ещё раз.</p>
           </div>
         {% endif %}
 
         <div class="form-group">
-          <label class="form-label" for="{{ form.file.id_for_label }}">Видео</label>
+          <label class="form-label" for="{{ form.file.id_for_label }}">Файл видео</label>
           {{ form.file }}
+          <p class="form-hint">Один файл за раз.</p>
           {% for error in form.file.errors %}
             <p class="field-error">{{ error }}</p>
           {% endfor %}
@@ -54,25 +63,37 @@
         <div class="form-group">
           <label class="form-label" for="{{ form.volume.id_for_label }}">Громкость фона: <span id="volume-value">{{ form.volume.value|default:12 }}</span>%</label>
           {{ form.volume }}
+          <p class="form-hint">Ниже значение, сильнее слышен перевод.</p>
           {% for error in form.volume.errors %}
             <p class="field-error">{{ error }}</p>
           {% endfor %}
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="{{ form.is_sub.id_for_label }}">{{ form.is_sub }} Вшить субтитры</label>
+          <div class="form-label">Дополнительно</div>
+          <div class="checkbox-stack">
+            <label class="checkbox-option" for="{{ form.is_sub.id_for_label }}">
+              {{ form.is_sub }}
+              <span>
+                <strong>Вшить субтитры</strong>
+                <span>Текст будет сразу в видео.</span>
+              </span>
+            </label>
+            <label class="checkbox-option" for="{{ form.is_del_vocal.id_for_label }}">
+              {{ form.is_del_vocal }}
+              <span>
+                <strong>Убрать речь на оригинальном языке</strong>
+                <span>Перевод будет звучать заметнее, останется только музыка и другие звуки из оригиналного видео.</span>
+              </span>
+            </label>
+          </div>
           {% for error in form.is_sub.errors %}
             <p class="field-error">{{ error }}</p>
           {% endfor %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="{{ form.is_del_vocal.id_for_label }}">{{ form.is_del_vocal }} Убирать оригинальный голос с фона</label>
           {% for error in form.is_del_vocal.errors %}
             <p class="field-error">{{ error }}</p>
           {% endfor %}
         </div>
-
         <button type="submit" class="btn-primary btn-block">Запустить перевод</button>
       </form>
     </div>

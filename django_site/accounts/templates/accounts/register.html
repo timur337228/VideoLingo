@@ -5,24 +5,11 @@
 
 {% block content %}
   <section class="auth-layout">
-    <div class="auth-copy">
-      <div class="hero-tag">AI · Шаг 1 из 2</div>
-      <h1>Сначала подтвердим<br><em>вашу почту</em></h1>
-      <p>Мы отправим ссылку на email, а пароль вы зададите уже после подтверждения. Так никто не сможет занять чужой адрес и закончить регистрацию за вас.</p>
-      <div class="auth-note-card">
-        <h3>Как устроен процесс</h3>
-        <div class="auth-checklist">
-          <p>1. Вводите email и получаете письмо со ссылкой.</p>
-          <p>2. Открываете письмо и подтверждаете адрес.</p>
-          <p>3. На следующем шаге задаёте пароль и имя.</p>
-        </div>
-      </div>
-    </div>
 
-    <div class="auth-card">
+    <div class="auth-card auth-panel">
       <div class="section-tag">Регистрация</div>
       <h2 class="auth-title">Получить ссылку</h2>
-      <p class="auth-subtitle">Введите рабочий email. После подтверждения мы откроем второй шаг с установкой пароля и остальными полями профиля.</p>
+      <p class="auth-subtitle">Введите рабочий email.</p>
 
       {% if messages %}
         <div class="form-errors">
@@ -51,14 +38,16 @@
           {% endfor %}
         </div>
 
-        <div class="auth-inline-note">
-          <strong>Важно:</strong> пока вы не подтвердите email, аккаунт не будет создан.
-        </div>
-
-        <button type="submit" class="btn-primary btn-block">Отправить ссылку</button>
+        <button type="submit" class="btn-primary btn-block">Далее</button>
       </form>
-      <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path|urlencode }}" class="btn-secondary btn-block">
-        Зарегистрироваться через Google
+      <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path|urlencode }}" class="btn-secondary btn-block auth-external-action auth-google-btn">
+        <svg class="auth-provider-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M21.805 12.23c0-.69-.062-1.353-.176-1.99H12v3.768h5.502c-.237 1.276-.956 2.357-2.037 3.08v2.557h3.294c1.928-1.775 3.046-4.39 3.046-7.415Z"/>
+          <path fill="#34A853" d="M12 22c2.76 0 5.075-.914 6.76-2.47l-3.294-2.557c-.913.612-2.082.973-3.466.973-2.662 0-4.917-1.797-5.722-4.212H2.873v2.638A9.996 9.996 0 0 0 12 22Z"/>
+          <path fill="#FBBC05" d="M6.278 13.734A5.996 5.996 0 0 1 5.958 12c0-.602.104-1.186.32-1.734V7.628H2.873A9.996 9.996 0 0 0 2 12c0 1.61.386 3.135.873 4.372l3.405-2.638Z"/>
+          <path fill="#EA4335" d="M12 6.054c1.5 0 2.846.516 3.906 1.53l2.93-2.93C17.07 2.998 14.756 2 12 2a9.996 9.996 0 0 0-9.127 5.628l3.405 2.638C7.083 7.85 9.338 6.054 12 6.054Z"/>
+        </svg>
+        <span>Зарегистрироваться через Google</span>
       </a>
 
       <p class="auth-switch">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>

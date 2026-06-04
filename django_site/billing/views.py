@@ -13,13 +13,26 @@ from .utils import (
     calculate_custom_topup,
     create_custom_payment,
     create_payment,
+    get_package_discount_percent,
+    get_package_rate_per_minute,
     mark_payment_status,
 )
 
 
 def _build_dashboard_context(request, *, custom_amount_value="", custom_payment_error=""):
     settings_obj = BillingSettings.load()
-    packages = PaymentPackage.objects.filter(is_active=True)
+    packages = list(PaymentPackage.objects.filter(is_active=True))
+
+    for package in packages:
+        package.display_rate_per_minute = get_package_rate_per_minute(
+            package,
+            price_rub_per_minute=settings_obj.price_rub_per_minute,
+        )
+        package.display_discount_percent = get_package_discount_percent(
+            package,
+            price_rub_per_minute=settings_obj.price_rub_per_minute,
+        )
+
     payments = request.user.payments.all()[:10]
     transactions = request.user.balance_transactions.all()[:20]
     custom_topup_preview = None
@@ -86,11 +99,11 @@ def create_custom_payment_view(request):
 
     try:
         payment = create_custom_payment(request.user, amount_rub)
-    except ValueError as exc:
+    except ValueError:
         context = _build_dashboard_context(
             request,
             custom_amount_value=raw_amount,
-            custom_payment_error=str(exc),
+            custom_payment_error="Не удалось подготовить оплату. Проверьте сумму и попробуйте ещё раз.",
         )
         return render(request, "billing/dashboard.html", context, status=400)
 
@@ -101,11 +114,6 @@ def create_custom_payment_view(request):
 def payment_checkout(request, payment_id):
     payment = get_object_or_404(Payment, pk=payment_id, user=request.user)
     checkout_context = build_checkout_context(payment, request)
-    checkout_context["gateway_payload_pretty"] = json.dumps(
-        checkout_context["gateway_payload"],
-        ensure_ascii=False,
-        indent=2,
-    )
     return render(request, "billing/checkout.html", checkout_context)
 
 

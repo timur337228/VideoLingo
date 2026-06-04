@@ -6,33 +6,60 @@
 {% block content %}
   <section class="auth-layout">
     <div class="auth-copy">
-      <div class="hero-tag">AI · Статус задачи</div>
-      <h1>Следим за<br><em>обработкой</em></h1>
-      <p>На этой странице можно проверить, взял ли worker задачу в работу, завершилась ли она успешно и появилась ли ссылка на результат.</p>
-      <div class="auth-note-card">
-        <h3>Текущее состояние</h3>
-        <div class="auth-checklist">
-          <p>ID задачи: {{ video.task_id }}</p>
-          <p>Статус Celery: {{ api_status }}</p>
-          <p>Создано: {{ video.created_at|date:"d.m.Y H:i" }}</p>
+      <div class="hero-tag">Статус перевода</div>
+      {% if api_status == "SUCCESS" %}
+        <h1>Перевод готов,<br><em>можно смотреть или скачать</em></h1>
+        <p>Результат уже доступен на этой странице.</p>
+      {% elif api_status == "FAILURE" or api_status == "REVOKED" %}
+        <h1>Перевод не завершился,<br><em>попробуйте ещё раз</em></h1>
+        <p>Обработка прервалась. Обновите статус или отправьте видео заново.</p>
+      {% else %}
+        <h1>Видео обрабатывается,<br><em>нужно немного подождать</em></h1>
+        {% comment %} <p>Страница обновится автоматически, когда результат будет готов.</p> {% endcomment %}
+      {% endif %}
+
+      <div class="status-summary">
+        <div class="status-summary-row">
+          <span>Загружено</span>
+          <span>{{ video.created_at|date:"d.m.Y H:i" }}</span>
+        </div>
+        {% if video.duration_seconds %}
+          <div class="status-summary-row">
+            <span>Длительность</span>
+            <span>{% widthratio video.duration_seconds 60 1 %} мин.</span>
+          </div>
+        {% endif %}
+        <div class="status-summary-row">
+          <span>Состояние</span>
+          {% if api_status == "SUCCESS" %}
+            <span>Готово</span>
+          {% elif api_status == "FAILURE" or api_status == "REVOKED" %}
+            <span>Нужна повторная попытка</span>
+          {% else %}
+            <span>Идёт обработка</span>
+          {% endif %}
         </div>
       </div>
     </div>
 
     <div class="auth-card auth-status-card">
-      <div class="status-badge">Статус: {{ api_status }}</div>
-      <h2 class="auth-title">Задача {{ video.pk }}</h2>
+      <div class="status-badge">
+        {% if api_status == "SUCCESS" %}
+          Готово
+        {% elif api_status == "FAILURE" or api_status == "REVOKED" %}
+          Ошибка обработки
+        {% else %}
+          Идёт перевод
+        {% endif %}
+      </div>
 
       {% if api_status == "SUCCESS" %}
-        <p class="auth-subtitle">Перевод завершен. Итоговый ролик можно посмотреть прямо на странице, а если ссылка устареет после долгой паузы, просто обнови статус.</p>
+        <h2 class="auth-title">Готовое видео</h2>
 
         {% if video_playback_url %}
           <div class="video-preview-card">
             <div class="video-preview-top">
-              <div>
-                <p class="video-preview-kicker">Готовое видео</p>
-                <h3 class="video-preview-title">Встроенный плеер результата</h3>
-              </div>
+              <h3 class="video-preview-title">Просмотр</h3>
               <span class="lang-badge">MP4</span>
             </div>
 
@@ -42,24 +69,17 @@
                 Ваш браузер не поддерживает встроенное видео.
               </video>
             </div>
-
-            <p class="video-preview-note">
-              Видео загружается по подписанной ссылке, поэтому оно не открывается как публичный файл из бакета напрямую.
-            </p>
           </div>
         {% else %}
           <div class="auth-inline-note">
-            Видео уже собрано, но ссылка для воспроизведения пока не готова. Нажми «Обновить статус» через пару секунд.
+            Видео собрано, ссылка для просмотра ещё обновляется.
           </div>
         {% endif %}
 
         {% if artifact_links %}
           <div class="artifact-card">
             <div class="video-preview-top">
-              <div>
-                <p class="video-preview-kicker">Файлы проекта</p>
-                <h3 class="video-preview-title">Скачать файлы</h3>
-              </div>
+              <h3 class="video-preview-title">Файлы</h3>
               <span class="lang-badge">SRT / MP3</span>
             </div>
 
@@ -76,38 +96,40 @@
 
         <div class="auth-actions">
           {% if video_playback_url %}
-            <a class="btn-primary btn-block" href="{{ video_playback_url }}" target="_blank" rel="noopener noreferrer">Открыть видео в новой вкладке</a>
+            <a class="btn-primary btn-block" href="{{ video_playback_url }}" target="_blank" rel="noopener noreferrer">Открыть в новой вкладке</a>
+            <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Новое видео</a>
+          {% else %}
+            <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Обновить статус</a>
+            <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Новое видео</a>
           {% endif %}
-          <a class="btn-secondary btn-block" href="{% url 'translate_status' video.pk %}">Обновить статус</a>
-          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Загрузить еще видео</a>
         </div>
-      {% elif api_status == "FAILURE" %}
-        <p class="auth-subtitle">Во время обработки произошла ошибка. Ниже мы показываем текст, который вернул API.</p>
-        <div class="form-errors">
-          <p>{{ api_result }}</p>
+      {% elif api_status == "FAILURE" or api_status == "REVOKED" %}
+        <h2 class="auth-title">Нужна повторная попытка</h2>
+        <div class="auth-inline-note">
+          Попробуйте обновить статус. Если ошибка повторится, загрузите видео заново.
         </div>
         <div class="auth-actions">
-          <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Проверить еще раз</a>
-          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Отправить другое видео</a>
+          <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Обновить статус</a>
+          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Новое видео</a>
         </div>
       {% else %}
-        <p class="auth-subtitle">Задача еще в очереди или уже выполняется. Страница обновляется автоматически, пока не появится финальный статус.</p>
+        <h2 class="auth-title">Видео ещё готовится</h2>
         <div class="auth-inline-note">
-          Текущий ответ API: {{ api_result|default:"пока без дополнительной информации" }}
+          Оставьте страницу открытой или обновите статус вручную.
         </div>
         <div class="auth-actions">
-          <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Обновить сейчас</a>
-          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">Вернуться к загрузке</a>
+          <a class="btn-primary btn-block" href="{% url 'translate_status' video.pk %}">Обновить статус</a>
+          <a class="btn-secondary btn-block" href="{% url 'upload_video' %}">К загрузке</a>
         </div>
       {% endif %}
     </div>
   </section>
 
-  {% if api_status != "SUCCESS" and api_status != "FAILURE" %}
+  {% if api_status != "SUCCESS" and api_status != "FAILURE" and api_status != "REVOKED" %}
     <script>
       setTimeout(() => {
         window.location.reload();
-      }, 5000);
+      }, 7000);
     </script>
   {% endif %}
 {% endblock %}

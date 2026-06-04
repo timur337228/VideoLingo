@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Платёж отменён | MixxTranslate{% endblock %}
+{% block title %}Оплата не завершена | MixxTranslate{% endblock %}
 {% block body_class %}auth-page{% endblock %}
 
 {% block content %}
   <section class="auth-layout">
     <div class="auth-copy">
-      <div class="hero-tag">Billing · Отмена</div>
-      <h1>Платёж <em>не завершён</em></h1>
-      <p>Если оплата была отменена или прервана, можно вернуться к выбору пакета и создать новый платёж.</p>
+      <div class="hero-tag">Оплата</div>
+      <h1>Оплата не завершена,<br><em>можно попробовать снова</em></h1>
+      <p>Вернитесь к выбору суммы и создайте новый платёж.</p>
     </div>
     <div class="auth-card">
-      <div class="status-badge">Платёж #{{ payment.pk }}</div>
+      <div class="status-badge">Платёж не завершён</div>
       <h2 class="auth-title">{{ payment.amount_rub }} ₽</h2>
       <p class="auth-subtitle">Текущий статус: {{ payment.get_status_display }}</p>
       <div class="auth-actions">

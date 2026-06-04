@@ -6,19 +6,14 @@
 {% block content %}
   <section class="auth-layout">
     <div class="auth-copy">
-      <div class="hero-tag">AI · Ошибка API</div>
-      <h1>Не удалось<br><em>отправить задачу</em></h1>
-      <p>Похоже, Django не смог достучаться до FastAPI или worker сейчас недоступен. Такое обычно бывает, если API не запущен или ответил с ошибкой.</p>
+      <div class="hero-tag">Не удалось отправить видео</div>
+      <h1>Перевод не запустился,<br><em>попробуйте ещё раз</em></h1>
+      <p>Повторная отправка обычно решает проблему.</p>
     </div>
 
     <div class="auth-card auth-status-card">
-      <div class="status-badge">Отправка не удалась</div>
-      <h2 class="auth-title">Попробуйте еще раз</h2>
-      {% if error %}
-        <div class="form-errors">
-          <p>{{ error }}</p>
-        </div>
-      {% endif %}
+      <div class="status-badge">Запуск не выполнен</div>
+      <h2 class="auth-title">Вернитесь к форме</h2>
       <div class="auth-actions">
         <a class="btn-primary btn-block" href="{% url 'upload_video' %}">Вернуться к форме</a>
         <a class="btn-secondary btn-block" href="{% url 'home' %}">На главную</a>
