@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 
 class UploadVideo(forms.Form):
     file = forms.FileField(label="Видео")
@@ -25,6 +26,24 @@ class UploadVideo(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["file"].widget.attrs.update({"class": "form-input", "accept": "video/*"})
+        accept_types = ",".join(settings.ALLOWED_VIDEO_EXTENSIONS)
+        self.fields["file"].widget.attrs.update({"class": "form-input", "accept": accept_types})
         self.fields["language"].widget.attrs.update({"class": "form-input"})
         self.fields["volume"].widget.attrs.update({"class": "form-input"})
+
+    def clean_file(self):
+        file = self.cleaned_data["file"]
+        filename = (file.name or "").lower()
+        if not filename.endswith(settings.ALLOWED_VIDEO_EXTENSIONS):
+            raise forms.ValidationError("Допустимы только видеофайлы.")
+
+        content_type = (getattr(file, "content_type", "") or "").lower()
+        if content_type and content_type not in settings.ALLOWED_VIDEO_CONTENT_TYPES:
+            raise forms.ValidationError("Неподдерживаемый тип файла.")
+
+        if file.size > settings.MAX_VIDEO_UPLOAD_SIZE_BYTES:
+            raise forms.ValidationError(
+                f"Размер файла превышает лимит {settings.MAX_VIDEO_UPLOAD_SIZE_MB} МБ."
+            )
+
+        return file

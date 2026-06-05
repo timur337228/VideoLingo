@@ -29,10 +29,7 @@ class StartRegistrationForm(StyledFieldsMixin, forms.Form):
         self.fields["email"].widget.attrs["autocomplete"] = "email"
 
     def clean_email(self):
-        email = self.cleaned_data["email"].strip().lower()
-        if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError("Пользователь с таким email уже существует.")
-        return email
+        return self.cleaned_data["email"].strip().lower()
 
 class ResetPasswordForm(StyledFieldsMixin, forms.Form):
     email = forms.EmailField(label="Email")
@@ -47,13 +44,7 @@ class ResetPasswordForm(StyledFieldsMixin, forms.Form):
         self.fields["email"].widget.attrs["autocomplete"] = "email"
     
     def clean_email(self):
-        email = self.cleaned_data["email"].strip().lower()
-        user = User.objects.filter(email__iexact=email)
-        if not user.exists():
-            raise forms.ValidationError("Пользователя с таким email не существует.")
-        if user.first().is_google_auth:
-            raise forms.ValidationError("Вы авторизовались через google, войдите с помощью google")
-        return email
+        return self.cleaned_data["email"].strip().lower()
 
 
 class CompleteRegistrationForm(StyledFieldsMixin, UserCreationForm):

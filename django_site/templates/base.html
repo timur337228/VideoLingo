@@ -21,7 +21,12 @@
         <li><a href="{% url 'my_videos' %}">Мои видео</a></li>
         <li><a href="{% url 'billing_dashboard' %}">Баланс</a></li>
         <li><span class="nav-pill">{{ user.available_minutes }} мин.</span></li>
-        <li><a href="{% url 'logout' %}">Выйти</a></li>
+        <li>
+          <form method="post" action="{% url 'logout' %}" class="nav-logout-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-link-button">Выйти</button>
+          </form>
+        </li>
       {% else %}
         <li><a href="{% url 'login' %}">Вход</a></li>
         <li><a href="{% url 'register' %}" class="nav-cta">Регистрация</a></li>

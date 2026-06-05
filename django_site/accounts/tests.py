@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.encoding import force_bytes
@@ -11,6 +12,7 @@ from .models import User
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class PasswordResetFlowTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.user = User.objects.create_user(
             email="user@example.com",
             password="OldPassword123!",
@@ -51,7 +53,7 @@ class PasswordResetFlowTests(TestCase):
         self.assertIn(uidb64, mail.outbox[0].body)
         self.assertIn("/auth/complite-reset-password/", mail.outbox[0].body)
 
-    def test_reset_password_rejects_google_user(self):
+    def test_reset_password_hides_google_user_existence(self):
         response = self.client.post(
             reverse("reset_password"),
             {"email": self.google_user.email},
@@ -60,7 +62,20 @@ class PasswordResetFlowTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
-            "Вы авторизовались через google, войдите с помощью google",
+            "Если аккаунт существует и для него доступен вход по паролю",
+        )
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_reset_password_hides_missing_user_existence(self):
+        response = self.client.post(
+            reverse("reset_password"),
+            {"email": "missing@example.com"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Если аккаунт существует и для него доступен вход по паролю",
         )
         self.assertEqual(len(mail.outbox), 0)
 
@@ -93,3 +108,44 @@ class PasswordResetFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Ссылка для сброса")
+
+
+class AuthSecurityTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = User.objects.create_user(
+            email="user@example.com",
+            password="StrongPassword123!",
+            is_active=True,
+        )
+
+    def test_logout_requires_post(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("logout"))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_logout_post_logs_user_out(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(reverse("logout"))
+
+        self.assertRedirects(response, reverse("home"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    @override_settings(LOGIN_RATE_LIMIT_ATTEMPTS=3, LOGIN_RATE_LIMIT_WINDOW_SECONDS=60)
+    def test_login_is_rate_limited_after_repeated_failures(self):
+        for _ in range(3):
+            self.client.post(
+                reverse("login"),
+                {"username": self.user.email, "password": "wrong-password"},
+            )
+
+        response = self.client.post(
+            reverse("login"),
+            {"username": self.user.email, "password": "wrong-password"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Слишком много попыток входа. Попробуйте позже.")

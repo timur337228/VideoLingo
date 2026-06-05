@@ -108,15 +108,28 @@ input {
 
 .nav-links a,
 .footer-links a,
-.nav-pill {
+.nav-pill,
+.nav-link-button {
   font-size: 14px;
   color: var(--muted);
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .nav-links a:hover,
+.nav-link-button:hover,
 .footer-links a:hover {
   color: var(--text);
+}
+
+.nav-logout-form {
+  margin: 0;
+}
+
+.nav-link-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .nav-pill {

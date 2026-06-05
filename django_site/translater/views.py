@@ -2,12 +2,13 @@ import os
 import shutil
 import uuid
 from datetime import timedelta
+import logging
 
+import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect, render
-import requests
 
 from billing.utils import (
     InsufficientBalanceError,
@@ -19,6 +20,9 @@ from billing.utils import (
 from .forms import UploadVideo
 from .models import Video
 from .utils import get_video_duration_seconds
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_video_upload_dir(video_id):
@@ -59,6 +63,7 @@ def upload_video(request):
             user = request.user
             video = None
             source_path = None
+            duration_seconds = 0
             try:
                 video = Video.objects.create(
                     user=user,
@@ -101,17 +106,23 @@ def upload_video(request):
                     "available_minutes": user.available_minutes,
                 }
             except requests.RequestException as e:
+                logger.warning("Failed to enqueue translation task for user_id=%s: %s", user.pk, e)
                 if video is not None:
                     refund_video_charge(video, "Возврат: задача не была поставлена в очередь")
                     _delete_video_upload_dir(video.pk)
                     video.delete()
-                return render(request, "translater/error_as_upload.html", {"error": str(e)})
+                return render(
+                    request,
+                    "translater/error_as_upload.html",
+                    {"error": "Не удалось связаться с сервисом обработки. Попробуйте позже."},
+                )
             except Exception as e:
+                logger.exception("Failed to prepare uploaded video for user_id=%s", user.pk)
                 if video is not None:
                     refund_video_charge(video, "Возврат после ошибки запуска обработки")
                     _delete_video_upload_dir(video.pk)
                     video.delete()
-                form.add_error(None, f"Не удалось подготовить видео к отправке: {e}")
+                form.add_error(None, "Не удалось подготовить видео к отправке. Попробуйте другой файл.")
     else:
         form = UploadVideo()
     return render(
@@ -137,7 +148,12 @@ def translate_status(request, video_id):
         response.raise_for_status()
         payload = response.json()
     except requests.RequestException as e:
-        return render(request, "translater/error_for_translate_status.html", {"error": str(e), "video": video})
+        logger.warning("Failed to fetch translation status for video_id=%s: %s", video.pk, e)
+        return render(
+            request,
+            "translater/error_for_translate_status.html",
+            {"error": "Не удалось получить статус обработки. Попробуйте обновить страницу позже.", "video": video},
+        )
 
     video.status = payload.get("status", video.status)
     result = payload.get("result")

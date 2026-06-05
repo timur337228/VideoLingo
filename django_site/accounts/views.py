@@ -1,22 +1,48 @@
+import uuid
+from datetime import timedelta
+
+from django.conf import settings
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.contrib.auth import login, logout
-from django.shortcuts import redirect, render
-from django.shortcuts import get_object_or_404
-from django.core.cache import cache
-import uuid
-from datetime import timedelta
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils import timezone
-from django.contrib.auth.forms import SetPasswordForm
+from django.views.decorators.http import require_POST
 
 from .models import User, PendingRegistration
 from .forms import StartRegistrationForm, UserLogin, \
     CompleteRegistrationForm, ResetPasswordForm
+
+
+def _throttle_key(scope, *parts):
+    normalized_parts = [str(part).strip().lower() for part in parts if str(part).strip()]
+    return ":".join([scope, *normalized_parts])
+
+
+def _throttle_is_limited(key, limit):
+    return int(cache.get(key, 0)) >= limit
+
+
+def _throttle_hit(key, window_seconds):
+    if not cache.add(key, 1, timeout=window_seconds):
+        try:
+            cache.incr(key)
+        except ValueError:
+            cache.set(key, 1, timeout=window_seconds)
+
+
+def _throttle_reset(*keys):
+    for key in keys:
+        if key:
+            cache.delete(key)
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -34,20 +60,26 @@ def register(request):
             request.session.create()
         form = StartRegistrationForm(request.POST)
         if form.is_valid():
-            allowed = cache.add(f"register.ip:{get_client_ip(request)}", True, timeout=120)
-            session_key = cache.add(f"register:session:{request.session.session_key}", True, timeout=120)
-            if not allowed or not session_key:
+            email = form.cleaned_data["email"]
+            ip_key = _throttle_key("register.ip", get_client_ip(request))
+            session_key = _throttle_key("register.session", request.session.session_key)
+            if (
+                _throttle_is_limited(ip_key, settings.REGISTRATION_RATE_LIMIT_ATTEMPTS)
+                or _throttle_is_limited(session_key, settings.REGISTRATION_RATE_LIMIT_ATTEMPTS)
+            ):
                 form.add_error(None, "Превышен лимит по количеству попыток")
             else:
-                email = form.cleaned_data["email"]
-                pending, _ = PendingRegistration.objects.update_or_create(
-                    email=email,
-                    defaults={
-                        "token": uuid.uuid4(),
-                        "expires_at": timezone.now() + timedelta(hours=24),
-                    },
-                )
-                send_verification_email(request, pending)
+                _throttle_hit(ip_key, settings.REGISTRATION_RATE_LIMIT_WINDOW_SECONDS)
+                _throttle_hit(session_key, settings.REGISTRATION_RATE_LIMIT_WINDOW_SECONDS)
+                if not User.objects.filter(email__iexact=email).exists():
+                    pending, _ = PendingRegistration.objects.update_or_create(
+                        email=email,
+                        defaults={
+                            "token": uuid.uuid4(),
+                            "expires_at": timezone.now() + timedelta(hours=24),
+                        },
+                    )
+                    send_verification_email(request, pending)
                 return redirect("verify_email_sent")
     else:
         form = StartRegistrationForm()
@@ -56,26 +88,40 @@ def register(request):
 
 
 def reset_password(request):
+    email_sent = False
     if request.method == "POST":
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
-            user = User.objects.get(email__iexact=email)
-            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            reset_link = request.build_absolute_uri(
-                reverse("complite_reset_password", kwargs={"uidb64": uidb64, "token": token})
-            )
-            send_mail(
-                "Сброс пароля",
-                f"Ссылка на сброс пароля: {reset_link}",
-                from_email=None,
-                recipient_list=[email],
-                fail_silently=False,
-            )
+            ip_key = _throttle_key("reset.ip", get_client_ip(request))
+            email_key = _throttle_key("reset.email", email)
+            if (
+                _throttle_is_limited(ip_key, settings.PASSWORD_RESET_RATE_LIMIT_ATTEMPTS)
+                or _throttle_is_limited(email_key, settings.PASSWORD_RESET_RATE_LIMIT_ATTEMPTS)
+            ):
+                form.add_error(None, "Слишком много запросов на сброс. Попробуйте позже.")
+            else:
+                _throttle_hit(ip_key, settings.PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS)
+                _throttle_hit(email_key, settings.PASSWORD_RESET_RATE_LIMIT_WINDOW_SECONDS)
+                user = User.objects.filter(email__iexact=email, is_google_auth=False).first()
+                if user is not None:
+                    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+                    token = default_token_generator.make_token(user)
+                    reset_link = request.build_absolute_uri(
+                        reverse("complite_reset_password", kwargs={"uidb64": uidb64, "token": token})
+                    )
+                    send_mail(
+                        "Сброс пароля",
+                        f"Ссылка на сброс пароля: {reset_link}",
+                        from_email=None,
+                        recipient_list=[email],
+                        fail_silently=False,
+                    )
+                email_sent = True
+                form = ResetPasswordForm()
     else:
         form = ResetPasswordForm()
-    return render(request, "password_reset.html", {"form": form})
+    return render(request, "password_reset.html", {"form": form, "email_sent": email_sent})
 
 
 def complite_reset_password(request, uidb64, token):
@@ -102,15 +148,28 @@ def login_view(request):
         return redirect("home")
 
     if request.method == "POST":
+        normalized_email = (request.POST.get("username") or "").strip().lower()
+        ip_key = _throttle_key("login.ip", get_client_ip(request))
+        account_key = _throttle_key("login.account", normalized_email)
         form = UserLogin(request, data=request.POST)
-        if form.is_valid():
+        if (
+            _throttle_is_limited(ip_key, settings.LOGIN_RATE_LIMIT_ATTEMPTS)
+            or _throttle_is_limited(account_key, settings.LOGIN_RATE_LIMIT_ATTEMPTS)
+        ):
+            form.add_error(None, "Слишком много попыток входа. Попробуйте позже.")
+        elif form.is_valid():
+            _throttle_reset(ip_key, account_key)
             login(request, form.get_user())
             return redirect("home")
+        else:
+            _throttle_hit(ip_key, settings.LOGIN_RATE_LIMIT_WINDOW_SECONDS)
+            _throttle_hit(account_key, settings.LOGIN_RATE_LIMIT_WINDOW_SECONDS)
     else:
         form = UserLogin(request)
 
     return render(request, "accounts/login.html", {"form": form})
 
+@require_POST
 def logout_view(request):
     logout(request)
     return redirect("home")
@@ -180,4 +239,3 @@ def complete_registration(request):
         "accounts/complete_registration.html",
         {"form": form, "email": pending.email},
     )
-

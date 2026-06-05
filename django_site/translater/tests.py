@@ -76,3 +76,41 @@ class UploadVideoTests(TestCase):
         self.assertTrue(payload["source_path"].startswith(self.uploads_dir))
         self.assertTrue(os.path.exists(payload["source_path"]))
         self.assertFalse(payload["source_path"].startswith(self.output_dir))
+
+    def test_upload_video_rejects_non_video_file(self):
+        with override_settings(OUTPUT_DIR=self.output_dir, UPLOADS_DIR=self.uploads_dir):
+            response = self.client.post(
+                reverse("upload_video"),
+                {
+                    "file": SimpleUploadedFile("payload.exe", b"fake bytes", content_type="application/octet-stream"),
+                    "language": "en",
+                    "volume": "12",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Допустимы только видеофайлы.")
+        self.assertEqual(Video.objects.count(), 0)
+
+    def test_upload_video_rejects_oversized_file(self):
+        oversized = SimpleUploadedFile("clip.mp4", b"123456", content_type="video/mp4")
+        oversized.size = 6
+
+        with override_settings(
+            OUTPUT_DIR=self.output_dir,
+            UPLOADS_DIR=self.uploads_dir,
+            MAX_VIDEO_UPLOAD_SIZE_MB=0,
+            MAX_VIDEO_UPLOAD_SIZE_BYTES=5,
+        ):
+            response = self.client.post(
+                reverse("upload_video"),
+                {
+                    "file": oversized,
+                    "language": "en",
+                    "volume": "12",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Размер файла превышает лимит")
+        self.assertEqual(Video.objects.count(), 0)
