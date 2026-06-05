@@ -1,10 +1,12 @@
+import json
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import User
-from billing.models import BalanceTransaction, BillingSettings, PaymentPackage
+from billing.models import BalanceTransaction, BillingSettings, Payment, PaymentPackage
 from billing.utils import (
     calculate_custom_topup,
     create_custom_payment,
@@ -128,3 +130,99 @@ class BillingFlowTests(TestCase):
         payment = self.user.payments.latest("id")
         self.assertRedirects(response, reverse("billing_checkout", kwargs={"payment_id": payment.pk}))
         self.assertEqual(payment.seconds_to_credit, 1860)
+
+    @patch("billing.yookassa.requests.request")
+    def test_start_payment_view_redirects_to_yookassa(self, mocked_request):
+        package = PaymentPackage.objects.create(
+            name="Starter",
+            minutes=10,
+            price_rub_override="250.00",
+        )
+        payment = create_payment(self.user, package)
+        self.client.force_login(self.user)
+
+        mocked_request.return_value.status_code = 200
+        mocked_request.return_value.json.return_value = {
+            "id": "2b6cc794-000f-5000-9000-1ac8dbfa12ab",
+            "status": "pending",
+            "confirmation": {
+                "type": "redirect",
+                "confirmation_url": "https://yookassa.example/confirm",
+            },
+        }
+
+        with self.settings(
+            YOOKASSA_SHOP_ID="shop-id",
+            YOOKASSA_SECRET_KEY="secret-key",
+            YOOKASSA_ENABLED=True,
+        ):
+            response = self.client.post(
+                reverse("billing_start_payment", kwargs={"payment_id": payment.pk}),
+                {"method_type": "bank_card"},
+            )
+
+        payment.refresh_from_db()
+        self.assertRedirects(response, "https://yookassa.example/confirm", fetch_redirect_response=False)
+        self.assertEqual(payment.provider, "yookassa")
+        self.assertEqual(payment.provider_payment_id, "2b6cc794-000f-5000-9000-1ac8dbfa12ab")
+
+    @patch("billing.yookassa.requests.request")
+    def test_payment_webhook_marks_payment_paid_after_provider_check(self, mocked_request):
+        package = PaymentPackage.objects.create(
+            name="Starter",
+            minutes=10,
+            price_rub_override="250.00",
+        )
+        payment = Payment.objects.create(
+            user=self.user,
+            package=package,
+            provider="yookassa",
+            status=Payment.STATUS_PENDING,
+            amount_rub=Decimal("250.00"),
+            seconds_to_credit=600,
+            description="Пополнение баланса: 10 мин.",
+            provider_payment_id="2b6cc794-000f-5000-9000-1ac8dbfa12ab",
+            provider_payload={},
+        )
+
+        mocked_request.return_value.status_code = 200
+        mocked_request.return_value.json.return_value = {
+            "id": "2b6cc794-000f-5000-9000-1ac8dbfa12ab",
+            "status": "succeeded",
+            "paid": True,
+            "metadata": {
+                "payment_id": str(payment.pk),
+            },
+        }
+
+        with self.settings(
+            YOOKASSA_SHOP_ID="shop-id",
+            YOOKASSA_SECRET_KEY="secret-key",
+            YOOKASSA_ENABLED=True,
+        ):
+            response = self.client.post(
+                reverse("billing_webhook"),
+                data=json.dumps(
+                    {
+                        "type": "notification",
+                        "event": "payment.succeeded",
+                        "object": {
+                            "id": "2b6cc794-000f-5000-9000-1ac8dbfa12ab",
+                            "metadata": {
+                                "payment_id": str(payment.pk),
+                            },
+                        },
+                    }
+                ),
+                content_type="application/json",
+            )
+
+        payment.refresh_from_db()
+        self.user.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payment.status, Payment.STATUS_PAID)
+        self.assertEqual(self.user.available_seconds, 1200)
+        self.assertEqual(
+            BalanceTransaction.objects.filter(payment=payment, type="topup").count(),
+            1,
+        )

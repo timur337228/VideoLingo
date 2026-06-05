@@ -7,11 +7,18 @@
   <section class="auth-layout">
     <div class="auth-copy">
       <div class="hero-tag">Оплата</div>
-      <h1>Оплата отправлена,<br><em>ждём подтверждение</em></h1>
-      <p>После подтверждения минуты автоматически появятся на балансе.</p>
+      {% if payment.status == payment.STATUS_PAID %}
+        <h1>Оплата подтверждена,<br><em>минуты уже начислены</em></h1>
+        <p>Баланс пополнен автоматически после подтверждения YooKassa.</p>
+      {% else %}
+        <h1>Оплата отправлена,<br><em>ждём подтверждение</em></h1>
+        <p>После подтверждения минуты автоматически появятся на балансе.</p>
+      {% endif %}
     </div>
     <div class="auth-card">
-      <div class="status-badge">Проверяем оплату</div>
+      <div class="status-badge">
+        {% if payment.status == payment.STATUS_PAID %}Оплачено{% else %}Проверяем оплату{% endif %}
+      </div>
       <h2 class="auth-title">{{ payment.amount_rub }} ₽</h2>
       <p class="auth-subtitle">Текущий статус: {{ payment.get_status_display }}</p>
       <div class="auth-actions">

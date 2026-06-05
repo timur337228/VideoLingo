@@ -26,7 +26,30 @@
         </div>
       </div>
       <div class="auth-inline-note">Минуты появятся на балансе после подтверждения платежа.</div>
+      {% if payment_error %}
+        <div class="auth-inline-note">{{ payment_error }}</div>
+      {% endif %}
       <div class="auth-actions">
+        {% if payment.status == payment.STATUS_PAID %}
+          <a class="btn-primary btn-block" href="{% url 'billing_success' payment.pk %}">Открыть статус оплаты</a>
+        {% elif existing_confirmation_url %}
+          <a class="btn-primary btn-block" href="{{ existing_confirmation_url }}">Продолжить оплату в YooKassa</a>
+        {% elif yookassa_enabled %}
+          <form method="post" action="{% url 'billing_start_payment' payment.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="method_type" value="bank_card">
+            <button type="submit" class="btn-primary btn-block">Оплатить картой</button>
+          </form>
+          <form method="post" action="{% url 'billing_start_payment' payment.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="method_type" value="sbp">
+            <button type="submit" class="btn-secondary btn-block">Оплатить через СБП</button>
+          </form>
+        {% else %}
+          <div class="auth-inline-note">
+            Оплата пока не настроена. Добавьте в `.env` переменные `YOOKASSA_SHOP_ID` и `YOOKASSA_SECRET_KEY`.
+          </div>
+        {% endif %}
         <a class="btn-secondary btn-block" href="{% url 'billing_dashboard' %}">Назад к балансу</a>
       </div>
     </div>

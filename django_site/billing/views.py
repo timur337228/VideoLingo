@@ -15,8 +15,11 @@ from .utils import (
     create_payment,
     get_package_discount_percent,
     get_package_rate_per_minute,
-    mark_payment_status,
+    get_provider_confirmation_url,
+    start_yookassa_payment,
+    sync_payment_with_provider,
 )
+from .yookassa import ALLOWED_PAYMENT_METHODS, YooKassaAPIError, YooKassaConfigurationError
 
 
 def _build_dashboard_context(request, *, custom_amount_value="", custom_payment_error=""):
@@ -113,20 +116,60 @@ def create_custom_payment_view(request):
 @login_required
 def payment_checkout(request, payment_id):
     payment = get_object_or_404(Payment, pk=payment_id, user=request.user)
+    payment = sync_payment_with_provider(payment)
     checkout_context = build_checkout_context(payment, request)
     return render(request, "billing/checkout.html", checkout_context)
 
 
 @login_required
+@require_POST
+def start_payment_view(request, payment_id):
+    payment = get_object_or_404(Payment, pk=payment_id, user=request.user)
+    method_type = (request.POST.get("method_type") or "").strip()
+
+    if method_type not in ALLOWED_PAYMENT_METHODS:
+        return HttpResponseBadRequest("Unsupported payment method")
+
+    try:
+        payment = start_yookassa_payment(payment, request, method_type)
+    except YooKassaConfigurationError as exc:
+        context = build_checkout_context(payment, request)
+        context["payment_error"] = str(exc)
+        return render(request, "billing/checkout.html", context, status=503)
+    except YooKassaAPIError as exc:
+        context = build_checkout_context(payment, request)
+        context["payment_error"] = (
+            "Не удалось создать платеж в YooKassa. Попробуйте еще раз. "
+            f"Техническая причина: {exc}"
+        )
+        return render(request, "billing/checkout.html", context, status=502)
+
+    confirmation_url = get_provider_confirmation_url(payment)
+    if payment.status == Payment.STATUS_PAID:
+        return redirect("billing_success", payment_id=payment.pk)
+    if not confirmation_url:
+        context = build_checkout_context(payment, request)
+        context["payment_error"] = "YooKassa не вернула ссылку на оплату."
+        return render(request, "billing/checkout.html", context, status=502)
+    return redirect(confirmation_url)
+
+
+@login_required
 def payment_success(request, payment_id):
     payment = get_object_or_404(Payment, pk=payment_id, user=request.user)
+    payment = sync_payment_with_provider(payment)
+    if payment.status == Payment.STATUS_CANCELLED:
+        return redirect("billing_cancel", payment_id=payment.pk)
     return render(request, "billing/success.html", {"payment": payment})
 
 
 @login_required
 def payment_cancel(request, payment_id):
     payment = get_object_or_404(Payment, pk=payment_id, user=request.user)
-    if payment.status not in {Payment.STATUS_PAID, Payment.STATUS_FAILED}:
+    payment = sync_payment_with_provider(payment)
+    if payment.status == Payment.STATUS_PAID:
+        return redirect("billing_success", payment_id=payment.pk)
+    if payment.provider != "yookassa" and payment.status not in {Payment.STATUS_PAID, Payment.STATUS_FAILED}:
         payment.mark_cancelled()
     return render(request, "billing/cancel.html", {"payment": payment})
 
@@ -139,16 +182,23 @@ def payment_webhook(request):
     except (UnicodeDecodeError, json.JSONDecodeError):
         return HttpResponseBadRequest("Invalid JSON payload")
 
-    payment_id = payload.get("payment_id")
-    status = payload.get("status")
-    if not payment_id or not status:
-        return HttpResponseBadRequest("payment_id and status are required")
+    payment_object = payload.get("object") or {}
+    provider_payment_id = payment_object.get("id")
+    if not provider_payment_id:
+        return HttpResponseBadRequest("object.id is required")
 
-    payment = get_object_or_404(Payment, pk=payment_id)
-    mark_payment_status(
-        payment,
-        status=status,
-        provider_payment_id=payload.get("provider_payment_id", ""),
-        payload=payload,
-    )
+    payment = Payment.objects.filter(provider_payment_id=provider_payment_id).first()
+    if payment is None:
+        metadata = payment_object.get("metadata") or {}
+        payment_id = metadata.get("payment_id")
+        if payment_id:
+            payment = get_object_or_404(Payment, pk=payment_id)
+        else:
+            return HttpResponseBadRequest("Payment not found")
+
+    try:
+        payment = sync_payment_with_provider(payment, raise_errors=True)
+    except (YooKassaAPIError, YooKassaConfigurationError):
+        return JsonResponse({"ok": False, "error": "Unable to verify payment in YooKassa"}, status=502)
+
     return JsonResponse({"ok": True, "payment_status": payment.status})

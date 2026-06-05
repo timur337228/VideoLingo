@@ -1,11 +1,14 @@
 import math
 from decimal import Decimal, ROUND_DOWN
 
+from django.conf import settings
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 
 from .models import BalanceTransaction, BillingSettings, Payment, PaymentPackage
+from .yookassa import create_payment as create_yookassa_payment
+from .yookassa import get_payment as get_yookassa_payment
 
 
 class InsufficientBalanceError(ValueError):
@@ -237,22 +240,25 @@ def create_custom_payment(user, amount_rub: Decimal, provider="stub"):
     return payment
 
 
+def build_absolute_url(request, url_name: str, **kwargs) -> str:
+    path = reverse(url_name, kwargs=kwargs)
+    if settings.APP_BASE_URL:
+        return f"{settings.APP_BASE_URL}{path}"
+    return request.build_absolute_uri(path)
+
+
+def get_provider_confirmation_url(payment: Payment) -> str:
+    if payment.status != Payment.STATUS_PENDING:
+        return ""
+    confirmation = (payment.provider_payload or {}).get("confirmation", {})
+    return confirmation.get("confirmation_url", "")
+
+
 def build_checkout_context(payment: Payment, request):
     return {
         "payment": payment,
-        "gateway_payload": {
-            "payment_id": payment.pk,
-            "amount_rub": str(payment.amount_rub),
-            "description": payment.description,
-            "seconds_to_credit": payment.seconds_to_credit,
-            "success_url": request.build_absolute_uri(reverse("billing_success", kwargs={"payment_id": payment.pk})),
-            "cancel_url": request.build_absolute_uri(reverse("billing_cancel", kwargs={"payment_id": payment.pk})),
-            "webhook_url": request.build_absolute_uri(reverse("billing_webhook")),
-            "metadata": {
-                "payment_id": payment.pk,
-                "user_id": payment.user_id,
-            },
-        },
+        "yookassa_enabled": settings.YOOKASSA_ENABLED,
+        "existing_confirmation_url": get_provider_confirmation_url(payment),
     }
 
 
@@ -320,3 +326,61 @@ def mark_payment_status(payment: Payment, status: str, provider_payment_id="", p
     )
 
     return payment
+
+
+def sync_payment_from_provider_data(payment: Payment, provider_data: dict):
+    provider_status = provider_data.get("status", "pending")
+    provider_payment_id = provider_data.get("id", "") or payment.provider_payment_id
+    payment.provider = "yookassa"
+    payment.save(update_fields=["provider", "updated_at"])
+
+    if provider_status == "succeeded":
+        return mark_payment_paid(
+            payment,
+            provider_payment_id=provider_payment_id,
+            payload=provider_data,
+        )
+
+    if provider_status == "canceled":
+        local_status = Payment.STATUS_CANCELLED
+    else:
+        local_status = Payment.STATUS_PENDING
+
+    return mark_payment_status(
+        payment,
+        status=local_status,
+        provider_payment_id=provider_payment_id,
+        payload=provider_data,
+    )
+
+
+def start_yookassa_payment(payment: Payment, request, method_type: str):
+    if payment.status == Payment.STATUS_PAID:
+        return payment
+
+    existing_confirmation_url = get_provider_confirmation_url(payment)
+    if payment.provider == "yookassa" and payment.provider_payment_id and existing_confirmation_url:
+        return payment
+
+    provider_data = create_yookassa_payment(
+        payment=payment,
+        method_type=method_type,
+        return_url=build_absolute_url(request, "billing_success", payment_id=payment.pk),
+    )
+    payment.provider = "yookassa"
+    payment.save(update_fields=["provider", "updated_at"])
+    return sync_payment_from_provider_data(payment, provider_data)
+
+
+def sync_payment_with_provider(payment: Payment, *, raise_errors=False):
+    if payment.provider != "yookassa" or not payment.provider_payment_id:
+        return payment
+
+    try:
+        provider_data = get_yookassa_payment(payment.provider_payment_id)
+    except Exception:
+        if raise_errors:
+            raise
+        return payment
+
+    return sync_payment_from_provider_data(payment, provider_data)
