@@ -18,15 +18,11 @@
         <div class="billing-custom-copy">
           <div class="section-tag">Своя сумма</div>
           <h2 class="auth-title">Пополнить на удобную сумму</h2>
-          <p class="auth-subtitle">Введите сумму в рублях.</p>
+          <p class="auth-subtitle">Если цена превысит указанную цену, скидка применится автоматически.</p>
           <div class="status-summary">
             <div class="status-summary-row">
               <span>Текущий баланс</span>
               <span>{{ user.available_minutes }} мин.</span>
-            </div>
-            <div class="status-summary-row">
-              <span>Базовая цена</span>
-              <span>{{ billing_settings.price_rub_per_minute }} ₽ / мин.</span>
             </div>
             {% if packages %}
               <div class="billing-price-list">

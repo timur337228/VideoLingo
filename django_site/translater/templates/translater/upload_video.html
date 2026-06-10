@@ -45,8 +45,18 @@
 
         <div class="form-group">
           <label class="form-label" for="{{ form.file.id_for_label }}">Файл видео</label>
-          {{ form.file }}
-          <p class="form-hint">Один файл за раз.</p>
+          <label class="upload-dropzone" for="{{ form.file.id_for_label }}" id="upload-dropzone">
+            <span class="upload-dropzone-icon" aria-hidden="true">+</span>
+            <span class="upload-dropzone-copy">
+              <strong>Перетащите видео сюда</strong>
+              <span>или нажмите, чтобы выбрать файл</span>
+            </span>
+            <span class="upload-dropzone-meta" id="upload-file-name">Файл пока не выбран</span>
+          </label>
+          <div class="upload-input-hidden">
+            {{ form.file }}
+          </div>
+          <p class="form-hint">Один файл за раз. Поддерживаются популярные видеоформаты.</p>
           {% for error in form.file.errors %}
             <p class="field-error">{{ error }}</p>
           {% endfor %}
@@ -63,7 +73,7 @@
         <div class="form-group">
           <label class="form-label" for="{{ form.volume.id_for_label }}">Громкость фона: <span id="volume-value">{{ form.volume.value|default:12 }}</span>%</label>
           {{ form.volume }}
-          <p class="form-hint">Ниже значение, сильнее слышен перевод.</p>
+          <p class="form-hint">Выше значение, сильнее слышны воновые звуки и музыка.</p>
           {% for error in form.volume.errors %}
             <p class="field-error">{{ error }}</p>
           {% endfor %}
@@ -100,8 +110,44 @@
   </section>
 
   <script>
+    const fileInput = document.getElementById("{{ form.file.id_for_label }}");
+    const dropzone = document.getElementById("upload-dropzone");
+    const fileName = document.getElementById("upload-file-name");
     const volumeInput = document.getElementById("{{ form.volume.id_for_label }}");
     const volumeValue = document.getElementById("volume-value");
+
+    if (fileInput && dropzone && fileName) {
+      const syncFileName = () => {
+        const selectedFile = fileInput.files && fileInput.files[0];
+        fileName.textContent = selectedFile ? selectedFile.name : "Файл пока не выбран";
+      };
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropzone.classList.add("is-dragover");
+        });
+      });
+
+      ["dragleave", "dragend", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropzone.classList.remove("is-dragover");
+        });
+      });
+
+      dropzone.addEventListener("drop", (event) => {
+        const droppedFiles = event.dataTransfer && event.dataTransfer.files;
+        if (!droppedFiles || !droppedFiles.length) {
+          return;
+        }
+        fileInput.files = droppedFiles;
+        syncFileName();
+      });
+
+      fileInput.addEventListener("change", syncFileName);
+      syncFileName();
+    }
 
     if (volumeInput && volumeValue) {
       const syncVolume = () => {
