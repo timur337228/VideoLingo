@@ -36,6 +36,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 a {
@@ -46,6 +47,11 @@ a {
 button,
 input {
   font: inherit;
+}
+
+img,
+video {
+  max-width: 100%;
 }
 
 .site-main {
@@ -1416,6 +1422,16 @@ input {
     gap: 40px;
   }
 
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-actions .btn-primary,
+  .hero-actions .btn-ghost {
+    width: 100%;
+    justify-content: center;
+  }
+
   .videos-grid {
     grid-template-columns: 1fr;
   }
@@ -1440,6 +1456,18 @@ input {
   .billing-custom-form {
     max-width: none;
     justify-self: stretch;
+  }
+
+  .auth-layout-split .auth-card {
+    justify-self: stretch;
+  }
+
+  .video-status-head,
+  .video-preview-top,
+  .status-summary-row,
+  .billing-price-row,
+  .billing-row {
+    gap: 10px;
   }
 
   .float-chip {
@@ -1475,23 +1503,102 @@ input {
 }
 
 @media (max-width: 720px) {
+  .auth-page .site-main {
+    align-items: flex-start;
+  }
+
   .site-nav {
     align-items: flex-start;
     flex-direction: column;
+    gap: 16px;
   }
 
   .videos-hero {
     align-items: flex-start;
     flex-direction: column;
+    margin-bottom: 28px;
   }
 
   .nav-links {
-    justify-content: flex-start;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .nav-links li {
+    width: 100%;
+    display: flex;
+  }
+
+  .nav-links a,
+  .nav-link-button,
+  .nav-pill {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.76);
+    padding: 10px 14px;
+  }
+
+  .nav-logout-form {
+    width: 100%;
+  }
+
+  .nav-cta {
+    width: 100%;
+    justify-content: center;
   }
 
   .hero {
     padding-top: 68px;
     padding-bottom: 72px;
+    gap: 28px;
+  }
+
+  .hero h1,
+  .auth-copy h1 {
+    margin: 18px 0 16px;
+    font-size: clamp(34px, 10vw, 46px);
+  }
+
+  .hero p,
+  .auth-copy p,
+  .videos-subtitle {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .float-chip {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .video-meta,
+  .video-status-head,
+  .video-preview-top,
+  .status-summary-row,
+  .billing-price-row,
+  .billing-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .lang-badge,
+  .billing-row-status,
+  .status-summary-row span:last-child,
+  .billing-price-row span:last-child {
+    text-align: left;
+    white-space: normal;
+  }
+
+  .video-preview-title {
+    font-size: 20px;
   }
 
   .billing-grid {
@@ -1521,6 +1628,48 @@ input {
     padding: 22px;
   }
 
+  .auth-layout,
+  .auth-layout-single,
+  .auth-layout-split {
+    gap: 28px;
+  }
+
+  .auth-layout-single {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card,
+  .auth-panel,
+  .auth-layout-single .auth-card,
+  .auth-layout-single .auth-panel {
+    max-width: none;
+  }
+
+  .auth-copy {
+    max-width: none;
+  }
+
+  .upload-dropzone {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+
+  .upload-dropzone-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 26px;
+  }
+
+  .form-input-large {
+    font-size: 18px;
+  }
+
+  .videos-hero .btn-primary,
+  .auth-actions .btn-primary,
+  .auth-actions .btn-secondary {
+    width: 100%;
+  }
+
   .stat {
     padding: 28px;
   }
@@ -1528,6 +1677,46 @@ input {
   .langs-section {
     padding-top: 64px;
     padding-bottom: 64px;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-nav,
+  .site-footer,
+  .hero,
+  .section,
+  .cta-section,
+  .auth-layout,
+  .langs-section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .auth-card,
+  .video-card,
+  .auth-note-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .section-title {
+    margin-bottom: 34px;
+  }
+
+  .video-thumb,
+  .result-video {
+    border-radius: 14px;
+  }
+
+  .artifact-link,
+  .checkbox-option,
+  .billing-row {
+    padding: 12px 13px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 14px 18px;
   }
 }
 .btn-primary.is-disabled {
