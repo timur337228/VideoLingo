@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from .models import User
+from .models import PendingRegistration, User
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -149,3 +149,31 @@ class AuthSecurityTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Слишком много попыток входа. Попробуйте позже.")
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class RegistrationLegalTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def test_register_requires_legal_acceptance(self):
+        response = self.client.post(
+            reverse("register"),
+            {"email": "new@example.com"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Нужно принять оферту")
+        self.assertFalse(PendingRegistration.objects.filter(email="new@example.com").exists())
+
+    def test_register_stores_legal_acceptance_metadata(self):
+        response = self.client.post(
+            reverse("register"),
+            {"email": "new@example.com", "accept_legal": "on"},
+        )
+
+        self.assertRedirects(response, reverse("verify_email_sent"))
+        pending = PendingRegistration.objects.get(email="new@example.com")
+        self.assertIsNotNone(pending.offer_accepted_at)
+        self.assertIsNotNone(pending.privacy_policy_accepted_at)
+        self.assertTrue(pending.legal_docs_version)

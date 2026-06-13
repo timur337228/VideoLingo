@@ -18,11 +18,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from .views import preview
+from .views import contacts, offer, payments_refunds, preview, privacy_policy
 
 urlpatterns = [
     path("", preview, name="home"),
     path("preview/", preview, name="preview"),
+    path("offer/", offer, name="offer"),
+    path("privacy-policy/", privacy_policy, name="privacy_policy"),
+    path("contacts/", contacts, name="contacts"),
+    path("payments-refunds/", payments_refunds, name="payments_refunds"),
     path("admin/", admin.site.urls),
     path("auth/", include("accounts.urls")),
     path("billing/", include("billing.urls")),

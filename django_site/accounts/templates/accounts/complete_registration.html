@@ -43,6 +43,11 @@
 
         <button type="submit" class="btn-primary btn-block">Завершить регистрацию</button>
       </form>
+      <p class="auth-legal-note">
+        Принятие <a href="{% url 'offer' %}">оферты</a> и
+        <a href="{% url 'privacy_policy' %}">политики обработки персональных данных</a>
+        уже зафиксировано на предыдущем шаге.
+      </p>
     </div>
   </section>
 {% endblock %}

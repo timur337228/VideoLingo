@@ -26,6 +26,10 @@
         </div>
       </div>
       <div class="auth-inline-note">Минуты появятся на балансе после подтверждения платежа.</div>
+      <div class="auth-inline-note">
+        Оплачивая заказ, вы подтверждаете согласие с <a href="{% url 'offer' %}">офертой</a> и
+        <a href="{% url 'payments_refunds' %}">правилами оплаты и возвратов</a>.
+      </div>
       {% if payment_error %}
         <div class="auth-inline-note">{{ payment_error }}</div>
       {% endif %}

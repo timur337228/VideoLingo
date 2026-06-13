@@ -23,7 +23,7 @@ def google_associate_by_email(backend, details, user=None, **kwargs):
 def google_create_user(backend, details, user=None, **kwargs):
     if user:
         return {"user": user}
-    
+
     email = details["email"]
     User = get_user_model()
     user = User.objects.create_user(email=email, password=None, is_google_auth=True)

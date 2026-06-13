@@ -104,6 +104,46 @@
     </div>
   </section>
 
+  <section class="section" id="pricing">
+    <div class="section-tag">Тарифы</div>
+    <h2 class="section-title">Стоимость <em>видна до оплаты</em></h2>
+    <p class="videos-subtitle">
+      Базовая цена: {{ base_rate_per_minute|floatformat:2 }} ₽ за минуту перевода.
+      Оплата на сайте принимается картой или через СБП.
+    </p>
+
+    <div class="billing-grid preview-pricing-grid">
+      {% for package in public_packages %}
+        <article class="video-card billing-card">
+          <div class="video-status-head">
+            <div>
+              <div class="video-title">{{ package.name }}</div>
+              <small>{{ package.minutes }} мин.{% if package.description %} · {{ package.description }}{% endif %}</small>
+              <p class="billing-rate-note">
+                {{ package.display_rate_per_minute|floatformat:2 }} ₽ / мин.
+                {% if package.display_discount_percent > 0 %}
+                  · скидка {{ package.display_discount_percent|floatformat:2 }}%
+                {% endif %}
+              </p>
+            </div>
+            <span class="lang-badge">{{ package.get_price_rub }} ₽</span>
+          </div>
+        </article>
+      {% empty %}
+        <article class="video-card billing-card">
+          <div class="video-status-head">
+            <div>
+              <div class="video-title">Перевод по базовому тарифу</div>
+              <small>Стоимость зависит от длительности видео.</small>
+              <p class="billing-rate-note">{{ base_rate_per_minute|floatformat:2 }} ₽ / мин.</p>
+            </div>
+            <span class="lang-badge">от {{ base_rate_per_minute|floatformat:2 }} ₽</span>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
   <section class="cta-section" id="preview-cta">
     <h2>Переведите видео<br><em>прямо сейчас</em></h2>
     <p>Загрузите видео, дождитесь результата и откройте готовый перевод.</p>

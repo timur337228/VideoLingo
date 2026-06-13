@@ -38,8 +38,27 @@
           {% endfor %}
         </div>
 
+        <label class="checkbox-option" for="{{ form.accept_legal.id_for_label }}">
+          {{ form.accept_legal }}
+          <span>
+            <strong>Принимаю условия сервиса</strong>
+            <span>
+              Я принимаю <a href="{% url 'offer' %}">публичную оферту</a>,
+              соглашаюсь с <a href="{% url 'privacy_policy' %}">политикой обработки персональных данных</a>
+              и подтверждаю, что ознакомился со страницей <a href="{% url 'payments_refunds' %}">оплаты и возвратов</a>.
+            </span>
+          </span>
+        </label>
+        {% for error in form.accept_legal.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+
         <button type="submit" class="btn-primary btn-block">Далее</button>
       </form>
+      <p class="auth-legal-note">
+        Продолжая, вы принимаете <a href="{% url 'offer' %}">условия оферты</a> и соглашаетесь с
+        <a href="{% url 'privacy_policy' %}">политикой обработки персональных данных</a>.
+      </p>
       <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path|urlencode }}" class="btn-secondary btn-block auth-external-action auth-google-btn">
         <svg class="auth-provider-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="#4285F4" d="M21.805 12.23c0-.69-.062-1.353-.176-1.99H12v3.768h5.502c-.237 1.276-.956 2.357-2.037 3.08v2.557h3.294c1.928-1.775 3.046-4.39 3.046-7.415Z"/>

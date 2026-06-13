@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Контакты | {{ legal_service_name }}{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+  <section class="section legal-page">
+    <div class="legal-header">
+      <div class="hero-tag">Юридическая информация</div>
+      <h1 class="section-title">Контакты <em>и реквизиты</em></h1>
+      <p class="videos-subtitle">Страница для связи по услугам, оплате, возвратам и претензиям.</p>
+    </div>
+
+    <article class="auth-card legal-card">
+      <div class="legal-contact-grid">
+        <div class="status-summary">
+          <div class="status-summary-row">
+            <span>Сервис</span>
+            <span>{{ legal_service_name }}</span>
+          </div>
+          <div class="status-summary-row">
+            <span>Исполнитель</span>
+            <span>{% if legal_owner_name %}{{ legal_owner_name }}{% else %}[укажите ФИО]{% endif %}</span>
+          </div>
+          <div class="status-summary-row">
+            <span>Статус</span>
+            <span>{{ legal_status_label }}</span>
+          </div>
+          {% if legal_inn %}
+            <div class="status-summary-row">
+              <span>ИНН</span>
+              <span>{{ legal_inn }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="status-summary">
+          {% if legal_contact_email %}
+            <div class="status-summary-row">
+              <span>Email</span>
+              <span><a href="mailto:{{ legal_contact_email }}">{{ legal_contact_email }}</a></span>
+            </div>
+          {% endif %}
+          {% if legal_contact_phone %}
+            <div class="status-summary-row">
+              <span>Телефон</span>
+              <span><a href="tel:{{ legal_contact_phone }}">{{ legal_contact_phone }}</a></span>
+            </div>
+          {% endif %}
+          {% if legal_contact_address %}
+            <div class="status-summary-row">
+              <span>Адрес для корреспонденции</span>
+              <span>{{ legal_contact_address }}</span>
+            </div>
+          {% endif %}
+          {% if legal_refund_email %}
+            <div class="status-summary-row">
+              <span>Возвраты и претензии</span>
+              <span><a href="mailto:{{ legal_refund_email }}">{{ legal_refund_email }}</a></span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="auth-inline-note">
+        Перед обращением по оплате или возврату укажите email аккаунта, дату платежа, сумму и, по возможности, идентификатор платежа.
+      </div>
+    </article>
+  </section>
+{% endblock %}

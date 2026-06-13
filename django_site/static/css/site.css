@@ -746,6 +746,50 @@ video {
   width: 100%;
 }
 
+.legal-page {
+  width: 100%;
+}
+
+.legal-header {
+  margin-bottom: 28px;
+}
+
+.legal-card {
+  display: grid;
+  gap: 20px;
+}
+
+.legal-prose {
+  display: grid;
+  gap: 16px;
+}
+
+.legal-prose h2 {
+  margin: 8px 0 0;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.legal-prose p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.legal-prose a,
+.legal-contact-grid a,
+.auth-legal-note a,
+.footer-legal-line a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.legal-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
 .billing-grid,
 .billing-columns {
   display: grid;
@@ -756,6 +800,11 @@ video {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 28px;
   align-items: stretch;
+}
+
+.preview-pricing-grid {
+  margin-top: 24px;
+  margin-bottom: 0;
 }
 
 .billing-grid > * {
@@ -1180,6 +1229,13 @@ video {
   color: var(--muted);
 }
 
+.auth-legal-note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
 .auth-inline-note {
   padding: 14px 16px;
   border: 1px solid rgba(45, 90, 61, 0.12);
@@ -1188,6 +1244,15 @@ video {
   color: var(--text);
   font-size: 13px;
   line-height: 1.65;
+}
+
+.auth-inline-note a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.billing-legal-note {
+  margin-bottom: 20px;
 }
 
 .auth-email-pill,
@@ -1394,6 +1459,11 @@ video {
   border-top: 1px solid var(--border);
 }
 
+.footer-meta {
+  display: grid;
+  gap: 6px;
+}
+
 .footer-logo {
   font-size: 18px;
 }
@@ -1402,6 +1472,11 @@ video {
 .footer-links a {
   font-size: 12px;
   color: var(--muted);
+}
+
+.footer-legal-line {
+  max-width: 620px;
+  line-height: 1.7;
 }
 
 @media (max-width: 980px) {
@@ -1456,6 +1531,10 @@ video {
   .billing-custom-form {
     max-width: none;
     justify-self: stretch;
+  }
+
+  .legal-contact-grid {
+    grid-template-columns: 1fr;
   }
 
   .auth-layout-split .auth-card {
@@ -1599,6 +1678,10 @@ video {
 
   .video-preview-title {
     font-size: 20px;
+  }
+
+  .legal-prose h2 {
+    font-size: 18px;
   }
 
   .billing-grid {

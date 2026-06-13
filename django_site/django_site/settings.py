@@ -104,6 +104,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django_site.context_processors.legal_context",
             ],
         },
     },
@@ -203,6 +204,19 @@ APP_BASE_URL = os.getenv("APP_BASE_URL", "").rstrip("/")
 YOOKASSA_SHOP_ID = os.getenv("YOOKASSA_SHOP_ID", "").strip()
 YOOKASSA_SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY", "").strip()
 YOOKASSA_ENABLED = bool(YOOKASSA_SHOP_ID and YOOKASSA_SECRET_KEY)
+
+LEGAL_SERVICE_NAME = os.getenv("LEGAL_SERVICE_NAME", "MixxTranslate").strip()
+LEGAL_OWNER_NAME = os.getenv("LEGAL_OWNER_NAME", "").strip()
+LEGAL_STATUS_LABEL = os.getenv(
+    "LEGAL_STATUS_LABEL",
+    "Плательщик налога на профессиональный доход (самозанятый)",
+).strip()
+LEGAL_INN = os.getenv("LEGAL_INN", "").strip()
+LEGAL_CONTACT_EMAIL = os.getenv("LEGAL_CONTACT_EMAIL", DEFAULT_FROM_EMAIL).strip()
+LEGAL_CONTACT_PHONE = os.getenv("LEGAL_CONTACT_PHONE", "").strip()
+LEGAL_CONTACT_ADDRESS = os.getenv("LEGAL_CONTACT_ADDRESS", "").strip()
+LEGAL_REFUND_EMAIL = os.getenv("LEGAL_REFUND_EMAIL", LEGAL_CONTACT_EMAIL).strip()
+LEGAL_DOCS_EFFECTIVE_DATE = os.getenv("LEGAL_DOCS_EFFECTIVE_DATE", "13.06.2026").strip()
 
 LOGIN_RATE_LIMIT_ATTEMPTS = int(os.getenv("LOGIN_RATE_LIMIT_ATTEMPTS", 5))
 LOGIN_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("LOGIN_RATE_LIMIT_WINDOW_SECONDS", 900))

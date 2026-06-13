@@ -32,6 +32,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_google_auth = models.BooleanField(default=False)
     available_seconds = models.PositiveIntegerField(default=0)
+    offer_accepted_at = models.DateTimeField(null=True, blank=True)
+    privacy_policy_accepted_at = models.DateTimeField(null=True, blank=True)
+    legal_docs_version = models.CharField(max_length=32, blank=True)
+    registration_ip = models.GenericIPAddressField(null=True, blank=True)
     
 
     USERNAME_FIELD = "email"
@@ -50,6 +54,10 @@ class PendingRegistration(models.Model):
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(default=pending_expiration)
+    offer_accepted_at = models.DateTimeField(null=True, blank=True)
+    privacy_policy_accepted_at = models.DateTimeField(null=True, blank=True)
+    legal_docs_version = models.CharField(max_length=32, blank=True)
+    registration_ip = models.GenericIPAddressField(null=True, blank=True)
 
 
 

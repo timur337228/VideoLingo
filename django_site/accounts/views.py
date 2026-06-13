@@ -72,11 +72,16 @@ def register(request):
                 _throttle_hit(ip_key, settings.REGISTRATION_RATE_LIMIT_WINDOW_SECONDS)
                 _throttle_hit(session_key, settings.REGISTRATION_RATE_LIMIT_WINDOW_SECONDS)
                 if not User.objects.filter(email__iexact=email).exists():
+                    accepted_at = timezone.now()
                     pending, _ = PendingRegistration.objects.update_or_create(
                         email=email,
                         defaults={
                             "token": uuid.uuid4(),
                             "expires_at": timezone.now() + timedelta(hours=24),
+                            "offer_accepted_at": accepted_at,
+                            "privacy_policy_accepted_at": accepted_at,
+                            "legal_docs_version": settings.LEGAL_DOCS_EFFECTIVE_DATE,
+                            "registration_ip": get_client_ip(request) or None,
                         },
                     )
                     send_verification_email(request, pending)
@@ -222,6 +227,10 @@ def complete_registration(request):
             user = form.save(commit=False)
             user.email = pending.email
             user.is_active = True
+            user.offer_accepted_at = pending.offer_accepted_at
+            user.privacy_policy_accepted_at = pending.privacy_policy_accepted_at
+            user.legal_docs_version = pending.legal_docs_version
+            user.registration_ip = pending.registration_ip
             try:
                 with transaction.atomic():
                     user.save()

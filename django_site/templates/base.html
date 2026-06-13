@@ -39,11 +39,25 @@
   </main>
 
   <footer class="site-footer">
-    <a class="footer-logo" href="{% url 'home' %}">Mixx<span>Translate</span></a>
-    <p>© {% now "Y" %} MixxTranslate. Перевод видео в одном окне.</p>
+    <div class="footer-meta">
+      <a class="footer-logo" href="{% url 'home' %}">Mixx<span>Translate</span></a>
+      <p>© {% now "Y" %} MixxTranslate. Перевод видео в одном окне.</p>
+      {% if legal_owner_name or legal_inn or legal_contact_email %}
+        <p class="footer-legal-line">
+          {% if legal_owner_name %}{{ legal_owner_name }}{% else %}[укажите ФИО]{% endif %}
+          {% if legal_status_label %} · {{ legal_status_label }}{% endif %}
+          {% if legal_inn %} · ИНН {{ legal_inn }}{% endif %}
+          {% if legal_contact_email %} · {{ legal_contact_email }}{% endif %}
+        </p>
+      {% endif %}
+    </div>
     <ul class="footer-links">
       <li><a href="{% url 'home' %}#how-it-works">Как это работает</a></li>
       <li><a href="{% url 'home' %}#languages">Языки</a></li>
+      <li><a href="{% url 'offer' %}">Оферта</a></li>
+      <li><a href="{% url 'payments_refunds' %}">Оплата и возвраты</a></li>
+      <li><a href="{% url 'privacy_policy' %}">Политика ПД</a></li>
+      <li><a href="{% url 'contacts' %}">Контакты</a></li>
     </ul>
   </footer>
 </body>

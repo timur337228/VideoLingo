@@ -10,7 +10,12 @@ class StyledFieldsMixin:
 
     def apply_styles(self):
         for name, field in self.fields.items():
-            field.widget.attrs["class"] = "form-input"
+            if isinstance(field.widget, forms.HiddenInput):
+                continue
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "checkbox-input"
+            else:
+                field.widget.attrs["class"] = "form-input"
             placeholder = self.field_placeholders.get(name)
             if placeholder:
                 field.widget.attrs["placeholder"] = placeholder
@@ -18,6 +23,11 @@ class StyledFieldsMixin:
 
 class StartRegistrationForm(StyledFieldsMixin, forms.Form):
     email = forms.EmailField(label="Email")
+    accept_legal = forms.BooleanField(
+        label="",
+        required=True,
+        error_messages={"required": "Нужно принять оферту и политику обработки персональных данных."},
+    )
 
     field_placeholders = {
         "email": "you@example.com",
