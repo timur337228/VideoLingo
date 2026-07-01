@@ -239,7 +239,11 @@ def complete_registration(request):
                 form.add_error(None, "Аккаунт с таким email уже был создан.")
             else:
                 request.session.pop("verified_registration_token", None)
-                login(request, user)
+                login(
+                    request,
+                    user,
+                    backend="django.contrib.auth.backends.ModelBackend",
+                )
                 return redirect("home")
     else:
         form = CompleteRegistrationForm()

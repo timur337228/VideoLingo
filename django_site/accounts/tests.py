@@ -3,6 +3,7 @@ from django.core import mail
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
@@ -177,3 +178,26 @@ class RegistrationLegalTests(TestCase):
         self.assertIsNotNone(pending.offer_accepted_at)
         self.assertIsNotNone(pending.privacy_policy_accepted_at)
         self.assertTrue(pending.legal_docs_version)
+
+    def test_complete_registration_logs_in_user_with_multiple_backends(self):
+        pending = PendingRegistration.objects.create(
+            email="new@example.com",
+            offer_accepted_at=timezone.now(),
+            privacy_policy_accepted_at=timezone.now(),
+            legal_docs_version="13.06.2026",
+        )
+        session = self.client.session
+        session["verified_registration_token"] = str(pending.token)
+        session.save()
+
+        response = self.client.post(
+            reverse("complete_registration"),
+            {
+                "password1": "StrongPassword123!",
+                "password2": "StrongPassword123!",
+            },
+        )
+
+        self.assertRedirects(response, reverse("home"))
+        self.assertTrue(User.objects.filter(email="new@example.com").exists())
+        self.assertIn("_auth_user_id", self.client.session)

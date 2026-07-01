@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}MixxTranslate | Переводчик видео{% endblock %}
+{% block title %}MixxTranslate — переводчик видео онлайн{% endblock %}
+{% block meta_description %}Переводите видео онлайн бесплатно. Загрузите файл, выберите язык — получите готовое видео с переводом.{% endblock %}
+{% block meta_keywords %}переводчик видео, перевести видео онлайн, видео перевод, mixxtranslate{% endblock %}
 
 {% block content %}
   <section class="hero">
@@ -9,6 +11,7 @@
       <div class="hero-tag">AI · Перевод видео</div>
       <h1>Переводите видео<br><em>без лишних шагов</em></h1>
       <p>Загрузите файл, выберите язык и получите готовое видео в одном понятном интерфейсе.</p>
+      <p class="videos-subtitle">Переводчик видео онлайн — загрузите видео, выберите язык и получите перевод за минуты.</p>
       <div class="hero-actions">
         {% if user.is_authenticated %}
           <a class="btn-primary" href="{% url 'upload_video' %}">Начать перевод</a>
@@ -90,17 +93,29 @@
   </section>
 
   <section class="langs-section" id="languages">
-    <h2 class="langs-title">8 языков</h2>
+    <h2 class="langs-title">{{ available_languages|length }} языков</h2>
     <p class="langs-sub">Все самые популярные и широко используемые языки мира.</p>
     <div class="lang-pills">
-      <span class="lang-pill active">English</span>
-      <span class="lang-pill active">Русский</span>
-      <span class="lang-pill active">Français</span>
-      <span class="lang-pill active">Deutsch</span>
-      <span class="lang-pill active">Italiano</span>
-      <span class="lang-pill active">Español</span>
-      <span class="lang-pill active">日本語</span>
-      <span class="lang-pill active">中文</span>
+      {% for language in available_languages %}
+        <span class="lang-pill active">{{ language.native_name }}</span>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section" id="language-pairs">
+    <div class="section-tag">Популярные пары</div>
+    <h2 class="section-title">Популярные направления <em>перевода</em></h2>
+    <p class="videos-subtitle">
+      Откройте нужную языковую пару и сразу переходите к переводу видео без лишнего поиска по сайту.
+    </p>
+    <div class="pair-links-grid">
+      {% for pair in featured_language_pairs %}
+        <a class="pair-link-card" href="{% url 'language_pair' pair.source.slug pair.target.slug %}">
+          <span class="pair-link-kicker">Направление перевода</span>
+          <strong>{{ pair.title }}</strong>
+          <span>{{ pair.route_label }}</span>
+        </a>
+      {% endfor %}
     </div>
   </section>
 
@@ -152,5 +167,23 @@
     {% else %}
       <a class="btn-primary btn-large" href="{% url 'register' %}">Создать аккаунт</a>
     {% endif %}
+  </section>
+
+  <section class="section faq-section" id="faq">
+    <div class="section-tag">FAQ</div>
+    <h2 class="section-title">Частые вопросы <em>о переводе видео</em></h2>
+    <div class="faq-list">
+      {% for item in faq_items %}
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>{{ item.question }}</span>
+            <span class="faq-arrow" aria-hidden="true">+</span>
+          </summary>
+          <div class="faq-answer">
+            <p>{{ item.answer }}</p>
+          </div>
+        </details>
+      {% endfor %}
+    </div>
   </section>
 {% endblock %}

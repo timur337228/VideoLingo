@@ -19,7 +19,6 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = os.path.join(BASE_DIR.parent, 'output')
 UPLOADS_DIR = os.path.join(BASE_DIR.parent, 'uploads')
-API_BASE_URL = "http://127.0.0.1:8001"
 
 load_dotenv(BASE_DIR / ".env")
 
@@ -72,6 +71,7 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.sitemaps",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
@@ -172,6 +172,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "email",
     "profile",
 ]
+GOOGLE_AUTH_ENABLED = env_bool(
+    "GOOGLE_AUTH_ENABLED",
+    bool(SOCIAL_AUTH_GOOGLE_OAUTH2_KEY and SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET),
+)
 SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     "prompt": "select_account",
 }
@@ -199,8 +203,10 @@ AUTH_USER_MODEL = "accounts.User"
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 APP_BASE_URL = os.getenv("APP_BASE_URL", "").rstrip("/")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8001").rstrip("/")
 YOOKASSA_SHOP_ID = os.getenv("YOOKASSA_SHOP_ID", "").strip()
 YOOKASSA_SECRET_KEY = os.getenv("YOOKASSA_SECRET_KEY", "").strip()
 YOOKASSA_ENABLED = bool(YOOKASSA_SHOP_ID and YOOKASSA_SECRET_KEY)

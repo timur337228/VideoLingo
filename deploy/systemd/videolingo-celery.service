@@ -1,0 +1,14 @@
+[Unit]
+Description=VideoLingo Celery
+After=network.target redis-server.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/videolingo
+ExecStart=/srv/videolingo/.venv/bin/celery -A API.celery_app:celery worker -Q pipeline --loglevel=INFO --concurrency=1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

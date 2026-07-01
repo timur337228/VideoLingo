@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Перевести видео с {{ source_language.source_case }} на {{ target_language.target_case }} онлайн | MixxTranslate{% endblock %}
+{% block meta_description %}Переведите видео с {{ source_language.source_case }} на {{ target_language.target_case }} онлайн. Загрузите файл, выберите язык и получите готовое видео с переводом.{% endblock %}
+{% block meta_keywords %}перевести видео с {{ source_language.source_case }} на {{ target_language.target_case }}, перевод видео онлайн, переводчик видео, mixxtranslate{% endblock %}
+
+{% block content %}
+  <section class="section pair-page">
+    <div class="pair-hero">
+      <div class="pair-hero-copy">
+        <div class="hero-tag">Языковая пара</div>
+        <h1 class="section-title">{{ pair_heading }} <em>онлайн</em></h1>
+        <p class="videos-subtitle">{{ pair_description_text }}</p>
+        <div class="pair-route">{{ source_language.emoji }} {{ source_language.name_ru }} → {{ target_language.emoji }} {{ target_language.name_ru }}</div>
+      </div>
+
+      <aside class="pair-side-card">
+        <div class="section-tag">Коротко о сервисе</div>
+        <h2 class="auth-title">Что важно знать заранее</h2>
+        <div class="pair-summary-list">
+          <div class="pair-summary-row">
+            <span>Какие файлы подходят</span>
+            <strong>MP4, MOV, AVI, MKV, WEBM</strong>
+          </div>
+          <div class="pair-summary-row">
+            <span>Как оплатить</span>
+            <strong>Карта или СБП</strong>
+          </div>
+          <div class="pair-summary-row">
+            <span>Где забрать результат</span>
+            <strong>Готовое видео в аккаунте</strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="pair-overview-grid">
+      <article class="pair-info-card">
+        <div class="section-tag">Как это работает</div>
+        <h2 class="auth-title">Три простых шага</h2>
+        <div class="pair-mini-steps">
+          <div class="pair-mini-step">
+            <strong>1</strong>
+            <span>Загрузите исходное видео в личном кабинете.</span>
+          </div>
+          <div class="pair-mini-step">
+            <strong>2</strong>
+            <span>Выберите перевод на {{ target_language.target_case }} язык и дополнительные настройки.</span>
+          </div>
+          <div class="pair-mini-step">
+            <strong>3</strong>
+            <span>Дождитесь результата и откройте готовое видео со страницей статуса.</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="pair-info-card">
+        <div class="section-tag">Форматы и цена</div>
+        <h2 class="auth-title">Что важно знать</h2>
+        <p>Поддерживаются MP4, MOV, AVI, MKV, WEBM и M4V. MP4 - самый популярный формат для загрузки и просмотра.</p>
+        <p>{{ pair_pricing_text }}</p>
+        <p>Оплата принимается банковской картой или через СБП, а результат появляется в вашем аккаунте.</p>
+      </article>
+
+      <article class="pair-info-card">
+        <div class="section-tag">Для кого</div>
+        <h2 class="auth-title">Где это полезно</h2>
+        <p>Перевод подходит для интервью, лекций, блогов, обучающих роликов и контента для соцсетей.</p>
+        <p>Сервис помогает быстро подготовить перевод видео без ручной сборки проекта.</p>
+      </article>
+    </div>
+
+    <div class="pair-actions">
+      {% if user.is_authenticated %}
+        <a class="btn-primary" href="{% url 'upload_video' %}">Загрузить видео</a>
+      {% else %}
+        <a class="btn-primary" href="{% url 'register' %}">Создать аккаунт</a>
+      {% endif %}
+      <a class="btn-secondary" href="{% url 'home' %}#pricing">Посмотреть цены</a>
+    </div>
+
+    <section class="pair-related-section">
+      <div class="section-tag">Популярные пары</div>
+      <h2 class="section-title">Популярные направления <em>перевода</em></h2>
+      <div class="pair-links-grid">
+        {% for pair in related_language_pairs %}
+          <a class="pair-link-card" href="{% url 'language_pair' pair.source.slug pair.target.slug %}">
+            <span class="pair-link-kicker">Направление перевода</span>
+            <strong>{{ pair.title }}</strong>
+            <span>{{ pair.route_label }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="faq-section pair-faq-section">
+      <div class="section-tag">FAQ</div>
+      <h2 class="section-title">Частые вопросы <em>по этой паре</em></h2>
+      <div class="faq-list">
+        {% for item in faq_items %}
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>{{ item.question }}</span>
+              <span class="faq-arrow" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq-answer">
+              <p>{{ item.answer }}</p>
+            </div>
+          </details>
+        {% endfor %}
+      </div>
+    </section>
+  </section>
+{% endblock %}

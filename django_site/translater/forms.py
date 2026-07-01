@@ -1,18 +1,11 @@
 from django import forms
 from django.conf import settings
 
+from django_site.languages import LANGUAGE_CHOICES
+
 class UploadVideo(forms.Form):
     file = forms.FileField(label="Видео")
-    CHOICES_LANGUAGE = [
-    ('en', 'Английский 🇺🇸'),
-    ('ru', 'Русский 🇷🇺'),
-    ('fr', 'Французский 🇫🇷'),
-    ('de', 'Немецкий 🇩🇪'),
-    ('it', 'Итальянский 🇮🇹'),
-    ('es', 'Испанский 🇪🇸'),
-    ('ja', 'Японский 🇯🇵'),
-    ('zh', 'Китайский 🇨🇳'),
-]
+    CHOICES_LANGUAGE = LANGUAGE_CHOICES
     language = forms.ChoiceField(choices=CHOICES_LANGUAGE, label="Выберите язык")
     is_sub = forms.BooleanField(label='Вшить субтитры в итоговое видео', required=False)
     volume = forms.IntegerField(

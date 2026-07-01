@@ -4,7 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}MixxTranslate{% endblock %}</title>
+  <title>{% block title %}MixxTranslate — переводчик видео онлайн{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ seo_description|default:seo_default_description }}{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}переводчик видео, перевести видео онлайн, видео перевод, mixxtranslate{% endblock %}">
+  <meta name="robots" content="{{ seo_robots_override|default:seo_robots }}">
+  <link rel="canonical" href="{{ seo_canonical_url }}">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ legal_service_name|default:'MixxTranslate' }}">
+  <meta property="og:title" content="{{ seo_title|default:'MixxTranslate' }}">
+  <meta property="og:description" content="{{ seo_description|default:seo_default_description }}">
+  <meta property="og:url" content="{{ seo_canonical_url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ seo_title|default:'MixxTranslate' }}">
+  <meta name="twitter:description" content="{{ seo_description|default:seo_default_description }}">
+  <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">

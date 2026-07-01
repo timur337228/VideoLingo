@@ -1,0 +1,14 @@
+[Unit]
+Description=VideoLingo Django
+After=network.target postgresql.service redis-server.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/videolingo/django_site
+ExecStart=/srv/videolingo/.venv/bin/gunicorn django_site.wsgi:application --bind 127.0.0.1:8000 --workers 3 --timeout 120
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
