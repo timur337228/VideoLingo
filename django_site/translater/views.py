@@ -155,15 +155,25 @@ def translate_status(request, video_id):
             {"error": "Не удалось получить статус обработки. Попробуйте обновить страницу позже.", "video": video},
         )
 
-    video.status = payload.get("status", video.status)
+    remote_status = payload.get("status", video.status)
     result = payload.get("result")
-    if video.status == "SUCCESS" and isinstance(result, str):
+
+    if remote_status == "SUCCESS" and isinstance(result, str):
         video.path_to_s3 = result
+
+    # Once the result is already saved locally, do not allow temporary
+    # task-backend states like PENDING to make the UI look unfinished again.
+    if video.status == "SUCCESS" or video.path_to_s3:
+        display_status = "SUCCESS"
+    else:
+        display_status = remote_status
+
+    video.status = display_status
     video.save(update_fields=["status", "path_to_s3"])
 
-    if video.status == "SUCCESS":
+    if display_status == "SUCCESS":
         confirm_video_charge(video)
-    elif video.status in {"FAILURE", "REVOKED"}:
+    elif display_status in {"FAILURE", "REVOKED"}:
         refund_video_charge(video, "Возврат минут после неуспешной обработки видео")
 
     artifact_links = [
@@ -202,7 +212,8 @@ def translate_status(request, video_id):
 
     context = {
         "video": video,
-        "api_status": payload.get("status"),
+        "display_status": display_status,
+        "api_status": remote_status,
         "api_result": result,
         "video_playback_url": payload.get("video_url"),
         "artifact_links": artifact_links,

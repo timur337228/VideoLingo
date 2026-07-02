@@ -114,3 +114,100 @@ class UploadVideoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Размер файла превышает лимит")
         self.assertEqual(Video.objects.count(), 0)
+
+
+class TranslateStatusTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="status@example.com",
+            password="StrongPassword123!",
+            is_active=True,
+            available_seconds=600,
+        )
+        self.client.force_login(self.user)
+
+    @patch("translater.views.refund_video_charge")
+    @patch("translater.views.confirm_video_charge")
+    @patch("translater.views.requests.get")
+    def test_translate_status_marks_video_success_and_shows_result(
+        self,
+        mock_get,
+        mock_confirm,
+        mock_refund,
+    ):
+        video = Video.objects.create(
+            user=self.user,
+            status="PENDING",
+            task_id="celery-task-123",
+        )
+
+        mock_response = Mock()
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {
+            "status": "SUCCESS",
+            "result": "users/1/videos/1",
+            "video_url": "https://cdn.example.com/output_dub.mp4",
+            "src_url": None,
+            "trans_url": None,
+            "src_trans_url": None,
+            "trans_src_url": None,
+            "dub_audio_url": None,
+            "background_audio_url": None,
+        }
+        mock_get.return_value = mock_response
+
+        response = self.client.get(reverse("translate_status", kwargs={"video_id": video.pk}))
+        video.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(video.status, "SUCCESS")
+        self.assertEqual(video.path_to_s3, "users/1/videos/1")
+        self.assertContains(response, "Перевод готов")
+        self.assertContains(response, "Готовое видео")
+        self.assertNotContains(response, "Видео ещё готовится")
+        mock_confirm.assert_called_once_with(video)
+        mock_refund.assert_not_called()
+
+    @patch("translater.views.refund_video_charge")
+    @patch("translater.views.confirm_video_charge")
+    @patch("translater.views.requests.get")
+    def test_translate_status_keeps_successful_video_ready_when_api_returns_pending(
+        self,
+        mock_get,
+        mock_confirm,
+        mock_refund,
+    ):
+        video = Video.objects.create(
+            user=self.user,
+            status="SUCCESS",
+            task_id="celery-task-123",
+            path_to_s3="users/1/videos/1",
+        )
+
+        mock_response = Mock()
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {
+            "status": "PENDING",
+            "result": None,
+            "video_url": None,
+            "src_url": None,
+            "trans_url": None,
+            "src_trans_url": None,
+            "trans_src_url": None,
+            "dub_audio_url": None,
+            "background_audio_url": None,
+        }
+        mock_get.return_value = mock_response
+
+        response = self.client.get(reverse("translate_status", kwargs={"video_id": video.pk}))
+        video.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(video.status, "SUCCESS")
+        self.assertEqual(video.path_to_s3, "users/1/videos/1")
+        self.assertContains(response, "Перевод готов")
+        self.assertContains(response, "Готовое видео")
+        self.assertNotContains(response, "Видео ещё готовится")
+        self.assertNotContains(response, "window.location.reload()")
+        mock_confirm.assert_called_once_with(video)
+        mock_refund.assert_not_called()
